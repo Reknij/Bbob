@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Bbob.Plugin\Bbob.Plugin.csproj" />
+    <PluginFiles Include="./bin/Debug/net6.0/*"/>
+    <TargetFolder Include="../Bbob.Tests/bin/Debug/net6.0/plugins/TestPlugin2"/>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>MainPlugin</AssemblyName>
+  </PropertyGroup>
+
+  <Target Name="CopyPlugin" AfterTargets="AfterBuild">
+    <Copy SourceFiles="@(PluginFiles)" DestinationFolder="@(TargetFolder)"></Copy> 
+    <Copy SourceFiles="./plugin.json" DestinationFolder="@(TargetFolder)"></Copy> 
+  </Target>
+
+</Project>

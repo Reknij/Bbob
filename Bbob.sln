@@ -1,0 +1,63 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1576F11C-4493-4E0B-8D8E-D9B222F0E428}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bbob", "src\Bbob\Bbob.csproj", "{1304CA15-8CED-4661-9ADC-C2C14BE666D9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bbob.Test", "src\Bbob.Tests\Bbob.Tests.csproj", "{1B249790-362B-449F-A2C6-34C675F7D470}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bbob.TestPlugin1", "src\Bbob.TestPlugin1\Bbob.TestPlugin1.csproj", "{783AF445-EB92-4F22-AB74-6093A760ED1D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bbob.TestPlugin2", "src\Bbob.TestPlugin2\Bbob.TestPlugin2.csproj", "{4E1ACAAA-59FC-43F0-B278-95185677D73F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bbob.Shared", "src\Bbob.Shared\Bbob.Shared.csproj", "{DEB10BB7-C8F9-43DA-9757-9790E2713C18}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1304CA15-8CED-4661-9ADC-C2C14BE666D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1304CA15-8CED-4661-9ADC-C2C14BE666D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1304CA15-8CED-4661-9ADC-C2C14BE666D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1304CA15-8CED-4661-9ADC-C2C14BE666D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B249790-362B-449F-A2C6-34C675F7D470}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B249790-362B-449F-A2C6-34C675F7D470}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B249790-362B-449F-A2C6-34C675F7D470}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B249790-362B-449F-A2C6-34C675F7D470}.Release|Any CPU.Build.0 = Release|Any CPU
+		{117F973B-AD90-40F6-8728-7AE220B1F786}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{117F973B-AD90-40F6-8728-7AE220B1F786}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{117F973B-AD90-40F6-8728-7AE220B1F786}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{117F973B-AD90-40F6-8728-7AE220B1F786}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4EEEB0D-6450-441C-9888-E7660192B504}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4EEEB0D-6450-441C-9888-E7660192B504}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4EEEB0D-6450-441C-9888-E7660192B504}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4EEEB0D-6450-441C-9888-E7660192B504}.Release|Any CPU.Build.0 = Release|Any CPU
+		{783AF445-EB92-4F22-AB74-6093A760ED1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{783AF445-EB92-4F22-AB74-6093A760ED1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{783AF445-EB92-4F22-AB74-6093A760ED1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{783AF445-EB92-4F22-AB74-6093A760ED1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E1ACAAA-59FC-43F0-B278-95185677D73F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E1ACAAA-59FC-43F0-B278-95185677D73F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E1ACAAA-59FC-43F0-B278-95185677D73F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E1ACAAA-59FC-43F0-B278-95185677D73F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEB10BB7-C8F9-43DA-9757-9790E2713C18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEB10BB7-C8F9-43DA-9757-9790E2713C18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEB10BB7-C8F9-43DA-9757-9790E2713C18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEB10BB7-C8F9-43DA-9757-9790E2713C18}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1304CA15-8CED-4661-9ADC-C2C14BE666D9} = {1576F11C-4493-4E0B-8D8E-D9B222F0E428}
+		{1B249790-362B-449F-A2C6-34C675F7D470} = {1576F11C-4493-4E0B-8D8E-D9B222F0E428}
+		{783AF445-EB92-4F22-AB74-6093A760ED1D} = {1576F11C-4493-4E0B-8D8E-D9B222F0E428}
+		{4E1ACAAA-59FC-43F0-B278-95185677D73F} = {1576F11C-4493-4E0B-8D8E-D9B222F0E428}
+		{DEB10BB7-C8F9-43DA-9757-9790E2713C18} = {1576F11C-4493-4E0B-8D8E-D9B222F0E428}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="2.2.7" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.2.7" />
+    <PackageReference Include="coverlet.collector" Version="3.1.0" />
+    <Configs Include="./configs/*.config.json" />
+    <TestPlugin1 Include="$(SolutionDir)src/Bbob.TestPlugin1" />
+    <TestPlugin2 Include="$(SolutionDir)src/Bbob.TestPlugin2" />
+  </ItemGroup>
+
+  <Target Name="CopyCustomContent" AfterTargets="AfterBuild">
+    <Copy SourceFiles="@(Configs)" DestinationFolder="./bin/Debug/net6.0/configs"></Copy>
+    <Copy SourceFiles="./Test.md" DestinationFolder="./bin/Debug/net6.0/"></Copy>
+    <Copy SourceFiles="./Test.html" DestinationFolder="./bin/Debug/net6.0/"></Copy>
+  </Target>
+
+  <Target Name="RebuildTestPlugins" AfterTargets="AfterBuild">
+    <Exec Command="dotnet build @(TestPlugin1)" />
+    <Exec Command="echo Rebuild TestPlugin1 done.." />
+    <Exec Command="dotnet build @(TestPlugin2)" />
+    <Exec Command="echo Rebuild TestPlugin2 done.." />
+    <Exec Command="dotnet build @(TestPlugin2)" />
+  </Target>
+
+  <ItemGroup>
+    <ProjectReference Include="../Bbob/Bbob.csproj" />
+    <ProjectReference Include="..\Bbob.Plugin\Bbob.Plugin.csproj" />
+    <ProjectReference Include="..\Bbob.Shared\Bbob.Shared.csproj" />
+  </ItemGroup>
+
+</Project>
