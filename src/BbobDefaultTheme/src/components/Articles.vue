@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Ref, ref, watch } from 'vue';
-import { onBeforeRouteLeave } from 'vue-router';
+import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
 import Bbob, { LinkInfo } from '../../../Bbob/JSApi/Bbob';
 import { scrollToDownEventRegist, scrollToDownEventUnRegist } from '../composition/functionsRegister';
 
@@ -48,9 +48,14 @@ const load = () => {
     })
     }
 }
-let indexEvent = scrollToDownEventRegist(load);
+let indexEvent = -1;
+onBeforeRouteUpdate(()=>{
+    indexEvent = scrollToDownEventRegist(load)
+})
 onBeforeRouteLeave(()=>{
-    scrollToDownEventUnRegist(indexEvent);
+    if (indexEvent != -1){
+        scrollToDownEventUnRegist(indexEvent);
+    }
 })
 </script>
 
