@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Ref, ref, watch } from 'vue';
-import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
+import { onBeforeMount, onBeforeUnmount, Ref, ref, watch } from 'vue';
+import { onBeforeRouteLeave, onBeforeRouteUpdate, useRouter } from 'vue-router';
 import Bbob, { LinkInfo } from '../../../Bbob/JSApi/Bbob';
 import { scrollToDownEventRegist, scrollToDownEventUnRegist } from '../composition/functionsRegister';
 
@@ -18,7 +18,7 @@ const props = defineProps({
         default: false
     }
 })
-
+let router = useRouter();
 let mainLinks: Ref<any[]> = ref([]);
 if (props.defineSource) {
     watch(() => props.source, () => mainLinks.value = props.source)
@@ -34,7 +34,7 @@ if (mainLinks.value.length > 0) {
 if (props.mode == 'default' && mainLinks.value.length > 6) {
     mainLinks.value = mainLinks.value.slice(0, 5);
 }
-let hasArticles = ref(props.mode == 'scroll' && Bbob.blog.nextFileLinks.length > 0);
+let articlesEnd = ref(props.mode == 'scroll' && Bbob.blog.nextFileLinks.length == 0);
 const load = () => {
     if (props.mode == 'scroll'){
         Bbob.api.nextLinkInfos((linkArray) => {
@@ -43,16 +43,16 @@ const load = () => {
             Bbob.blog.links = mainLinks.value;
         }
         else {
-            hasArticles.value = false;
+            articlesEnd.value = true;
         }
     })
     }
 }
 let indexEvent = -1;
-onBeforeRouteUpdate(()=>{
+onBeforeMount(()=>{
     indexEvent = scrollToDownEventRegist(load)
 })
-onBeforeRouteLeave(()=>{
+onBeforeUnmount(()=>{
     if (indexEvent != -1){
         scrollToDownEventUnRegist(indexEvent);
     }
@@ -84,6 +84,7 @@ onBeforeRouteLeave(()=>{
                     v-for="(category, index) in link.categories"
                     :key="index"
                     type="warning"
+                    @click="router.push(`/filter/categories?checked=${category}`)"
                 >{{ category }}</el-tag>
                 <el-divider v-if="link.tags" content-position="left">
                     <el-tag effect="dark" type="success">Tags</el-tag>
@@ -94,16 +95,18 @@ onBeforeRouteLeave(()=>{
                     v-for="(tag, index) in link.tags"
                     :key="index"
                     type="success"
+                    @click="router.push(`/filter/tags?checked=${tag}`)"
                 >{{ tag }}</el-tag>
             </el-card>
         </el-timeline-item>
     </el-timeline>
-    <h4 v-if="hasArticles" style="text-align: center;">Articles is end~</h4>
+    <h4 v-if="articlesEnd" style="text-align: center;">Articles is end~</h4>
 </template>
 
 <style>
 .tagItem {
     margin-left: 5px;
+    cursor: pointer;
 }
 .articleTitle {
     text-decoration: none;
