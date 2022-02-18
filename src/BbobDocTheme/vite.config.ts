@@ -1,18 +1,30 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import AutoImport from 'unplugin-auto-import/vite'
-import Components from 'unplugin-vue-components/vite'
-import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+import importToCDN from 'vite-plugin-cdn-import'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
-    AutoImport({
-      resolvers: [ElementPlusResolver()],
-    }),
-    Components({
-      resolvers: [ElementPlusResolver()],
+    importToCDN({
+      modules:[
+        {
+          name: 'vue',
+          var: 'Vue',
+          path: 'https://unpkg.com/vue@3.2.25/dist/vue.runtime.global.prod.js'
+        },
+        {
+          name: 'vue-router',
+          var: 'VueRouter',
+          path: 'https://unpkg.com/vue-router@4.0.12/dist/vue-router.global.prod.js'
+        },
+        {
+          name: 'element-plus',
+          var: 'ElementPlus',
+          path: 'https://unpkg.com/element-plus',
+          css: 'https://unpkg.com/element-plus/dist/index.css'
+        },
+      ]
     })
   ]
 })
