@@ -43,7 +43,6 @@ public class BuildWebArticleJson: IPlugin
             fs.Flush(); //If not flush now, hash can't compute
             fs.Position = 0; //set to 0 to read.
             hash = Shared.SharedLib.BytesToString(sha256.ComputeHash(fs));
-            System.Console.WriteLine($"My hash: {hash}");
         }
         string newName = $"{Path.GetFileNameWithoutExtension(filePath)}.{hash.Substring(0,9)}.json";
         string newLocal = Path.Combine(FileLocalFolder, newName);

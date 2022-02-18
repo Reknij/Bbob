@@ -173,17 +173,24 @@ public static class JSAPiHelper
         {
             int bcot = i + bcotNext;
             List<LinkInfo> nextLinkInfos = new List<LinkInfo>(); //next of LinkInfos
-            string fileName = Path.GetRandomFileName() + ".json";
-            string nextLinkInfosFile = Path.Combine(nextLinkInfoFilesFolderLocal, fileName);
-            nextFileLinkInfos.Add($"/{nextLinkInfoFilesFolder}/{fileName}");
+            string nextLinkInfosFile = Path.Combine(nextLinkInfoFilesFolderLocal, "next.temp.json");
             for (; i < LinkInfos.Count && i < bcot; i++)
             {
                 nextLinkInfos.Add(LinkInfos[i]);
             }
-            using (FileStream fs = new FileStream(nextLinkInfosFile, FileMode.Create, FileAccess.Write))
+            SHA256 sha256 = SHA256.Create();
+            string hash = "";
+            using (FileStream fs = new FileStream(nextLinkInfosFile, FileMode.Create, FileAccess.ReadWrite))
             {
                 JsonSerializer.Serialize(fs, nextLinkInfos);
+                fs.Flush(); //If not flush now, hash can't compute
+                fs.Position = 0; //set to 0 to read.
+                hash = Shared.SharedLib.BytesToString(sha256.ComputeHash(fs));
             }
+            string newName = $"next.{hash.Substring(0, 9)}.js";
+            string newPath = Path.Combine(nextLinkInfoFilesFolderLocal, newName);
+            File.Move(nextLinkInfosFile, newPath);
+            nextFileLinkInfos.Add($"{config.publicPath}{nextLinkInfoFilesFolder}/{newName}");
         }
 
         return (current.ToArray(), nextFileLinkInfos.ToArray());
