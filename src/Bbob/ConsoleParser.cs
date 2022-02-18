@@ -15,6 +15,7 @@ class ConsoleParser
 
     public void Parse()
     {
+        string dist = Path.Combine(Environment.CurrentDirectory, "dist");
         int i = 0;
         int length = arguments.Length;
         if (length == 0)
@@ -33,7 +34,7 @@ class ConsoleParser
                 break;
             case Commands.Generate.Current:
             case Commands.Generate.CurrentAka:
-                Generator generater = new Generator(Path.Combine(Environment.CurrentDirectory, "dist"), afp);
+                Generator generater = new Generator(dist, afp);
                 if (generater.Process()) System.Console.WriteLine("Generate success.");
                 else System.Console.WriteLine("Generate failed.");
                 break;
@@ -55,6 +56,12 @@ class ConsoleParser
                 Creator creater = new Creator(filename, afp, types);
                 if (creater.Process()) System.Console.WriteLine($"Created {filename} success.");
                 else System.Console.WriteLine($"Create {filename} failed.");
+                break;
+            case Commands.Deploy.Current:
+            case Commands.Deploy.CurrentAka:
+                Deploy deploy = new Deploy(dist, true);
+                if (deploy.Process()) System.Console.WriteLine("Deploy success.");
+                else System.Console.WriteLine("Deploy failed.");
                 break;
 
             default:
@@ -81,6 +88,12 @@ class ConsoleParser
         {
             public const string Current = "generate";
             public const string CurrentAka = "g";
+        }
+
+        public static class Deploy
+        {
+            public const string Current = "deploy";
+            public const string CurrentAka = "d";
         }
     }
 }

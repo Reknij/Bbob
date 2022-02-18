@@ -18,7 +18,7 @@ public static class PluginSystem
         Directory.CreateDirectory(configsFolder);
         System.Console.WriteLine("Loading Plugin System...");
         PluginHelper.clearAllObject();
-        PluginHelper.executingDirectory = Environment.CurrentDirectory;
+        PluginHelper.ExecutingDirectory = Environment.CurrentDirectory;
         LoadBuildInPlugins();
         LoadThirdPlugins();
     }
@@ -83,13 +83,27 @@ public static class PluginSystem
     {
         foreach (var p in buildInPlugins)
         {
+            PluginHelper.ExecutingPlugin = getPluginInfo(p);
             cyclePluginDelegate.Invoke(p);
         }
         foreach (var p in thirdPlugins)
         {
             if (p.Plugin == null) continue;
+            PluginHelper.ExecutingPlugin = p.PluginInfo;
             cyclePluginDelegate.Invoke(p.Plugin);
         }
+    }
+
+    public static PluginJson getPluginInfo(IPlugin plugin)
+    {
+        Type type = plugin.GetType();
+        PluginJson info = new PluginJson();
+        info.name = type.Name;
+        info.author = "Bbob";
+        info.description = "This is build-in plugin.";
+        info.repository = "No have repository";
+
+        return info;
     }
 
     public static IPlugin? GetThirdPlugin(int index) => thirdPlugins?[index].Plugin;

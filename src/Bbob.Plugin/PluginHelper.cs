@@ -4,11 +4,17 @@ using System.Text.Json;
 namespace Bbob.Plugin;
 public static class PluginHelper
 {
-    private static string? _executingDirectory;
-    public static string executingDirectory
+    private static PluginJson? _ExecutingPlugin;
+    public static PluginJson ExecutingPlugin
     {
-        get=> _executingDirectory ?? throw new NullReferenceException("executing directory is null.");
-        set=> _executingDirectory = value;
+        get => _ExecutingPlugin ?? throw new NullReferenceException("Executing plugin is null.");
+        set => _ExecutingPlugin = value;
+    }
+    private static string? _executingDirectory;
+    public static string ExecutingDirectory
+    {
+        get => _executingDirectory ?? throw new NullReferenceException("executing directory is null.");
+        set => _executingDirectory = value;
     }
     public static class HelperDelegates
     {
@@ -63,6 +69,8 @@ public static class PluginHelper
         config = default(T);
         return false;
     }
+    public static bool getPluginJsonConfig<T>(out T? config) =>
+    getPluginJsonConfig<T>(ExecutingPlugin.name ?? throw new NullReferenceException("Executing plugin name is null."), out config);
 
     public static void savePluginJsonConfig<T>(string pluginName, T config)
     {
@@ -74,10 +82,14 @@ public static class PluginHelper
             JsonSerializer.Serialize<T>(fs, config);
         }
     }
+    public static void savePluginJsonConfig<T>(T config) =>
+    savePluginJsonConfig<T>(ExecutingPlugin.name ?? throw new NullReferenceException("Executing plugin name is null."), config);
+    public static void printConsole(string msg)
+    {
+        System.Console.WriteLine($"[{ExecutingPlugin.name}]: {msg}");
+    }
 
-    
-    
-    public static sortArticlesDelegate? sortArticles {get;set;}
-    public static sortCategoriesDelegate? sortCategories {get;set;}
-    public static sortTagsDelegate? sortTags {get;set;}
+    public static sortArticlesDelegate? sortArticles { get; set; }
+    public static sortCategoriesDelegate? sortCategories { get; set; }
+    public static sortTagsDelegate? sortTags { get; set; }
 }
