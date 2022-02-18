@@ -107,9 +107,9 @@ public class ConfigManager
                 System.Console.WriteLine("Auto set to 3 now.");
                 blogCountOneTime = 3;
             }
-            if (allLink != "current" && allLink != "next")
+            if (allLink != "current" && allLink != "next" && allLink != "false")
             {
-                System.Console.WriteLine("Warning: config.allLink value is not `current` or `next`.");
+                System.Console.WriteLine("Warning: config.allLink value is not `current`, `next` or 'false'.");
                 System.Console.WriteLine("Auto set to `false` now.");
                 allLink = "false";
             }
