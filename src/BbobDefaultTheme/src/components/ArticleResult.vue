@@ -50,13 +50,13 @@ let tocDrawer = ref(false)
                 </template>
                 <template #default>
                     <div>
-                        <span v-html="article.toc"></span>
+                        <span @click="tocDrawer = false" v-html="article.toc"></span>
                     </div>
                 </template>
             </el-drawer>
 
             <el-affix style="margin-left: 90%;" :offset="80" position="bottom">
-                <el-button @click="tocDrawer = !tocDrawer" type="primary">Toc</el-button>
+                <el-button @click="tocDrawer = true" type="primary">Toc</el-button>
             </el-affix>
         </div>
     </div>
