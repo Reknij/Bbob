@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using Bbob.Plugin;
 
 namespace Bbob.Main.BuildInPlugin;
@@ -20,7 +21,7 @@ public class GitDeploy : IPlugin
             }
             else
             {
-                if (!runCommand("git remote -v", ghDirectory).Contains($"origin  ${config.repos}"))
+                if (!Regex.IsMatch(runCommand("git remote -v", ghDirectory), @$"origin\s+{config.repos}"))
                 {
                      PluginHelper.printConsole("Exists other repository, replace it.");
                     Shared.SharedLib.DirectoryHelper.DeleteDirectory(ghDirectory);
@@ -29,6 +30,12 @@ public class GitDeploy : IPlugin
             }
             DeleteAll();
             Shared.SharedLib.DirectoryHelper.CopyDirectory(distribution, ghDirectory);
+            if (config.type == "github")
+            {
+                string index = Path.Combine(ghDirectory, "index.html");
+                string file404 = Path.Combine(ghDirectory, "404.html");
+                File.Copy(index, file404);
+            }
             runCommand($"git add .", ghDirectory);
             runCommand($"git commit -m \"{config.message}\"", ghDirectory);
             PluginHelper.printConsole(runCommand($"git push -f origin {config.branch}", ghDirectory));
@@ -79,10 +86,9 @@ public class GitDeploy : IPlugin
         p.StartInfo.WorkingDirectory = workingDirectory == null ? WorkingDirectoryGlobal : workingDirectory;
         p.Start();
         string output = p.StandardOutput.ReadToEnd();
-
         using (StreamReader s = p.StandardError)
         {
-            output = s.ReadToEnd();
+            output += s.ReadToEnd();
         }
         return output;
     }
@@ -92,5 +98,6 @@ public class GitDeploy : IPlugin
         public string? repos { get; set; }
         public string? branch { get; set; }
         public string? message { get; set; }
+        public string? type {get;set;}
     }
 }

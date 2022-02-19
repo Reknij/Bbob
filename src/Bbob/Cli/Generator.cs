@@ -34,6 +34,7 @@ public class Generator : ICommand
 
         string[] files = Directory.GetFiles(articlesFolderPath, "*.*", config.recursion ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
+        ThemeProcessor.Theme? theme = ThemeProcessor.BuildThemeToDist(config.theme, distribution);
         foreach (string file in files)
         {
             System.Console.WriteLine($"Run generate all stage for <{file}>");
@@ -76,7 +77,6 @@ public class Generator : ICommand
         }
         BuildData jsBuildData = SortAll();
 
-        ThemeProcessor.Theme? theme = ThemeProcessor.BuildThemeToDist(config.theme, distribution);
         if (theme != null)
         {
             printResult();
