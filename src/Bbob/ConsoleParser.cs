@@ -60,8 +60,8 @@ class ConsoleParser
             case Commands.Deploy.Current:
             case Commands.Deploy.CurrentAka:
                 Deploy deploy = new Deploy(dist, true);
-                if (deploy.Process()) System.Console.WriteLine("Deploy success.");
-                else System.Console.WriteLine("Deploy failed.");
+                if (deploy.Process()) System.Console.WriteLine("Run deploy done.");
+                else System.Console.WriteLine("Run deploy failed.");
                 break;
 
             default:
