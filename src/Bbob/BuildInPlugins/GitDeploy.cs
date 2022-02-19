@@ -20,14 +20,10 @@ public class GitDeploy : IPlugin
             }
             else
             {
-                if (runCommand("git remote -v", ghDirectory).Contains($"origin  ${config.repos}"))
+                if (!runCommand("git remote -v", ghDirectory).Contains($"origin  ${config.repos}"))
                 {
-                    PluginHelper.printConsole(runCommand($"git pull", ghDirectory));
-                }
-                else
-                {
-                    PluginHelper.printConsole("Exists other repository, replace it.");
-                    Directory.Delete(ghDirectory, true);
+                     PluginHelper.printConsole("Exists other repository, replace it.");
+                    Shared.SharedLib.DirectoryHelper.DeleteDirectory(ghDirectory);
                     cloneReposAndCheckout(config);
                 }
             }
@@ -35,7 +31,7 @@ public class GitDeploy : IPlugin
             Shared.SharedLib.DirectoryHelper.CopyDirectory(distribution, ghDirectory);
             runCommand($"git add .", ghDirectory);
             runCommand($"git commit -m \"{config.message}\"", ghDirectory);
-            PluginHelper.printConsole(runCommand($"git push origin {config.branch}", ghDirectory));
+            PluginHelper.printConsole(runCommand($"git push -f origin {config.branch}", ghDirectory));
             PluginHelper.printConsole("Done..");
         }
         else
