@@ -18,7 +18,6 @@ public class Deploy : ICommand
         if (load)
         {
             PluginSystem.LoadAllPlugins();
-            ThemeProcessor.LoadAllTheme();
         }
         PluginSystem.cyclePlugins((plugin) =>
         {

@@ -35,7 +35,19 @@ class ConsoleParser
             case Commands.Generate.Current:
             case Commands.Generate.CurrentAka:
                 Generator generater = new Generator(dist, afp);
-                if (generater.Process()) System.Console.WriteLine("Generate success.");
+                if (generater.Process())
+                {
+                    System.Console.WriteLine("Generate success.");
+                    if (++i < length)
+                        switch (arguments[i])
+                        {
+                            case Commands.Generate.Deploy:
+                            case Commands.Generate.DeployAka:
+                                DeployIt(dist, false);
+                                break;
+                            default: break;
+                        }
+                }
                 else System.Console.WriteLine("Generate failed.");
                 break;
 
@@ -59,15 +71,20 @@ class ConsoleParser
                 break;
             case Commands.Deploy.Current:
             case Commands.Deploy.CurrentAka:
-                Deploy deploy = new Deploy(dist, true);
-                if (deploy.Process()) System.Console.WriteLine("Run deploy done.");
-                else System.Console.WriteLine("Run deploy failed.");
+                DeployIt(dist);
                 break;
 
             default:
                 System.Console.WriteLine($"Unknown command: {arguments[i]}");
                 break;
         }
+    }
+
+    private void DeployIt(string dist, bool load = true)
+    {
+        Deploy deploy = new Deploy(dist, load);
+        if (deploy.Process()) System.Console.WriteLine("Run deploy done.");
+        else System.Console.WriteLine("Run deploy failed.");
     }
 
     static class Commands
@@ -88,6 +105,8 @@ class ConsoleParser
         {
             public const string Current = "generate";
             public const string CurrentAka = "g";
+            public const string Deploy = "deploy";
+            public const string DeployAka = "d";
         }
 
         public static class Deploy
