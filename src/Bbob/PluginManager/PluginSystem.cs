@@ -21,6 +21,7 @@ public static class PluginSystem
         PluginHelper.ExecutingDirectory = Environment.CurrentDirectory;
         LoadBuildInPlugins();
         LoadThirdPlugins();
+        System.Console.WriteLine($"Loaded {AllPluginCount} plugins. ({BuildInPluginCount}|{ThirdPluginCount})");
     }
 
     private static void LoadBuildInPlugins()
