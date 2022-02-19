@@ -16,12 +16,20 @@ public class GitDeploy : IPlugin
             PluginHelper.printConsole($"Trying deploy to {config.repos}, branch {config.branch}");
             if (!Directory.Exists(ghDirectory))
             {
-                PluginHelper.printConsole(runCommand($"git clone {config.repos} {ghDirectoryName}", PluginHelper.ExecutingDirectory));
-                if (runCommand($"git checkout -b {config.branch}", ghDirectory).Contains("already exists")) runCommand($"git checkout {config.branch}", ghDirectory);
+                cloneReposAndCheckout(config);
             }
             else
             {
-                PluginHelper.printConsole(runCommand($"git pull", ghDirectory));
+                if (runCommand("git remote -v", ghDirectory).Contains($"origin  ${config.repos}"))
+                {
+                    PluginHelper.printConsole(runCommand($"git pull", ghDirectory));
+                }
+                else
+                {
+                    PluginHelper.printConsole("Exists other repository, replace it.");
+                    Directory.Delete(ghDirectory, true);
+                    cloneReposAndCheckout(config);
+                }
             }
             DeleteAll();
             Shared.SharedLib.DirectoryHelper.CopyDirectory(distribution, ghDirectory);
@@ -32,8 +40,14 @@ public class GitDeploy : IPlugin
         }
         else
         {
-            PluginHelper.printConsole("Config is null..");
+            PluginHelper.printConsole("Config is null, please save you config into ../configs/GitDeploy.config.json");
         }
+    }
+
+    private void cloneReposAndCheckout(GitConfig config)
+    {
+        PluginHelper.printConsole(runCommand($"git clone {config.repos} {ghDirectoryName}", PluginHelper.ExecutingDirectory));
+        if (runCommand($"git checkout -b {config.branch}", ghDirectory).Contains("already exists")) runCommand($"git checkout {config.branch}", ghDirectory);
     }
 
     private void DeleteAll()
