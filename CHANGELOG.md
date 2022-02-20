@@ -1,3 +1,11 @@
+# 2022-2-20 20:55:00
+## Bbob
+- change sort article of SortData plugin. Now is sort by order instead of name.
+- plugin process variable type now is `dynamic` instead of `LinkInfo`
+- plugin now have two variable to process, it is `article` and `link`. `article` is about article data, and `link` is about links.
+- plugin will serialize all fields of `article` and `link` now.
+- MarkdownParser plugin no provide `getYamlObject` function now.
+- config.publicPath change to config.base
 # 2022-2-18 23:42:00
 ## Bbob
 - add deploy command
