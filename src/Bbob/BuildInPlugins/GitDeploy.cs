@@ -34,7 +34,12 @@ public class GitDeploy : IPlugin
             {
                 string index = Path.Combine(ghDirectory, "index.html");
                 string file404 = Path.Combine(ghDirectory, "404.html");
-                File.Copy(index, file404);
+                if (File.Exists(index))
+                {
+                    if (!File.Exists(file404)) File.Copy(index, file404);
+                    else PluginHelper.printConsole("Distribution already exists '404.html'");
+                }
+                else PluginHelper.printConsole("No exists 'index.html'");
             }
             runCommand($"git add .", ghDirectory);
             runCommand($"git commit -m \"{config.message}\"", ghDirectory);
