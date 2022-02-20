@@ -3,7 +3,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Bbob.Main.Configuration;
-using static Bbob.Main.BuildInPlugin.MarkdownParser;
 using static Bbob.Main.JSApi.JSApiType;
 using Bbob.Plugin;
 using System.Security.Cryptography;
@@ -49,7 +48,7 @@ public static class JSAPiHelper
         string mainjsOriginal = Path.Combine(Environment.CurrentDirectory, "JSApi", "bbobMain.js");
         string mainjsDist = Path.Combine(dist, "bbob.js");
         string mjs = File.ReadAllText(mainjsOriginal);
-        (LinkInfo[], string[]) allLinkInfos = getLinkInfos(buildData.LinkInfos, dist);
+        (dynamic[], string[]) allLinkInfos = getLinkInfos(buildData.LinkInfos, dist);
         ConfigManager.ConfigJson config = ConfigManager.GetConfigManager().MainConfig;
         BuildListToFolder(buildData.Categories, dist, "categories");
         BuildListToFolder(buildData.Tags, dist, "tags");
@@ -95,7 +94,7 @@ public static class JSAPiHelper
         File.WriteAllText(distIndex, index);
     }
 
-    private static void BuildListToFolder(List<KeyValuePair<string, List<LinkInfo>>> dict, string dist, string v)
+    private static void BuildListToFolder(List<KeyValuePair<string, List<dynamic>>> dict, string dist, string v)
     {
         string localPath = Path.Combine(dist, v);
         if (dict.Count == 0) return;
@@ -141,10 +140,10 @@ public static class JSAPiHelper
 
 
 
-    private static (LinkInfo[], string[]) getLinkInfos(List<LinkInfo> LinkInfos, string dist)
+    private static (dynamic[], string[]) getLinkInfos(List<dynamic> LinkInfos, string dist)
     {
         ConfigManager.ConfigJson config = ConfigManager.GetConfigManager().MainConfig;
-        List<LinkInfo> current = new List<LinkInfo>();
+        List<dynamic> current = new List<dynamic>();
         string nextLinkInfoFilesFolder = "nextLinkInfoFiles";
         string nextLinkInfoFilesFolderLocal = Path.Combine(dist, nextLinkInfoFilesFolder);
         Directory.CreateDirectory(nextLinkInfoFilesFolderLocal);
@@ -172,7 +171,7 @@ public static class JSAPiHelper
         while (i < LinkInfos.Count)
         {
             int bcot = i + bcotNext;
-            List<LinkInfo> nextLinkInfos = new List<LinkInfo>(); //next of LinkInfos
+            List<dynamic> nextLinkInfos = new List<dynamic>(); //next of LinkInfos
             string nextLinkInfosFile = Path.Combine(nextLinkInfoFilesFolderLocal, "next.temp.json");
             for (; i < LinkInfos.Count && i < bcot; i++)
             {
@@ -196,7 +195,7 @@ public static class JSAPiHelper
         return (current.ToArray(), nextFileLinkInfos.ToArray());
     }
 
-    private static string[] listItemToArray(List<KeyValuePair<string, List<LinkInfo>>> categories)
+    private static string[] listItemToArray(List<KeyValuePair<string, List<dynamic>>> categories)
     {
         string[] array = new string[categories.Count];
         for (int i = 0; i < categories.Count; i++)

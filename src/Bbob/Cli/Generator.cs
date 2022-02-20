@@ -14,9 +14,9 @@ public class Generator : ICommand
     public string ArticlesFolderPath { get => articlesFolderPath; }
     string distribution;
 
-    List<LinkInfo> allLink = new List<LinkInfo>();
-    Dictionary<string, List<LinkInfo>> allCategory = new Dictionary<string, List<LinkInfo>>();
-    Dictionary<string, List<LinkInfo>> allTag = new Dictionary<string, List<LinkInfo>>();
+    List<dynamic> allLink = new List<dynamic>();
+    Dictionary<string, List<dynamic>> allCategory = new Dictionary<string, List<dynamic>>();
+    Dictionary<string, List<dynamic>> allTag = new Dictionary<string, List<dynamic>>();
     public Generator(string _distribution, string _articlesFolderPath)
     {
         distribution = _distribution;
@@ -30,7 +30,7 @@ public class Generator : ICommand
         Directory.CreateDirectory(distribution);
         Directory.CreateDirectory(articlesFolderPath);
         var config = ConfigManager.GetConfigManager().MainConfig;
-        registerConfig();
+        ConfigManager.GetConfigManager().MainConfig.registerToPluginSystem();
 
         string[] files = Directory.GetFiles(articlesFolderPath, "*.*", config.recursion ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
@@ -40,40 +40,56 @@ public class Generator : ICommand
             System.Console.WriteLine($"Run generate all stage for <{file}>");
             foreach (GenerationStage stage in Enum.GetValues<GenerationStage>())
             {
-               try
-               {
+                try
+                {
                     PluginSystem.cyclePlugins((plugin) =>
                 {
                     plugin.GenerateCommand(file, distribution, stage);
                 });
-               }
-               catch (System.Exception ex)
-               {
-                   System.Console.WriteLine($"Stage {stage} error!");
-                   System.Console.WriteLine(ex);
-               }
+                }
+                catch (System.Exception ex)
+                {
+                    System.Console.WriteLine($"Stage {stage} error!");
+                    System.Console.WriteLine(ex);
+                }
             }
 
-            PluginHelper.getRegisteredObject<LinkInfo>("linkInfo", out var linkInfo);
-            if (linkInfo == null || linkInfo.address == null) continue;
-            allLink.Add(linkInfo);
-            if (linkInfo.categories != null) foreach (var category in linkInfo.categories)
-                {
-                    if (!allCategory.ContainsKey(category))
-                    {
-                        allCategory.Add(category, new List<LinkInfo> { linkInfo });
-                    }
-                    else allCategory[category].Add(linkInfo);
-                }
+            PluginHelper.getRegisteredObject<dynamic>("link", out dynamic? link);
+            if (link == null) continue;
+            allLink.Add(link);
 
-            if (linkInfo.tags != null) foreach (var tag in linkInfo.tags)
+            PluginHelper.getRegisteredObject<dynamic>("article", out dynamic? article);
+            if (article == null) continue;
+
+            if (((IDictionary<string, object?>)article).TryGetValue("categories", out object? c) && c is List<object> categories)
+            {
+                foreach (var category in categories)
                 {
-                    if (!allTag.ContainsKey(tag))
+                    if (category is string text)
                     {
-                        allTag.Add(tag, new List<LinkInfo> { linkInfo });
+                        if (!allCategory.ContainsKey(text))
+                        {
+                            allCategory.Add(text, new List<dynamic> { link });
+                        }
+                        else allCategory[text].Add(link);
                     }
-                    else allTag[tag].Add(linkInfo);
                 }
+            }
+
+            if (((IDictionary<string, object?>)article).TryGetValue("tags", out object? t) && t is List<object> tags)
+            {
+                foreach (var tag in tags)
+                {
+                    if (tag is string text)
+                    {
+                        if (!allTag.ContainsKey(text))
+                        {
+                            allTag.Add(text, new List<dynamic> { link });
+                        }
+                        else allTag[text].Add(link);
+                    }
+                }
+            }
         }
         BuildData jsBuildData = SortAll();
 
@@ -106,11 +122,11 @@ public class Generator : ICommand
             allLink.Sort((item1, item2) => PluginHelper.sortArticles(item1, item2));
             foreach (var category in listCategory)
             {
-                category.Value.Sort((item1, item2)=> PluginHelper.sortArticles(item1, item2));
+                category.Value.Sort((item1, item2) => PluginHelper.sortArticles(item1, item2));
             }
             foreach (var tag in listTag)
             {
-                tag.Value.Sort((item1, item2)=> PluginHelper.sortArticles(item1, item2));
+                tag.Value.Sort((item1, item2) => PluginHelper.sortArticles(item1, item2));
             }
         }
 
@@ -125,16 +141,6 @@ public class Generator : ICommand
         }
 
         return new BuildData(allLink, listCategory, listTag);
-    }
-
-    private void registerConfig()
-    {
-        System.Console.WriteLine("Register configs...");
-        var properties = typeof(ConfigManager.ConfigJson).GetProperties();
-        foreach (var property in properties)
-        {
-            PluginHelper.registerObject($"config.{property.Name}", property.GetValue(ConfigManager.GetConfigManager().MainConfig));
-        }
     }
 
     private void printResult()

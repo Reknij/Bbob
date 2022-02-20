@@ -10,7 +10,7 @@ public class JSApiType
     {
         public string[]? categories { get; set; }
         public string[]? tags { get; set; }
-        public LinkInfo[]? links { get; set; }
+        public dynamic[]? links { get; set; }
         public string[]? nextFileLinks { get; set; }
     }
 
@@ -37,13 +37,13 @@ public class JSApiType
 
     public class BuildData
     {
-        public List<LinkInfo> LinkInfos { get; set; }
-        public List<KeyValuePair<string, List<LinkInfo>>> Categories { get; set; }
-        public List<KeyValuePair<string, List<LinkInfo>>> Tags { get; set; }
+        public List<dynamic> LinkInfos { get; set; }
+        public List<KeyValuePair<string, List<dynamic>>> Categories { get; set; }
+        public List<KeyValuePair<string, List<dynamic>>> Tags { get; set; }
 
-        public BuildData(List<LinkInfo> LinkInfos,
-                        List<KeyValuePair<string, List<LinkInfo>>> categories,
-                        List<KeyValuePair<string, List<LinkInfo>>> tags)
+        public BuildData(List<dynamic> LinkInfos,
+                        List<KeyValuePair<string, List<dynamic>>> categories,
+                        List<KeyValuePair<string, List<dynamic>>> tags)
         {
             this.LinkInfos = LinkInfos;
             Categories = categories;

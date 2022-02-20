@@ -57,7 +57,7 @@ public class ConfigManager
         public int blogCountOneTime { get; set; }
         public string allLink { get; set; }
         public bool recursion { get; set; }
-        public string publicPath {get;set;}
+        public string publicPath { get; set; }
 
         public string[] buildInPlugins { get; set; }
 
@@ -97,6 +97,16 @@ public class ConfigManager
             result = result.Remove(result.Length - 2, 2);
             result += '>';
             return result;
+        }
+
+        public void registerToPluginSystem()
+        {
+            System.Console.WriteLine("Register configs...");
+            var properties = this.GetType().GetProperties();
+            foreach (var property in properties)
+            {
+                PluginHelper.registerObject($"config.{property.Name}", property.GetValue(this));
+            }
         }
 
         public void Recheck()

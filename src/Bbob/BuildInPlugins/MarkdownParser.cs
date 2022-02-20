@@ -1,3 +1,4 @@
+using System.Dynamic;
 using System.Text;
 using Bbob.Plugin;
 using Markdig;
@@ -66,22 +67,27 @@ public class MarkdownParser : IPlugin
                 yamlString = yamlString.Remove(0, 3);
                 yamlString = yamlString.Remove(yamlString.Length - 3, 3);
                 parseLinkInfo(yamlString, filePath);
-                PluginHelper.registerObject("getYamlObject", ((Type type) =>
-                {
-                    return serializer.Deserialize(yamlString, type);
-                }));
                 doc.Remove(yamlFrontMatterBlock);
             }
             else throw new NullReferenceException();
         }
     }
 
-    private void parseLinkInfo(string yaml, string filePath)
+    private void parseLinkInfo(string plain, string filePath)
     {
-        LinkInfo linkInfo = serializer.Deserialize<LinkInfo>(yaml);
-
-        linkInfo.setFilePath(filePath);
-        PluginHelper.registerObject("linkInfo", linkInfo);
+        Dictionary<string, object> yaml = serializer.Deserialize<Dictionary<string, object>>(plain);
+        dynamic article = new ExpandoObject();
+        dynamic link = new ExpandoObject();
+        foreach (var y in yaml)
+        {
+            if (y.Value != null)
+            {
+                ((IDictionary<String, Object>)article).Add(y.Key, y.Value);
+                ((IDictionary<String, Object>)link).Add(y.Key, y.Value);
+            }
+        }
+        PluginHelper.registerObject("article", article);
+        PluginHelper.registerObject("link", link);
     }
     private void parseMarkdownToHtml()
     {
@@ -101,8 +107,12 @@ public class MarkdownParser : IPlugin
                     toc.Add(headingBlock.Level, name, id);
                 }
             }
-            PluginHelper.registerObject("toc", toc.ToHtml());
-            PluginHelper.registerObject("contentParsed", result.ToHtml());
+            PluginHelper.modifyRegisteredObject<dynamic>("article", (ref dynamic? article) =>
+            {
+                if (article == null) return;
+                article.toc = toc.ToHtml();
+                article.contentParsed = result.ToHtml();
+            });
         }
     }
 
@@ -151,7 +161,7 @@ public class MarkdownParser : IPlugin
         }
         private void calcTocNumber(int currentLevel)
         {
-            if(currentLevel == lastLevel || lastLevel == 0)
+            if (currentLevel == lastLevel || lastLevel == 0)
             {
                 tocNumber.Current++;
             }
@@ -160,7 +170,7 @@ public class MarkdownParser : IPlugin
                 tocNumber.Child = new TocNumber(1, tocNumber);
                 tocNumber = tocNumber.Child;
             }
-            else if(currentLevel < lastLevel)
+            else if (currentLevel < lastLevel)
             {
                 if (tocNumber.Parent != null)
                 {
@@ -173,9 +183,9 @@ public class MarkdownParser : IPlugin
 
         private class TocNumber
         {
-            public int Current{get;set;}
-            public TocNumber? Parent{get;set;}
-            public TocNumber? Child{get;set;}
+            public int Current { get; set; }
+            public TocNumber? Parent { get; set; }
+            public TocNumber? Child { get; set; }
 
             public TocNumber(int current = 0, TocNumber? parent = null, TocNumber? child = null)
             {
@@ -195,6 +205,31 @@ public class MarkdownParser : IPlugin
                 }
                 return text;
             }
+        }
+    }
+
+    public class LinkInfo
+    {
+        public string? title { get; set; }
+        public string? date { get; set; }
+
+        public string[]? categories { get; set; }
+        public string[]? tags { get; set; }
+        public string? address { get; set; }
+        public LinkInfo(string filePath, string? title = null, string? date = null, string[]? categories = null, string[]? tags = null, string? address = null)
+        {
+            this.title = title;
+            this.date = date;
+            this.categories = categories;
+            this.tags = tags;
+            this.address = address;
+        }
+
+        public LinkInfo()
+        {
+            title = date = address = null;
+            this.categories = this.tags = null;
+            //all must be null when deserializing yaml, otherwise an error will be thrown.
         }
     }
 
