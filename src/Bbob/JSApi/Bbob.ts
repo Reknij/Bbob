@@ -25,7 +25,9 @@ export interface BbobMeta{
     description: string,
     about: string,
     copyright: string,
-    publicPath: string,
+    blogCountOneTime: number,
+    allLink: string,
+    baseUrl: string,
     extra: object
 }
 export interface BbobJSApi {

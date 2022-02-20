@@ -16,12 +16,14 @@ public class JSApiType
 
     public class BbobMeta
     {
-        public string? blogName { get; set; }
-        public string? author { get; set; }
-        public string? description { get; set; }
-        public string? about { get; set; }
+        public string blogName { get; set; }
+        public string author { get; set; }
+        public string description { get; set; }
+        public string about { get; set; }
         public string copyright { get; set; }
-        public string publicPath{get;set;}
+        public int blogCountOneTime { get; set; }
+        public string allLink { get; set; }
+        public string baseUrl{get;set;}
         public object? extra { get; set; }
         public BbobMeta(Configuration.ConfigManager.ConfigJson config)
         {
@@ -30,7 +32,9 @@ public class JSApiType
             this.description = config.description;
             this.about = config.about;
             this.copyright = $"© year author Powered by Bbob & themeName";
-            this.publicPath = config.publicPath;
+            this.blogCountOneTime = config.blogCountOneTime;
+            this.allLink = config.allLink;
+            this.baseUrl = config.baseUrl;
             extra = new Object();
         }
     }

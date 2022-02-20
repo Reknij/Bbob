@@ -26,7 +26,7 @@ public static class JSAPiHelper
             foreach (string jsFile in hookFiles)
             {
                 System.Console.WriteLine($"Hook {jsFile} to {indexName}");
-                src += $"\n<script src=\"{config.publicPath}{jsFile}\"></script>";
+                src += $"\n<script src=\"{config.baseUrl}{jsFile}\"></script>";
             }
             string pattern = @"<head>(.*)</head>";
             string replacement = $"<head>{src}$1</head>";
@@ -89,7 +89,7 @@ public static class JSAPiHelper
         string distIndex = Path.Combine(dist, indexHtml);
         string index = File.ReadAllText(distIndex);
         string pattern = "=\"/([^/].*)\"";
-        string replacement = $"=\"{config.publicPath}$1\"";
+        string replacement = $"=\"{config.baseUrl}$1\"";
         index = Regex.Replace(index, pattern, replacement);
         File.WriteAllText(distIndex, index);
     }
@@ -189,7 +189,7 @@ public static class JSAPiHelper
             string newName = $"next.{hash.Substring(0, 9)}.js";
             string newPath = Path.Combine(nextLinkInfoFilesFolderLocal, newName);
             File.Move(nextLinkInfosFile, newPath);
-            nextFileLinkInfos.Add($"{config.publicPath}{nextLinkInfoFilesFolder}/{newName}");
+            nextFileLinkInfos.Add($"{config.baseUrl}{nextLinkInfoFilesFolder}/{newName}");
         }
 
         return (current.ToArray(), nextFileLinkInfos.ToArray());

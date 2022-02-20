@@ -57,7 +57,7 @@ public class ConfigManager
         public int blogCountOneTime { get; set; }
         public string allLink { get; set; }
         public bool recursion { get; set; }
-        public string publicPath { get; set; }
+        public string baseUrl { get; set; }
 
         public string[] buildInPlugins { get; set; }
 
@@ -71,7 +71,7 @@ public class ConfigManager
             blogCountOneTime = 10;
             allLink = "false";
             recursion = false;
-            publicPath = "/";
+            baseUrl = "/";
             var main = Assembly.GetExecutingAssembly();
             var types = main?.GetTypes();
             List<string> buildInList = new List<string>();
@@ -123,21 +123,21 @@ public class ConfigManager
                 System.Console.WriteLine("Auto set to `false` now.");
                 allLink = "false";
             }
-            if (publicPath == "")
+            if (baseUrl == "")
             {
                 System.Console.WriteLine("Warning: config.publicPath value is null.");
                 System.Console.WriteLine("Auto set to '/'");
-                publicPath = "/";
+                baseUrl = "/";
             }
-            else if (publicPath.First() != '/')
+            else if (baseUrl.First() != '/')
             {
                 System.Console.WriteLine("Warning: config.publicPath value start character is not '/'.");
                 System.Console.WriteLine("Auto added the '/'");
-                publicPath = $"/{publicPath}";
+                baseUrl = $"/{baseUrl}";
             }
-            if (publicPath.Last() != '/')
+            if (baseUrl.Last() != '/')
             {
-                publicPath = $"{publicPath}/";
+                baseUrl = $"{baseUrl}/";
             }
         }
 
