@@ -19,10 +19,10 @@ public class MainPlugin : IPlugin
                 PluginHelper.registerObject("injectData", "HelloWorld!");
                 break;
             case GenerationStage.FinalProcess:
-                PluginHelper.modifyRegisteredObject<string>("contentParsed", (ref string? value) =>
+                PluginHelper.modifyRegisteredObject<dynamic>("article", (ref dynamic? article) =>
                         {
-                            if (value == null) return;
-                            value = value.Replace("class", "id");
+                            if (article == null) return;
+                            article.contentParsed = article.contentParsed.Replace("class", "id");
                         });
                 break;
 

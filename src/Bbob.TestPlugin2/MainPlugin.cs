@@ -15,19 +15,19 @@ public class MainPlugin : IPlugin
             });
                 break;
             case GenerationStage.FinalProcess:
-                if (PluginHelper.getRegisteredObject<Func<Type, object>>("getYamlObject", out var getYamlObject) && getYamlObject != null)
+                PluginHelper.modifyRegisteredObject<dynamic>("article", (ref dynamic? article) =>
                 {
-                    yamlObject yo = getYamlObject(typeof(yamlObject)) as yamlObject ?? throw new NullReferenceException();
+                    if (article == null) return;
                     PluginHelper.getPluginJsonConfig<jsonObject>("TestPlugin2", out var jo);
-                    if (jo == null) throw new NullReferenceException();
-                    string n = $"{yo.newClassName}-{yo.msg}-{jo.append}-{jo.year}";
-                    PluginHelper.modifyRegisteredObject<string>("contentParsed", (ref string? html) =>
+                    if (jo == null)
                     {
-                        if (html == null) return;
-                        html = html.Replace("bbob", n);
-                    });
+                        PluginHelper.printConsole("plugin config is null.");
+                        return;
+                    }
+                    string n = $"{article.newClassName}-{article.msg}-{jo.append}-{jo.year}";
 
-                }
+                    article.contentParsed = article.contentParsed.Replace("bbob", n);
+                });
                 break;
             default:
                 break;

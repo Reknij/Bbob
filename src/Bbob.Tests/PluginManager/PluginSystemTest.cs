@@ -14,14 +14,12 @@ public class PluginSystemTest
     readonly string testHtmlPath = Path.Combine(Environment.CurrentDirectory, "Test.html");
 
     readonly string afp = Path.Combine(Environment.CurrentDirectory, "articles");
+    readonly string dist = Path.Combine(Environment.CurrentDirectory, "dist");
 
     private void ClearRubbish()
     {
-        foreach (string file in Directory.GetFiles(afp))
-        {
-            File.Delete(file);
-        }
-        if (Directory.Exists(afp)) Directory.Delete(afp);
+        if (Directory.Exists(afp)) Directory.Delete(afp, true);
+        if (Directory.Exists(dist)) Directory.Delete(dist, true);
     }
     [TestMethod]
     public void IsSuccessCreateDefaultMarkdownFile()
@@ -46,7 +44,7 @@ public class PluginSystemTest
     [TestMethod]
     public void IsPluginCountSame()
     {
-        int expectBIP = 3;
+        int expectBIP = 4;
         int expectTP = 2;
         Assert.AreEqual(expectBIP, PluginSystem.BuildInPluginCount);
         Assert.AreEqual(expectTP, PluginSystem.ThirdPluginCount);
@@ -56,9 +54,10 @@ public class PluginSystemTest
     [TestMethod]
     public void RunGenerateStage1()
     {
+        Main.Configuration.ConfigManager.GetConfigManager().MainConfig.registerToPluginSystem();
         PluginSystem.cyclePlugins((IPlugin plugin) =>
         {
-            plugin.GenerateCommand(testMDPath, Path.Combine(Environment.CurrentDirectory, "dist"), GenerationStage.Initialize);
+            plugin.GenerateCommand(testMDPath, dist, GenerationStage.Initialize);
         });
         Assert.IsTrue(PluginHelper.getRegisteredObject<string>("markdown", out string? markdown));
         Assert.IsNotNull(markdown);
@@ -70,13 +69,13 @@ public class PluginSystemTest
         PluginSystem.cyclePlugins((IPlugin plugin) =>
         {
 
-            plugin.GenerateCommand(testMDPath, Path.Combine(Environment.CurrentDirectory, "dist"), GenerationStage.Process);
+            plugin.GenerateCommand(testMDPath, dist, GenerationStage.Process);
         });
         PluginHelper.getRegisteredObject<string>("markdown", out string? markdown);
         using (StreamReader sr = new StreamReader(testMDPath))
         {
             string emarkdown = sr.ReadToEnd().Replace("title", "ttat").Replace("paragraph", "ppap");
-            emarkdown = emarkdown.Substring(43);
+            emarkdown = emarkdown.Substring(82);
             Assert.AreEqual(emarkdown, markdown);
         }
         Assert.IsTrue(PluginHelper.getRegisteredObject<string>("injectData", out string? value));
@@ -89,10 +88,10 @@ public class PluginSystemTest
         PluginSystem.cyclePlugins((IPlugin plugin) =>
         {
 
-            plugin.GenerateCommand(testMDPath, Path.Combine(Environment.CurrentDirectory, "dist"), GenerationStage.Parse);
+            plugin.GenerateCommand(testMDPath, dist, GenerationStage.Parse);
         });
-        Assert.IsTrue(PluginHelper.getRegisteredObject<string>("contentParsed", out var contentParsed));
-        Assert.IsNotNull(contentParsed);
+        Assert.IsTrue(PluginHelper.getRegisteredObject<dynamic>("article", out var article));
+        Assert.IsNotNull(article);
     }
 
     [TestMethod]
@@ -101,21 +100,16 @@ public class PluginSystemTest
         PluginSystem.cyclePlugins((IPlugin plugin) =>
         {
 
-            plugin.GenerateCommand(testMDPath, Path.Combine(Environment.CurrentDirectory, "dist"), GenerationStage.FinalProcess);
+            plugin.GenerateCommand(testMDPath, dist, GenerationStage.FinalProcess);
         });
-        PluginHelper.getRegisteredObject<string>("contentParsed", out var contentParsed);
+        PluginHelper.getRegisteredObject<dynamic>("article", out var article);
+        Assert.IsNotNull(article);
+        if (article == null) return;
         using (StreamReader sr = new StreamReader(testHtmlPath))
         {
             string n = "Hello-World-plus-2022";
             string ehtml = sr.ReadToEnd().Replace("class", "id").Replace("bbob", n).Replace("title", "ttat").Replace("paragraph", "ppap");
-            Assert.AreEqual(ehtml, contentParsed);
+            Assert.AreEqual(ehtml, article.contentParsed);
         }
-    }
-
-    [TestMethod]
-    public void IsHaveFunctions()
-    {
-        Assert.IsTrue(PluginHelper.getRegisteredObject<Func<Type, object>>("getYamlObject", out var getYamlObject));
-        Assert.IsNotNull(getYamlObject);
     }
 }
