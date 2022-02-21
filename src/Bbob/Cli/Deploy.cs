@@ -19,10 +19,22 @@ public class Deploy : ICommand
         {
             PluginSystem.LoadAllPlugins();
         }
-        PluginSystem.cyclePlugins((plugin) =>
+        try
         {
-            plugin.DeployCommand(distribution);
-        });
+            PluginSystem.cyclePlugins((plugin) =>
+            {
+                plugin.DeployCommand(distribution);
+            });
+        }
+        catch (System.Exception ex)
+        {
+            string msg = ex.Message;
+#if DEBUG
+            msg = ex.ToString();
+#endif
+            System.Console.WriteLine("Error executing plugin deploy command:\n" + msg);
+            return false;
+        }
         return true;
     }
 }

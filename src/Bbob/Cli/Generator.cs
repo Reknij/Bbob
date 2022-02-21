@@ -49,8 +49,12 @@ public class Generator : ICommand
                 }
                 catch (System.Exception ex)
                 {
-                    System.Console.WriteLine($"Stage {stage} error!");
-                    System.Console.WriteLine(ex);
+                    string msg = ex.Message;
+#if DEBUG
+                    msg = ex.ToString();
+#endif
+                    System.Console.WriteLine($"Executing generate functions of plugin error in stage {stage}:\n" + msg);
+                    return false;
                 }
             }
 
@@ -91,8 +95,20 @@ public class Generator : ICommand
                 }
             }
         }
-        BuildData jsBuildData = SortAll();
-
+        BuildData jsBuildData;
+        try
+        {
+            jsBuildData = SortAll();
+        }
+        catch (System.Exception ex)
+        {
+            string msg = ex.Message;
+#if DEBUG
+            msg = ex.ToString();
+#endif
+            System.Console.WriteLine("Executing sort functions error:\n" + msg);
+            return false;
+        }
         if (theme != null)
         {
             printResult();

@@ -29,11 +29,23 @@ public class Creator : ICommand
         }
         System.Console.WriteLine($"Processing <{filename}> file content...");
         string content = "";
-        PluginSystem.cyclePlugins((plugin) =>
+        try
         {
-            plugin.NewCommand(filePath, ref content, NewType);
-        });
-        File.WriteAllText(filePath, content);
+            PluginSystem.cyclePlugins((plugin) =>
+            {
+                plugin.NewCommand(filePath, ref content, NewType);
+            });
+            File.WriteAllText(filePath, content);
+        }
+        catch (System.Exception ex)
+        {
+           string msg = ex.Message;
+#if DEBUG
+            msg = ex.ToString();
+#endif
+            System.Console.WriteLine("Error executing plugin new command:\n" + msg);
+            return false;
+        }
         return true;
     }
 

@@ -14,9 +14,22 @@ public class Init : ICommand
         PluginSystem.LoadAllPlugins();
         ThemeProcessor.LoadAllTheme();
         Directory.CreateDirectory(JSApi.JSAPiHelper.metasFolder);
-        PluginSystem.cyclePlugins((plugin)=>{
-            plugin.InitCommand();
-        });
+        try
+        {
+            PluginSystem.cyclePlugins((plugin) =>
+            {
+                plugin.InitCommand();
+            });
+        }
+        catch (System.Exception ex)
+        {
+            string msg = ex.Message;
+#if DEBUG
+            msg = ex.ToString();
+#endif
+            System.Console.WriteLine("Executing init command error:\n" + msg);
+            return false;
+        }
         return true;
     }
 }
