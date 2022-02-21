@@ -26,7 +26,7 @@ public class Generator : ICommand
     }
     public bool Process()
     {
-        if (Directory.Exists(distribution)) Directory.Delete(distribution, true);
+        if (Directory.Exists(distribution)) Shared.SharedLib.DirectoryHelper.DeleteDirectory(distribution);
         Directory.CreateDirectory(distribution);
         Directory.CreateDirectory(articlesFolderPath);
         var config = ConfigManager.GetConfigManager().MainConfig;
