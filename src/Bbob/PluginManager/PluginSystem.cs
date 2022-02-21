@@ -56,9 +56,8 @@ public static class PluginSystem
         string[] folders = Directory.GetDirectories(pluginDirectory);
         foreach (string folder in folders)
         {
-            string pluginDll = Path.Combine(folder, "MainPlugin.dll");
             string pluginJsonPath = Path.Combine(folder, "plugin.json");
-            if (File.Exists(pluginDll) && File.Exists(pluginJsonPath))
+            if (File.Exists(pluginJsonPath))
             {
                 using (FileStream fs = new FileStream(pluginJsonPath, FileMode.Open, FileAccess.ReadWrite))
                 {
@@ -68,6 +67,11 @@ public static class PluginSystem
                         System.Console.WriteLine("Plugin json file can't loaded.");
                         break;
                     }
+                    if (pluginInfo.name == null)
+                    {
+                        pluginInfo.name = Path.GetDirectoryName(folder);
+                    }
+                    string pluginDll = Path.Combine(folder, pluginInfo.entry);
                     var mainPlugin = new PluginAssemblyLoadContext(pluginDll, pluginInfo);
                     if (mainPlugin.Plugin != null)
                     {
