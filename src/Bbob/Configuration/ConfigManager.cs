@@ -21,6 +21,7 @@ public class ConfigManager
         MainConfig = new ConfigJson();
         DefaultConfig = new ConfigJson();
         if (File.Exists(ConfigPath))
+        {
             using (FileStream fs = new FileStream(ConfigPath, FileMode.Open, FileAccess.Read))
             {
 
@@ -29,20 +30,31 @@ public class ConfigManager
                 {
                     MainConfig = targetConfig;
                     MainConfig.Recheck();
+
                     System.Console.WriteLine("Loaded config file.");
                 }
+                else
+                {
+                    System.Console.WriteLine("Config can't deserialize from the file. Load default config");
+                }
             }
+        }
         else
         {
             Console.WriteLine("Not found app config file. Will create and load default config.");
-            using (FileStream fs = File.OpenWrite(ConfigPath))
+        }
+        SaveConfig(DefaultConfig, ConfigPath); //always save as the config user may be old.
+    }
+
+    public void SaveConfig(ConfigJson target, string savePath)
+    {
+        using (FileStream fs = File.OpenWrite(savePath))
+        {
+            JsonSerializerOptions options = new JsonSerializerOptions()
             {
-                JsonSerializerOptions options = new JsonSerializerOptions()
-                {
-                    WriteIndented = true
-                };
-                JsonSerializer.Serialize(fs, MainConfig, options);
-            }
+                WriteIndented = true
+            };
+            JsonSerializer.Serialize(fs, target, options);
         }
     }
 
