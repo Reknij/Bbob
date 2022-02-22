@@ -1,3 +1,10 @@
+# 2022-2-21 19:51:00
+## Bbob
+- If plugin no assign name in plugin.json, it will default name folder of plugin.
+## Bbob.Plugin
+- PluginJson add 'entry' section, it is entry whose file is plugin entry. Default is 'MainPlugin.dll'
+- PluginJson description and author now have default info.
+
 # 2022-2-20 20:55:00
 ## Bbob
 - change sort article of SortData plugin. Now is sort by order instead of name.
