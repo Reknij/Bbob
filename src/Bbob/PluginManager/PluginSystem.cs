@@ -86,17 +86,28 @@ public static class PluginSystem
     public delegate void CyclePluginDelegate(IPlugin plugin);
     public static void cyclePlugins(CyclePluginDelegate cyclePluginDelegate)
     {
+        PluginHelper.ExecutingCommandResult = new CommandResult();
         foreach (var p in buildInPlugins)
         {
             PluginHelper.ExecutingPlugin = getPluginInfo(p);
             cyclePluginDelegate.Invoke(p);
+            if (!checkCommandResult()) return;
         }
         foreach (var p in thirdPlugins)
         {
             if (p.Plugin == null) continue;
             PluginHelper.ExecutingPlugin = p.PluginInfo;
             cyclePluginDelegate.Invoke(p.Plugin);
+            if (!checkCommandResult()) return;
         }
+    }
+
+    private static bool checkCommandResult()
+    {
+        if (PluginHelper.ExecutingCommandResult.Operation == CommandOperation.Stop ||
+            PluginHelper.ExecutingCommandResult.Operation == CommandOperation.Skip)
+            return false;
+        return true;
     }
 
     public static PluginJson getPluginInfo(IPlugin plugin)

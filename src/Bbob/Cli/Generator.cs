@@ -24,6 +24,21 @@ public class Generator : ICommand
         PluginSystem.LoadAllPlugins();
         ThemeProcessor.LoadAllTheme();
     }
+
+    private bool isSkip(bool displayMessage = true)
+    {
+        if (PluginHelper.ExecutingCommandResult.Operation == CommandOperation.Skip)
+        {
+            if (displayMessage)
+            {
+                System.Console.WriteLine($"<{PluginHelper.ExecutingPlugin.name}> Skip this file.");
+                if (!string.IsNullOrWhiteSpace(PluginHelper.ExecutingCommandResult.Message))
+                    System.Console.WriteLine($"Message: {PluginHelper.ExecutingCommandResult.Message}");
+            }
+            return true;
+        }
+        return false;
+    }
     public bool Process()
     {
         if (Directory.Exists(distribution)) Shared.SharedLib.DirectoryHelper.DeleteDirectory(distribution);
@@ -43,9 +58,17 @@ public class Generator : ICommand
                 try
                 {
                     PluginSystem.cyclePlugins((plugin) =>
-                {
-                    plugin.GenerateCommand(file, distribution, stage);
-                });
+                    {
+                        plugin.GenerateCommand(file, distribution, stage);
+                    });
+                    if (isSkip(false)) break;
+                    if (PluginHelper.ExecutingCommandResult.Operation == CommandOperation.Stop)
+                    {
+                        System.Console.WriteLine($"<{PluginHelper.ExecutingPlugin.name}> Stop command execution");
+                        if (!string.IsNullOrWhiteSpace(PluginHelper.ExecutingCommandResult.Message))
+                            System.Console.WriteLine($"Message: {PluginHelper.ExecutingCommandResult.Message}");
+                        return false;
+                    }
                 }
                 catch (System.Exception ex)
                 {
@@ -57,6 +80,7 @@ public class Generator : ICommand
                     return false;
                 }
             }
+            if (isSkip()) continue;
 
             PluginHelper.getRegisteredObject<dynamic>("link", out dynamic? link);
             if (link == null) continue;

@@ -92,4 +92,5 @@ public static class PluginHelper
     public static sortArticlesDelegate? sortArticles { get; set; }
     public static sortCategoriesDelegate? sortCategories { get; set; }
     public static sortTagsDelegate? sortTags { get; set; }
+    public static CommandResult ExecutingCommandResult { get; set; }
 }

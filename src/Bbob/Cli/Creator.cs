@@ -35,11 +35,19 @@ public class Creator : ICommand
             {
                 plugin.NewCommand(filePath, ref content, NewType);
             });
+            if (PluginHelper.ExecutingCommandResult.Operation == CommandOperation.Skip ||
+                PluginHelper.ExecutingCommandResult.Operation == CommandOperation.Stop)
+            {
+                System.Console.WriteLine($"<{PluginHelper.ExecutingPlugin.name}> Stop command execution");
+                if (!string.IsNullOrWhiteSpace(PluginHelper.ExecutingCommandResult.Message))
+                    System.Console.WriteLine($"Message: {PluginHelper.ExecutingCommandResult.Message}");
+                return false;
+            }
             File.WriteAllText(filePath, content);
         }
         catch (System.Exception ex)
         {
-           string msg = ex.Message;
+            string msg = ex.Message;
 #if DEBUG
             msg = ex.ToString();
 #endif
