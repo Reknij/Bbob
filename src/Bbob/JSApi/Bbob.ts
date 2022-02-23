@@ -13,11 +13,22 @@ export interface Article {
     contentParsed?: string
     toc?: string
 }
+export interface ArchiveYear {
+    year: number,
+    address: string
+}
+export interface ArchiveMonth {
+    month: string,
+    link: LinkInfo[]
+}
 export interface ArticleProcessCallBack {
     (article: Article): void
 }
 export interface LinkInfoArrayProcessCallBack {
     (linkArray: LinkInfo[]): void
+}
+export interface ArticleMonthArrayProcessCallBack {
+    (archiveMonthArray: ArchiveMonth[]): void
 }
 export interface BbobMeta{
     blogName: string,
@@ -35,6 +46,7 @@ export interface BbobJSApi {
         tags: string[],
         categories: string[],
         links: LinkInfo[],
+        archives: ArchiveYear[],
         nextFileLinks: string[]
     },
     meta: BbobMeta
@@ -45,6 +57,7 @@ export interface BbobJSApi {
         getArticleFromAddress(address: string, callback: ArticleProcessCallBack): void,
         getLinkInfosWithTag(tagName: string, callback: LinkInfoArrayProcessCallBack): void,
         getLinkInfosWithCategory(categoryName: string, callback: LinkInfoArrayProcessCallBack): void
+        getLinkInfosWithArchiveAddress(archiveYearAddress: string, callback: ArticleMonthArrayProcessCallBack): void
     }
 }
 

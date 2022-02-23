@@ -43,6 +43,9 @@ const api = {
         else{
             callback(false)
         }
+    },
+    getLinkInfosWithArchiveAddress(archiveAddress, callback) {
+        ajaxRequest('get', archiveAddress, callback);
     }
 }
 

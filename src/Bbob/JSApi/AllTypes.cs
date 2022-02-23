@@ -6,11 +6,14 @@ namespace Bbob.Main.JSApi;
 
 public class JSApiType
 {
+    public record class ArchiveYear(int year, string address);
+    public record class ArchiveMonth(int month, List<dynamic> link);
     public class Blog
     {
         public string[]? categories { get; set; }
         public string[]? tags { get; set; }
         public dynamic[]? links { get; set; }
+        public ArchiveYear[]? archives {get;set;}
         public string[]? nextFileLinks { get; set; }
     }
 

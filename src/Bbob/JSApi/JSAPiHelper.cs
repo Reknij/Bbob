@@ -49,6 +49,7 @@ public static class JSAPiHelper
         string mainjsDist = Path.Combine(dist, "bbob.js");
         string mjs = File.ReadAllText(mainjsOriginal);
         (dynamic[], string[]) allLinkInfos = getLinkInfos(buildData.LinkInfos, dist);
+        List<ArchiveYear> archives = generateArchives(buildData.LinkInfos, dist);
         ConfigManager.ConfigJson config = ConfigManager.GetConfigManager().MainConfig;
         BuildListToFolder(buildData.Categories, dist, "categories");
         BuildListToFolder(buildData.Tags, dist, "tags");
@@ -57,6 +58,7 @@ public static class JSAPiHelper
             categories = listItemToArray(buildData.Categories),
             tags = listItemToArray(buildData.Tags),
             links = allLinkInfos.Item1,
+            archives = archives.ToArray(),
             nextFileLinks = allLinkInfos.Item2
         };
         JSApiType.BbobMeta meta = new JSApiType.BbobMeta(config);
@@ -138,7 +140,45 @@ public static class JSAPiHelper
         }
     }
 
-
+    private static List<ArchiveYear> generateArchives(List<dynamic> LinkInfos, string dist)
+    {
+        var config = ConfigManager.GetConfigManager().MainConfig;
+        List<ArchiveYear> a = new List<ArchiveYear>();
+        Dictionary<int, Dictionary<int, List<dynamic>>> archives = new();
+        foreach (dynamic link in LinkInfos)
+        {
+            DateTime dateTime = DateTime.Parse(link.date);
+            if (!archives.ContainsKey(dateTime.Year)) archives.Add(dateTime.Year, new Dictionary<int, List<dynamic>>());
+            if (!archives[dateTime.Year].ContainsKey(dateTime.Month)) archives[dateTime.Year].Add(dateTime.Month, new List<dynamic>());
+            archives[dateTime.Year][dateTime.Month].Add(link);
+        }
+        string folder = Path.Combine(dist, "archives");
+        Directory.CreateDirectory(folder);
+        string tempFile = Path.Combine(folder, "archive.temp.json");
+        SHA256 sha256 = SHA256.Create();
+        foreach (var item in archives)
+        {
+            string hash = "";
+            List<ArchiveMonth> months = new ();
+            foreach (var m in item.Value)
+            {
+                months.Add(new ArchiveMonth(m.Key, m.Value));
+            }
+            using (FileStream fs = new FileStream(tempFile, FileMode.Create, FileAccess.ReadWrite))
+            {
+                JsonSerializer.Serialize(fs, months);
+                fs.Flush(); //If not flush now, hash can't compute
+                fs.Position = 0; //set to 0 to read.
+                hash = Shared.SharedLib.BytesToString(sha256.ComputeHash(fs));
+            }
+            string newName = $"archive.{item.Key}.{hash.Substring(0,9)}.json";
+            string newPath = Path.Combine(folder, newName);
+            File.Move(tempFile, newPath);
+            string webUrl = Path.Combine($"{config.baseUrl}archives/{newName}");
+            a.Add(new ArchiveYear(item.Key, webUrl));
+        }
+        return a;
+    }
 
     private static (dynamic[], string[]) getLinkInfos(List<dynamic> LinkInfos, string dist)
     {
