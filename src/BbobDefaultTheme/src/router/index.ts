@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import Home from '../components/Home.vue'
 import Articles from '../components/Articles.vue'
 import ArticleResult from '../components/ArticleResult.vue'
-import CategoriesOrTagsArticles from '../components/CategoriesOrTagsArticles.vue'
+import Filter from '../components/Filter.vue'
 import About from '../components/About.vue'
 import Bbob from '../../../Bbob/JSApi/Bbob'
 const routes = [
@@ -21,7 +21,7 @@ const routes = [
     },
     {
         path: '/filter/:mode',
-        component: CategoriesOrTagsArticles,
+        component: Filter,
         props: true
 
     },

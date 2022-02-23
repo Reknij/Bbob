@@ -8,6 +8,10 @@ const paths = [
         path: '/articles/scroll'
     },
     {
+        name: 'Archives',
+        path: '/filter/archives'
+    },
+    {
         name: 'Categories',
         path: '/filter/categories'
     },
