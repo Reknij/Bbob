@@ -1,3 +1,11 @@
+# 2022-2-23 18:21:00
+## Bbob
+- Add reset-config command, use with given name to reset target config to default.
+- Add SkipIfDraft build-in plugin, if article front matter have set 'draft' and value is true, generate will skip it.
+## Bbob.Plugin
+- Command now can set command result, to control command operation.
+- Add extensions to give some functions helper develop plugins. Etc. check object exists property.
+
 # 2022-2-23 13:40:00
 ## Bbob
 - Add preview command to preview your blog, must generate first.
