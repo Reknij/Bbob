@@ -37,10 +37,10 @@ public class BuildWebArticleJson : IPlugin
         string newName = $"{Path.GetFileNameWithoutExtension(filePath)}.{hash.Substring(0, 9)}.json";
         string newLocal = Path.Combine(FileLocalFolder, newName);
         File.Move(FileLocal, newLocal, true);
-        PluginHelper.getRegisteredObject<string>("config.publicPath", out var publicPath);
+        PluginHelper.getRegisteredObject<string>("config.baseUrl", out var publicPath);
         if (publicPath == null)
         {
-            throw new NullReferenceException("publicPath is null");
+            throw new NullReferenceException("baseUrl is null");
         }
         PluginHelper.modifyRegisteredObject<dynamic>("link", (ref dynamic? link)=>{
             if (link == null) return;
