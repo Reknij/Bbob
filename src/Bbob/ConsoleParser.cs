@@ -81,6 +81,15 @@ class ConsoleParser
             case Commands.Preview.CurrentAka:
                 PreviewIt(dist);
                 break;
+            case Commands.ResetConfig.Current:
+            case Commands.ResetConfig.CurrentAka:
+                if (++i < length)
+                {
+                    ResetConfig resetConfig = new ResetConfig(arguments[i]);
+                    if (resetConfig.Process()) System.Console.WriteLine($"Reset config {arguments[i]} success.");
+                    else System.Console.WriteLine("No found config with given name.");
+                }
+                break;
 
             default:
                 System.Console.WriteLine($"Unknown command: {arguments[i]}");
@@ -133,6 +142,12 @@ class ConsoleParser
         {
             public const string Current = "preview";
             public const string CurrentAka = "p";
+        }
+
+        public static class ResetConfig
+        {
+            public const string Current = "reset-config";
+            public const string CurrentAka = "rc";
         }
     }
 }
