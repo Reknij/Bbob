@@ -87,7 +87,7 @@ public static class ThemeProcessor
         {
             index = "index.html";
             description = "Nothing.";
-            author = "Jinker";
+            author = "Unknown author";
         }
     }
 }
