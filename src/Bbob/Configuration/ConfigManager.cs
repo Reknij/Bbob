@@ -43,7 +43,7 @@ public class ConfigManager
         {
             Console.WriteLine("Not found app config file. Will create and load default config.");
         }
-        SaveConfig(DefaultConfig, ConfigPath); //always save as the config user may be old.
+        SaveConfig(MainConfig, ConfigPath); //always save as the config user may be old.
     }
 
     public void SaveConfig(ConfigJson target, string savePath)
