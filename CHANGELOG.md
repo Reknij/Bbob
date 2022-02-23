@@ -1,3 +1,7 @@
+# 2022-2-23 13:40:00
+## Bbob
+- Add preview command to preview your blog, must generate first.
+
 # 2022-2-21 19:51:00
 ## Bbob
 - If plugin no assign name in plugin.json, it will default name folder of plugin.
