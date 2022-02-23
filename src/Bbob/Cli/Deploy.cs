@@ -19,6 +19,16 @@ public class Deploy : ICommand
         {
             PluginSystem.LoadAllPlugins();
         }
+        if (!Directory.Exists(distribution))
+        {
+            System.Console.WriteLine("Distribution not exists!");
+            return false;
+        }
+        if (Directory.GetFiles(distribution, "*", SearchOption.AllDirectories).Length == 0)
+        {
+            System.Console.WriteLine("Distribution is not exists any files!");
+            return false;
+        }
         try
         {
             PluginSystem.cyclePlugins((plugin) =>
