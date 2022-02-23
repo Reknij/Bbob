@@ -70,6 +70,7 @@ public class ConfigManager
         public string allLink { get; set; }
         public bool recursion { get; set; }
         public string baseUrl { get; set; }
+        public int previewPort {get;set;}
 
         public string[] buildInPlugins { get; set; }
 
@@ -84,6 +85,7 @@ public class ConfigManager
             allLink = "false";
             recursion = false;
             baseUrl = "/";
+            previewPort = 3000;
             var main = Assembly.GetExecutingAssembly();
             var types = main?.GetTypes();
             List<string> buildInList = new List<string>();
@@ -150,6 +152,12 @@ public class ConfigManager
             if (baseUrl.Last() != '/')
             {
                 baseUrl = $"{baseUrl}/";
+            }
+            if (previewPort < 1024 || previewPort > 49151)
+            {
+                System.Console.WriteLine("Warning: config.previewPort value is not 1024 - 49151");
+                System.Console.WriteLine("Auto set to default port '3000'");
+                previewPort = 3000;
             }
         }
 

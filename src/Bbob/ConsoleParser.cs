@@ -41,9 +41,13 @@ class ConsoleParser
                     if (++i < length)
                         switch (arguments[i])
                         {
-                            case Commands.Generate.Deploy:
-                            case Commands.Generate.DeployAka:
+                            case Commands.Deploy.Current:
+                            case Commands.Deploy.CurrentAka:
                                 DeployIt(dist, false);
+                                break;
+                            case Commands.Preview.Current:
+                            case Commands.Preview.CurrentAka:
+                                PreviewIt(dist);
                                 break;
                             default: break;
                         }
@@ -73,6 +77,10 @@ class ConsoleParser
             case Commands.Deploy.CurrentAka:
                 DeployIt(dist);
                 break;
+            case Commands.Preview.Current:
+            case Commands.Preview.CurrentAka:
+                PreviewIt(dist);
+                break;
 
             default:
                 System.Console.WriteLine($"Unknown command: {arguments[i]}");
@@ -85,6 +93,14 @@ class ConsoleParser
         Deploy deploy = new Deploy(dist, load);
         if (deploy.Process()) System.Console.WriteLine("Run deploy done.");
         else System.Console.WriteLine("Run deploy failed.");
+    }
+
+    private void PreviewIt(string dist)
+    {
+        var preview = new Bbob.Main.Cli.Preview(dist);
+        System.Console.WriteLine("Running preview...");
+        if (preview.Process()) System.Console.WriteLine("Run preview done.");
+        else System.Console.WriteLine("Can't run preview!");
     }
 
     static class Commands
@@ -105,14 +121,18 @@ class ConsoleParser
         {
             public const string Current = "generate";
             public const string CurrentAka = "g";
-            public const string Deploy = "deploy";
-            public const string DeployAka = "d";
         }
 
         public static class Deploy
         {
             public const string Current = "deploy";
             public const string CurrentAka = "d";
+        }
+
+        public static class Preview
+        {
+            public const string Current = "preview";
+            public const string CurrentAka = "p";
         }
     }
 }
