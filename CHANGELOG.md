@@ -1,3 +1,12 @@
+# 2022-2-23 22:31:00
+## Bbob
+- Distribution now have archives.
+- Bbob js api new function `getLinkInfosWithArchiveAddress`.
+- Add Bbob js blog.archives. It is array of ArticleYear object.
+
+## BbobDefaultTheme
+- Add archives.
+
 # 2022-2-23 18:21:00
 ## Bbob
 - Add reset-config command, use with given name to reset target config to default.
