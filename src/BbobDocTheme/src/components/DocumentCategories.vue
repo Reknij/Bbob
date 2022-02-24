@@ -29,9 +29,9 @@ let clickDoc = (link: LinkInfo) => {
 let blogs: any = {}
 for (let index = 0; index < Bbob.blog.categories.length; index++) {
     const category = Bbob.blog.categories[index];
-    blogs[category] = ref<LinkInfo>();
-    Bbob.api.getLinkInfosWithCategory(category, (linkArray) => {
-        blogs[category].value = linkArray
+    blogs[category.text] = ref<LinkInfo[]>();
+    Bbob.api.getLinkInfosWithAddress(category.address, (linkArray) => {
+        blogs[category.text].value = linkArray
     })
 }
 
@@ -40,17 +40,17 @@ for (let index = 0; index < Bbob.blog.categories.length; index++) {
 <template>
     <div>
         <div v-for="(category, indexCategory) in Bbob.blog.categories" :key="indexCategory">
-            <h1>{{ category }}</h1>
+            <h1>{{ category.text }}</h1>
             <div class="articlesTitle">
                 <el-collapse accordion v-model="activeName">
                     <el-collapse-item
-                        v-for="(link, index) in blogs[category].value"
+                        v-for="(link, index) in blogs[category.text].value"
                         @click="clickDoc(link)"
                         :key="index"
-                        :name="`${category}/${index}`"
+                        :name="`${category.text}/${index}`"
                     >
                         <template #title>
-                            <h4 v-if="activeName == `${category}/${index}`">{{ link.title }}</h4>
+                            <h4 v-if="activeName == `${category.text}/${index}`">{{ link.title }}</h4>
                             <span v-else>{{ link.title }}</span>
                         </template>
                         <span v-html="toc"></span>
