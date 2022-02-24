@@ -38,6 +38,10 @@ let props = defineProps({
 <style>
 .title:hover {
   cursor: pointer;
+  color: #409EFF
+}
+.title {
+  color: #313331
 }
 div.menu {
   width: 35px;
