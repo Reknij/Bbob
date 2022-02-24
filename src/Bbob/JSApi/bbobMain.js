@@ -18,34 +18,8 @@ const api = {
     getArticleFromAddress(address, callback) {
         ajaxRequest('get', address, callback);
     },
-    getLinkInfosWithTag(tagName, callback) {
-        if (blog.tags.length) {
-            blog.tags.forEach(tag => {
-                if (tag == tagName) {
-                    let r = Math.random();
-                    ajaxRequest('get', `${meta.publicPath}bbob.assets/tags/${tag}.json?r=${r}`, callback)
-                }
-            });
-        }
-        else{
-            callback(false)
-        }
-    },
-    getLinkInfosWithCategory(categoryName, callback) {
-        if (blog.categories.length) {
-            blog.categories.forEach(category => {
-                if (category == categoryName) {
-                    let r = Math.random();
-                    ajaxRequest('get', `${meta.publicPath}bbob.assets/categories/${category}.json?r=${r}`, callback)
-                }
-            });
-        }
-        else{
-            callback(false)
-        }
-    },
-    getLinkInfosWithArchiveAddress(archiveAddress, callback) {
-        ajaxRequest('get', archiveAddress, callback);
+    getLinkInfosWithAddress(address, callback) {
+        ajaxRequest('get', address, callback)
     }
 }
 

@@ -13,22 +13,15 @@ export interface Article {
     contentParsed?: string
     toc?: string
 }
-export interface ArchiveYear {
-    year: number,
+export interface FilterSource {
+    text: string,
     address: string
-}
-export interface ArchiveMonth {
-    month: string,
-    link: LinkInfo[]
 }
 export interface ArticleProcessCallBack {
     (article: Article): void
 }
 export interface LinkInfoArrayProcessCallBack {
     (linkArray: LinkInfo[]): void
-}
-export interface ArticleMonthArrayProcessCallBack {
-    (archiveMonthArray: ArchiveMonth[]): void
 }
 export interface BbobMeta{
     blogName: string,
@@ -43,10 +36,10 @@ export interface BbobMeta{
 }
 export interface BbobJSApi {
     blog: {
-        tags: string[],
-        categories: string[],
+        categories: FilterSource[],
+        tags: FilterSource[],
+        archives: FilterSource[],
         links: LinkInfo[],
-        archives: ArchiveYear[],
         nextFileLinks: string[]
     },
     meta: BbobMeta
@@ -55,9 +48,7 @@ export interface BbobJSApi {
         resetNextLinkInfosOffset(new_offset: number): void,
         nextLinkInfos(callback: LinkInfoArrayProcessCallBack): void,
         getArticleFromAddress(address: string, callback: ArticleProcessCallBack): void,
-        getLinkInfosWithTag(tagName: string, callback: LinkInfoArrayProcessCallBack): void,
-        getLinkInfosWithCategory(categoryName: string, callback: LinkInfoArrayProcessCallBack): void
-        getLinkInfosWithArchiveAddress(archiveYearAddress: string, callback: ArticleMonthArrayProcessCallBack): void
+        getLinkInfosWithAddress(address: string, callback: LinkInfoArrayProcessCallBack): void,
     }
 }
 

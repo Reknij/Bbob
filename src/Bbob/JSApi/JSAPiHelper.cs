@@ -6,6 +6,7 @@ using Bbob.Main.Configuration;
 using static Bbob.Main.JSApi.JSApiType;
 using Bbob.Plugin;
 using System.Security.Cryptography;
+using System.Dynamic;
 
 namespace Bbob.Main.JSApi;
 
@@ -51,16 +52,13 @@ public static class JSAPiHelper
         string bbobAssetsPath = Path.Combine(dist, bbobAssets);
         string mjs = File.ReadAllText(mainjsOriginal);
         (dynamic[], string[]) allLinkInfos = getLinkInfos(buildData.LinkInfos, bbobAssetsPath);
-        List<ArchiveYear> archives = generateArchives(buildData.LinkInfos, bbobAssetsPath);
         ConfigManager.ConfigJson config = ConfigManager.GetConfigManager().MainConfig;
-        BuildListToFolder(buildData.Categories, bbobAssetsPath, "categories");
-        BuildListToFolder(buildData.Tags, bbobAssetsPath, "tags");
         JSApiType.Blog blog = new JSApiType.Blog()
         {
-            categories = listItemToArray(buildData.Categories),
-            tags = listItemToArray(buildData.Tags),
+            categories = BuildListToFolder(buildData.Categories, bbobAssetsPath, "categories"),
+            tags = BuildListToFolder(buildData.Tags, bbobAssetsPath, "tags"),
             links = allLinkInfos.Item1,
-            archives = archives.ToArray(),
+            archives = generateArchives(buildData.LinkInfos, bbobAssetsPath, "archives"),
             nextFileLinks = allLinkInfos.Item2
         };
         JSApiType.BbobMeta meta = new JSApiType.BbobMeta(config);
@@ -98,20 +96,31 @@ public static class JSAPiHelper
         File.WriteAllText(distIndex, index);
     }
 
-    private static void BuildListToFolder(List<KeyValuePair<string, List<dynamic>>> dict, string dist, string v)
+    private static FilterSource[] BuildListToFolder(List<KeyValuePair<string, List<dynamic>>> dict, string dist, string name)
     {
-        string localPath = Path.Combine(dist, v);
-        if (dict.Count == 0) return;
+        List<FilterSource> filterSources = new List<FilterSource>();
+        var config = ConfigManager.GetConfigManager().MainConfig;
+        string localPath = Path.Combine(dist, name);
         Directory.CreateDirectory(localPath);
-
+        SHA256 sha256 = SHA256.Create();
         foreach (var item in dict)
         {
             string vFile = Path.Combine(localPath, $"{item.Key}.json");
-            using (FileStream fs = File.OpenWrite(vFile))
+            string hash = "";
+            using (FileStream fs = new FileStream(vFile, FileMode.Create, FileAccess.ReadWrite))
             {
                 JsonSerializer.Serialize(fs, item.Value);
+                fs.Flush(); //If not flush now, hash can't compute
+                fs.Position = 0; //set to 0 to read.
+                hash = Shared.SharedLib.BytesToString(sha256.ComputeHash(fs));
             }
+            string newName = $"{item.Key}.{hash.Substring(0,9)}.json";
+            string newPath = Path.Combine(localPath, newName);
+            string webPath = Path.Combine($"{config.baseUrl}{bbobAssets}/{name}/{newName}");
+            File.Move(vFile, newPath);
+            filterSources.Add(new FilterSource(item.Key, webPath));
         }
+        return filterSources.ToArray();
     }
 
     private static void LoadThirdMetas(JSApiType.BbobMeta bbobMeta)
@@ -142,44 +151,17 @@ public static class JSAPiHelper
         }
     }
 
-    private static List<ArchiveYear> generateArchives(List<dynamic> LinkInfos, string dist)
+    private static FilterSource[] generateArchives(List<dynamic> LinkInfos, string dist, string name)
     {
-        var config = ConfigManager.GetConfigManager().MainConfig;
-        List<ArchiveYear> a = new List<ArchiveYear>();
-        Dictionary<int, Dictionary<int, List<dynamic>>> archives = new();
+        Dictionary<string, List<dynamic>> a = new();
         foreach (dynamic link in LinkInfos)
         {
             DateTime dateTime = DateTime.Parse(link.date);
-            if (!archives.ContainsKey(dateTime.Year)) archives.Add(dateTime.Year, new Dictionary<int, List<dynamic>>());
-            if (!archives[dateTime.Year].ContainsKey(dateTime.Month)) archives[dateTime.Year].Add(dateTime.Month, new List<dynamic>());
-            archives[dateTime.Year][dateTime.Month].Add(link);
+            string year = dateTime.Year.ToString();
+            if (!a.ContainsKey(year)) a.Add(year, new List<dynamic>());
+            a[year].Add(link);
         }
-        string folder = Path.Combine(dist, "archives");
-        Directory.CreateDirectory(folder);
-        string tempFile = Path.Combine(folder, "archive.temp.json");
-        SHA256 sha256 = SHA256.Create();
-        foreach (var item in archives)
-        {
-            string hash = "";
-            List<ArchiveMonth> months = new ();
-            foreach (var m in item.Value)
-            {
-                months.Add(new ArchiveMonth(m.Key, m.Value));
-            }
-            using (FileStream fs = new FileStream(tempFile, FileMode.Create, FileAccess.ReadWrite))
-            {
-                JsonSerializer.Serialize(fs, months);
-                fs.Flush(); //If not flush now, hash can't compute
-                fs.Position = 0; //set to 0 to read.
-                hash = Shared.SharedLib.BytesToString(sha256.ComputeHash(fs));
-            }
-            string newName = $"archive.{item.Key}.{hash.Substring(0,9)}.json";
-            string newPath = Path.Combine(folder, newName);
-            File.Move(tempFile, newPath);
-            string webUrl = Path.Combine($"{config.baseUrl}archives/{newName}");
-            a.Add(new ArchiveYear(item.Key, webUrl));
-        }
-        return a;
+        return BuildListToFolder(a.ToList(), dist, name);
     }
 
     private static (dynamic[], string[]) getLinkInfos(List<dynamic> LinkInfos, string dist)
@@ -235,15 +217,5 @@ public static class JSAPiHelper
         }
 
         return (current.ToArray(), nextFileLinkInfos.ToArray());
-    }
-
-    private static string[] listItemToArray(List<KeyValuePair<string, List<dynamic>>> categories)
-    {
-        string[] array = new string[categories.Count];
-        for (int i = 0; i < categories.Count; i++)
-        {
-            array[i] = categories.ElementAt(i).Key;
-        }
-        return array;
     }
 }
