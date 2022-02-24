@@ -18,8 +18,7 @@ public class BuildWebArticleJson : IPlugin
         string day = dateTime.Day.ToString();
         string targetFile = $"{Path.GetFileNameWithoutExtension(filePath)}.json";
         string folder = "articles";
-        string webPath = Path.Combine(folder, year, month, day, targetFile);
-        string FileLocalFolder = Path.Combine(distribution, folder, year, month, day);
+        string FileLocalFolder = Path.Combine(distribution, JSApi.JSAPiHelper.bbobAssets, folder, year, month, day);
         string FileLocal = Path.Combine(FileLocalFolder, targetFile);
         Directory.CreateDirectory(FileLocalFolder);
         SHA256 sha256 = SHA256.Create();
@@ -44,7 +43,7 @@ public class BuildWebArticleJson : IPlugin
         }
         PluginHelper.modifyRegisteredObject<dynamic>("link", (ref dynamic? link)=>{
             if (link == null) return;
-            link.address = $"{publicPath}{folder}/{year}/{month}/{day}/{newName}";
+            link.address = $"{publicPath}{JSApi.JSAPiHelper.bbobAssets}/{folder}/{year}/{month}/{day}/{newName}";
         });
     }
 

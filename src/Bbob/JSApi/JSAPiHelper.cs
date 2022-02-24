@@ -12,6 +12,7 @@ namespace Bbob.Main.JSApi;
 public static class JSAPiHelper
 {
     public static readonly string metasFolder = Path.Combine(Environment.CurrentDirectory, "metas");
+    public static readonly string bbobAssets = "bbob.assets";
 
     public static void Hook(string dist, string indexName, string hookFile)
     => Hook(dist, indexName, new string[] { hookFile });
@@ -47,12 +48,13 @@ public static class JSAPiHelper
     {
         string mainjsOriginal = Path.Combine(Environment.CurrentDirectory, "JSApi", "bbobMain.js");
         string mainjsDist = Path.Combine(dist, "bbob.js");
+        string bbobAssetsPath = Path.Combine(dist, bbobAssets);
         string mjs = File.ReadAllText(mainjsOriginal);
-        (dynamic[], string[]) allLinkInfos = getLinkInfos(buildData.LinkInfos, dist);
-        List<ArchiveYear> archives = generateArchives(buildData.LinkInfos, dist);
+        (dynamic[], string[]) allLinkInfos = getLinkInfos(buildData.LinkInfos, bbobAssetsPath);
+        List<ArchiveYear> archives = generateArchives(buildData.LinkInfos, bbobAssetsPath);
         ConfigManager.ConfigJson config = ConfigManager.GetConfigManager().MainConfig;
-        BuildListToFolder(buildData.Categories, dist, "categories");
-        BuildListToFolder(buildData.Tags, dist, "tags");
+        BuildListToFolder(buildData.Categories, bbobAssetsPath, "categories");
+        BuildListToFolder(buildData.Tags, bbobAssetsPath, "tags");
         JSApiType.Blog blog = new JSApiType.Blog()
         {
             categories = listItemToArray(buildData.Categories),

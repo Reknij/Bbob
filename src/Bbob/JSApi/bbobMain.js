@@ -23,7 +23,7 @@ const api = {
             blog.tags.forEach(tag => {
                 if (tag == tagName) {
                     let r = Math.random();
-                    ajaxRequest('get', `${meta.publicPath}tags/${tag}.json?r=${r}`, callback)
+                    ajaxRequest('get', `${meta.publicPath}bbob.assets/tags/${tag}.json?r=${r}`, callback)
                 }
             });
         }
@@ -36,7 +36,7 @@ const api = {
             blog.categories.forEach(category => {
                 if (category == categoryName) {
                     let r = Math.random();
-                    ajaxRequest('get', `${meta.publicPath}categories/${category}.json?r=${r}`, callback)
+                    ajaxRequest('get', `${meta.publicPath}bbob.assets/categories/${category}.json?r=${r}`, callback)
                 }
             });
         }
