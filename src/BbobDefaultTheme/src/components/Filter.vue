@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import Bbob, { ArchiveMonth, LinkInfo } from '../../../Bbob/JSApi/Bbob'
+import Bbob, { FilterSource, LinkInfo } from '../../../Bbob/JSApi/Bbob'
 import router from '../router';
 import Articles from './Articles.vue';
 
@@ -11,8 +11,7 @@ let props = defineProps({
     }
 })
 let title = ref('Categories')
-let filterTags = ref(Bbob.blog.categories)
-let clickFunc: Function = Bbob.api.getLinkInfosWithCategory;
+let filterTags = ref<FilterSource[]>([])
 let mode = ref('warning')
 let source = ref<any[]>([])
 const setSource = (linkArray: any[]) => {
@@ -22,42 +21,40 @@ const setSource = (linkArray: any[]) => {
 function changeMode(changeTo: string) {
     if (changeTo == 'categories') {
         title.value = 'Categories'
-        clickFunc = Bbob.api.getLinkInfosWithCategory;
         filterTags.value = Bbob.blog.categories;
         mode.value = 'warning';
     }
     else if (changeTo == 'tags') {
         title.value = 'Tags'
-        clickFunc = Bbob.api.getLinkInfosWithTag;
         filterTags.value = Bbob.blog.tags;
         mode.value = 'success';
     }
     else if (changeTo == 'archives') {
         title.value = 'Archives'
-        clickFunc = (year: number, callback: Function)=> {
-            Bbob.blog.archives.forEach(archiveYear => {
-                if (archiveYear.year == year){
-                    Bbob.api.getLinkInfosWithArchiveAddress(archiveYear.address, (archiveMonthArray: ArchiveMonth[])=>{
-                        let linkArray: LinkInfo[] = [];
-                        archiveMonthArray.forEach(archiveMonth => {
-                            linkArray.push(...archiveMonth.link);
-                        });
-                        callback(linkArray);
-                    })
-                }
-            });
-        }
-        let archives: string[] = [];
-        Bbob.blog.archives.forEach(archiveYear => {
-            archives.push(archiveYear.year.toString());
-        });
-        filterTags.value = archives
+        filterTags.value = Bbob.blog.archives;
         mode.value = "";
+    }
+}
+function checkIt(filter: FilterSource, status: boolean) {
+    if (status) {
+        Bbob.api.getLinkInfosWithAddress(filter.address, (linkArray) => {
+            setSource(linkArray);
+            router.replace({ query: { checked: filter.text } })
+        })
+    }
+    else {
+        setSource([]);
+        router.replace({ query: {} })
     }
 }
 function directChecked() {
     if (router.currentRoute.value.query.checked) {
-        clickFunc(router.currentRoute.value.query.checked as string, setSource)
+        filterTags.value.forEach(filter => {
+            if (filter.text == router.currentRoute.value.query.checked) {
+                Bbob.api.getLinkInfosWithAddress(filter.address, setSource)
+                return;
+            }
+        });
     }
 }
 changeMode(props.mode);
@@ -80,11 +77,11 @@ watch(() => router.currentRoute.value, (value, oldValue) => {
     <el-check-tag
         v-if="filterTags.length"
         class="tagItem"
-        v-for="(value, index) in filterTags"
+        v-for="(filter, index) in filterTags"
         :key="index"
-        :checked="router.currentRoute.value.query.checked == value"
-        @change="(status: boolean) => router.replace(status?{ query: { checked: value } }:{query:{}})"
-    >{{ value }}</el-check-tag>
+        :checked="router.currentRoute.value.query.checked == filter.text"
+        @change="(status: boolean) => checkIt(filter, status)"
+    >{{ filter.text }}</el-check-tag>
     <Articles :source="source" define-source mode="all"></Articles>
 </template>
 
