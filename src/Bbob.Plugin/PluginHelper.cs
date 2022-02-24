@@ -27,6 +27,18 @@ public static class PluginHelper
         if (pluginsObject.ContainsKey(name)) pluginsObject[name] = obj;
         else pluginsObject.Add(name, obj);
     }
+    public static bool existsObject(string name)
+    {
+        return pluginsObject.ContainsKey(name);
+    }
+    public static bool existsObjectNoNull(string name)
+    {
+        return pluginsObject.ContainsKey(name) && pluginsObject[name] != null;
+    }
+    public static bool existsObjectNoNull<T>(string name)
+    {
+        return pluginsObject.ContainsKey(name) && pluginsObject[name]?.GetType() == typeof(T);
+    }
     public static bool getRegisteredObject<T>(string name, out T? value)
     {
         if (pluginsObject.TryGetValue(name, out object? v) && v is T)
@@ -36,6 +48,14 @@ public static class PluginHelper
         }
         value = default(T);
         return false;
+    }
+    public static T getRegisteredObjectNoNull<T>(string name)
+    {
+        if (getRegisteredObject<T>(name, out T? a) && a != null)
+        {
+            return a;
+        }
+        throw new KeyNotFoundException("Object with given name is not exists or not null!");
     }
 
     public static void clearAllObject()
