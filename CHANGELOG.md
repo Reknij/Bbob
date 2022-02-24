@@ -1,6 +1,7 @@
 # 2022-2-24 11:31:00
 ## Bbob
 - All assets of generation now migrate to one folder 'bbob.assets'.
+- optimize path of app.
 ## Bbob.Plugin
 - Optimize function of PluginHelper
 ## BbobDefaultTheme
