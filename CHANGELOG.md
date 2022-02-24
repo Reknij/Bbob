@@ -1,3 +1,13 @@
+# 2022-2-24 11:31:00
+## Bbob
+- All assets of generation now migrate to one folder 'bbob.assets'.
+## Bbob.Plugin
+- Optimize function of PluginHelper
+## BbobDefaultTheme
+- Blog title color change
+## BbobDocTheme
+- Blog title color change
+
 # 2022-2-23 22:31:00
 ## Bbob
 - Distribution now have archives.
