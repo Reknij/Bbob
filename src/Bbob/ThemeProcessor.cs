@@ -1,14 +1,11 @@
 using System.Text.Json;
-using System.Text.RegularExpressions;
-using Bbob.Main.Configuration;
 using Bbob.Shared;
-using static Bbob.Main.JSApi.JSAPiHelper;
 
 namespace Bbob.Main;
 
 public static class ThemeProcessor
 {
-    static readonly string themesFolder = Path.Combine(Environment.CurrentDirectory, "themes");
+    static readonly string themesFolder = Path.Combine(AppContext.BaseDirectory, "themes"); //themes in base of Bbob directory.
 
     static Dictionary<string, Theme> themes = new Dictionary<string, Theme>();
     public static void LoadAllTheme()

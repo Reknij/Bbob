@@ -47,7 +47,7 @@ public static class JSAPiHelper
 
     public static string BuildBbobJS(string dist, BuildData buildData, ThemeProcessor.ThemeInfo themeInfo)
     {
-        string mainjsOriginal = Path.Combine(Environment.CurrentDirectory, "JSApi", "bbobMain.js");
+        string mainjsOriginal = Path.Combine(AppContext.BaseDirectory, "JSApi", "bbobMain.js");
         string mainjsDist = Path.Combine(dist, "bbob.js");
         string bbobAssetsPath = Path.Combine(dist, bbobAssets);
         string mjs = File.ReadAllText(mainjsOriginal);
@@ -213,7 +213,7 @@ public static class JSAPiHelper
             string newName = $"next.{hash.Substring(0, 9)}.js";
             string newPath = Path.Combine(nextLinkInfoFilesFolderLocal, newName);
             File.Move(nextLinkInfosFile, newPath);
-            nextFileLinkInfos.Add($"{config.baseUrl}{nextLinkInfoFilesFolder}/{newName}");
+            nextFileLinkInfos.Add($"{config.baseUrl}{bbobAssets}/{nextLinkInfoFilesFolder}/{newName}");
         }
 
         return (current.ToArray(), nextFileLinkInfos.ToArray());

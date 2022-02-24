@@ -10,11 +10,17 @@ public static class PluginHelper
         get => _ExecutingPlugin ?? throw new NullReferenceException("Executing plugin is null.");
         set => _ExecutingPlugin = value;
     }
-    private static string? _executingDirectory;
-    public static string ExecutingDirectory
+    private static string? _currentDirectory;
+    private static string? _baseDirectory;
+    public static string CurrentDirectory
     {
-        get => _executingDirectory ?? throw new NullReferenceException("executing directory is null.");
-        set => _executingDirectory = value;
+        get => _currentDirectory ?? throw new NullReferenceException("current directory is null.");
+        set => _currentDirectory = value;
+    }
+    public static string BaseDirectory
+    {
+        get => _baseDirectory ?? throw new NullReferenceException("base directory is null.");
+        set => _baseDirectory = value;
     }
     public static class HelperDelegates
     {
@@ -76,10 +82,10 @@ public static class PluginHelper
         return false;
     }
 
+    private static readonly string configsDirectory = Path.Combine(CurrentDirectory, "configs");
     public static bool getPluginJsonConfig<T>(string pluginName, out T? config)
     {
-        string pluginConfigsFolder = Path.Combine(Environment.CurrentDirectory, "configs");
-        string pluginConfigJson = Path.Combine(pluginConfigsFolder, $"{pluginName}.config.json");
+        string pluginConfigJson = Path.Combine(configsDirectory, $"{pluginName}.config.json");
         if (File.Exists(pluginConfigJson))
             using (FileStream fs = new FileStream(pluginConfigJson, FileMode.Open, FileAccess.Read))
             {
@@ -94,8 +100,7 @@ public static class PluginHelper
 
     public static void savePluginJsonConfig<T>(string pluginName, T config)
     {
-        string pluginConfigsFolder = Path.Combine(Environment.CurrentDirectory, "configs");
-        string pluginConfigJson = Path.Combine(pluginConfigsFolder, $"{pluginName}.config.json");
+        string pluginConfigJson = Path.Combine(configsDirectory, $"{pluginName}.config.json");
         if (File.Exists(pluginConfigJson)) File.Delete(pluginConfigJson);
         using (FileStream fs = File.OpenWrite(pluginConfigJson))
         {
