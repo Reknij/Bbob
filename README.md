@@ -6,3 +6,6 @@ Please see the [Documents](https://reknij.github.io/Bbob.Doc/)
 
 # Why make it?
 Feel funny
+
+# Wait to solve
+- seo
