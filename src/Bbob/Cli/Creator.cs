@@ -43,6 +43,9 @@ public class Creator : ICommand
                     System.Console.WriteLine($"Message: {PluginHelper.ExecutingCommandResult.Message}");
                 return false;
             }
+            PluginSystem.cyclePlugins((plugin)=>{
+                plugin.CommandComplete(Commands.NewCommand);
+            });
             File.WriteAllText(filePath, content);
         }
         catch (System.Exception ex)

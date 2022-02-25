@@ -20,6 +20,9 @@ public class Init : ICommand
             {
                 plugin.InitCommand();
             });
+            PluginSystem.cyclePlugins((plugin)=>{
+                plugin.CommandComplete(Commands.InitCommand);
+            });
         }
         catch (System.Exception ex)
         {

@@ -141,7 +141,9 @@ public class Generator : ICommand
             string newName = JSAPiHelper.BuildBbobJS(distribution, jsBuildData, theme.Info);
             System.Console.WriteLine($"Hook in {mainName} to index file...");
             JSAPiHelper.Hook(distribution, theme.Info.index, newName);
-
+            PluginSystem.cyclePlugins((plugin)=>{
+                plugin.CommandComplete(Commands.GenerateCommand);
+            });
         }
         else
         {
