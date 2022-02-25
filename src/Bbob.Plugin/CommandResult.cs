@@ -4,7 +4,8 @@ public enum CommandOperation
 {
     None,
     Skip,
-    Stop
+    Stop,
+    RunMeAgain
 }
 public struct CommandResult
 {

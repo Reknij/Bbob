@@ -87,22 +87,44 @@ public static class PluginSystem
     public delegate void CyclePluginDelegate(IPlugin plugin);
     public static void cyclePlugins(CyclePluginDelegate cyclePluginDelegate)
     {
-        PluginHelper.ExecutingCommandResult = new CommandResult();
+        List<IPlugin> requireRunAgain = new List<IPlugin>();
         foreach (var p in buildInPlugins)
         {
-            PluginHelper.ExecutingPlugin = getPluginInfo(p);
-            cyclePluginDelegate.Invoke(p);
+            InitializeExecutingPlugin(p);
+            cyclePluginDelegate?.Invoke(p);
+            if (PluginHelper.ExecutingCommandResult.Operation == CommandOperation.RunMeAgain) requireRunAgain.Add(p);
             if (!checkCommandResult()) return;
         }
         foreach (var p in thirdPlugins)
         {
             if (p.Plugin == null) continue;
-            PluginHelper.ExecutingPlugin = p.PluginInfo;
-            cyclePluginDelegate.Invoke(p.Plugin);
+            InitializeExecutingPlugin(p);
+            cyclePluginDelegate?.Invoke(p.Plugin);
+            if (PluginHelper.ExecutingCommandResult.Operation == CommandOperation.RunMeAgain) requireRunAgain.Add(p.Plugin);
             if (!checkCommandResult()) return;
+        }
+        while (requireRunAgain.Count > 0)
+        {
+            for (int i = requireRunAgain.Count; i >= 0; i--)
+            {
+                PluginHelper.ExecutingPlugin = getPluginInfo(requireRunAgain[i]);
+                System.Console.WriteLine($"Run again <{PluginHelper.ExecutingPlugin.name}>");
+                System.Console.WriteLine($"Message: {PluginHelper.ExecutingCommandResult.Message}");
+                cyclePluginDelegate?.Invoke(requireRunAgain[i]);
+                if (PluginHelper.ExecutingCommandResult.Operation != CommandOperation.RunMeAgain) requireRunAgain.RemoveAt(i);
+                if (!checkCommandResult()) return;
+            }
         }
     }
 
+    private static void InitializeExecutingPlugin(IPlugin plugin)=>InitializeExecutingPlugin(getPluginInfo(plugin));
+    private static void InitializeExecutingPlugin(PluginAssemblyLoadContext pContent)=>InitializeExecutingPlugin(pContent.PluginInfo);
+    private static void InitializeExecutingPlugin(PluginJson info)
+    {
+        PluginHelper.ExecutingPlugin = info;
+        PluginHelper.ExecutingCommandResult = new CommandResult();
+    }
+    
     private static bool checkCommandResult()
     {
         if (PluginHelper.ExecutingCommandResult.Operation == CommandOperation.Stop ||
