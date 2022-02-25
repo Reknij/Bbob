@@ -57,11 +57,12 @@ public static class PluginHelper
     }
     public static T getRegisteredObjectNoNull<T>(string name)
     {
-        if (getRegisteredObject<T>(name, out T? a) && a != null)
+        bool exists = getRegisteredObject<T>(name, out T? a);
+        if (exists && a != null)
         {
             return a;
         }
-        throw new KeyNotFoundException("Object with given name is not exists or not null!");
+        throw new KeyNotFoundException($"Object name {name} " + (!exists ? "is not exists!" : "value is null!"));
     }
 
     public static void clearAllObject()
@@ -84,7 +85,7 @@ public static class PluginHelper
     public static bool getPluginJsonConfig<T>(string pluginName, out T? config)
     {
         string configsDirectory = Path.Combine(CurrentDirectory, "configs");
-        
+
         string pluginConfigJson = Path.Combine(configsDirectory, $"{pluginName}.config.json");
         if (File.Exists(pluginConfigJson))
             using (FileStream fs = new FileStream(pluginConfigJson, FileMode.Open, FileAccess.Read))
