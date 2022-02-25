@@ -17,9 +17,9 @@ public static class PluginSystem
     {
         Directory.CreateDirectory(configsFolder);
         System.Console.WriteLine("Loading Plugin System...");
-        PluginHelper.clearAllObject();
         PluginHelper.CurrentDirectory = Environment.CurrentDirectory;
         PluginHelper.BaseDirectory = AppContext.BaseDirectory;
+        PluginHelper.clearAllObject();
         LoadBuildInPlugins();
         LoadThirdPlugins();
         System.Console.WriteLine($"Loaded {AllPluginCount} plugins. ({BuildInPluginCount}|{ThirdPluginCount})");

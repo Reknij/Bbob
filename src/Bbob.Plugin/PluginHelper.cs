@@ -81,10 +81,10 @@ public static class PluginHelper
         }
         return false;
     }
-
-    private static readonly string configsDirectory = Path.Combine(CurrentDirectory, "configs");
     public static bool getPluginJsonConfig<T>(string pluginName, out T? config)
     {
+        string configsDirectory = Path.Combine(CurrentDirectory, "configs");
+        
         string pluginConfigJson = Path.Combine(configsDirectory, $"{pluginName}.config.json");
         if (File.Exists(pluginConfigJson))
             using (FileStream fs = new FileStream(pluginConfigJson, FileMode.Open, FileAccess.Read))
@@ -100,6 +100,7 @@ public static class PluginHelper
 
     public static void savePluginJsonConfig<T>(string pluginName, T config)
     {
+        string configsDirectory = Path.Combine(CurrentDirectory, "configs");
         string pluginConfigJson = Path.Combine(configsDirectory, $"{pluginName}.config.json");
         if (File.Exists(pluginConfigJson)) File.Delete(pluginConfigJson);
         using (FileStream fs = File.OpenWrite(pluginConfigJson))
