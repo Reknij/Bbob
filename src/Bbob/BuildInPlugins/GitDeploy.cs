@@ -7,7 +7,7 @@ namespace Bbob.Main.BuildInPlugin;
 public class GitDeploy : IPlugin
 {
     static readonly string ghDirectoryName = ".deploy_git";
-    static readonly string ghDirectory = Path.Combine(PluginHelper.ExecutingDirectory, ghDirectoryName);
+    static readonly string ghDirectory = Path.Combine(PluginHelper.CurrentDirectory, ghDirectoryName);
     public void DeployCommand(string distribution)
     {
         if (PluginHelper.getPluginJsonConfig<GitConfig>("GitDeploy", out var config) && config != null)
@@ -54,7 +54,7 @@ public class GitDeploy : IPlugin
 
     private void cloneReposAndCheckout(GitConfig config)
     {
-        PluginHelper.printConsole(runCommand($"git clone {config.repos} {ghDirectoryName}", PluginHelper.ExecutingDirectory));
+        PluginHelper.printConsole(runCommand($"git clone {config.repos} {ghDirectoryName}", PluginHelper.CurrentDirectory));
         if (runCommand($"git checkout -b {config.branch}", ghDirectory).Contains("already exists")) runCommand($"git checkout {config.branch}", ghDirectory);
     }
 
