@@ -11,6 +11,9 @@ interface query {
 const noArticle = 'No exists article!';
 const route = useRoute();
 const query = route.query as any as query;
+if (Bbob.meta.extra.shortAddress){
+    query.address = `${Bbob.meta.extra.shortAddress.startOfAddress}${query.address}${Bbob.meta.extra.shortAddress.endOfAddress}`
+}
 let article = ref<Article>({
     title: noArticle,
     date: noArticle,
