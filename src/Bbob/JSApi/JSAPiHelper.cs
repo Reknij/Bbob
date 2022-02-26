@@ -63,7 +63,7 @@ public static class JSAPiHelper
         };
         JSApiType.BbobMeta meta = new JSApiType.BbobMeta(config);
         meta.copyright = meta.copyright.Replace("year", DateTime.Now.Year.ToString()).Replace("author", config.author).Replace("themeName", themeInfo.name);
-        LoadThirdMetas(meta);
+        LoadThirdMetas(meta, buildData.Metas);
         JsonSerializerOptions a = new JsonSerializerOptions();
         string blogPlain = $"\nconst blog = {JsonSerializer.Serialize(blog, blog.GetType())}";
         string metaPlain = $"\nconst meta =  {JsonSerializer.Serialize(meta, meta.GetType())}";
@@ -123,7 +123,7 @@ public static class JSAPiHelper
         return filterSources.ToArray();
     }
 
-    private static void LoadThirdMetas(JSApiType.BbobMeta bbobMeta)
+    private static void LoadThirdMetas(JSApiType.BbobMeta bbobMeta, Dictionary<string, object> pluginsMeta)
     {
         Directory.CreateDirectory(metasFolder);
         string[] metas = Directory.GetFiles(metasFolder);
@@ -134,21 +134,51 @@ public static class JSAPiHelper
             if (Shared.SharedLib.PathHelper.FileNameEndWith(meta, ext))
             {
                 string name = Path.GetFileName(meta).Replace(ext, string.Empty);
-                object? third = JsonSerializer.Deserialize(File.ReadAllText(meta), typeof(Object));
+                object? third = JsonSerializer.Deserialize<IDictionary<string, object>>(File.ReadAllText(meta));
                 if (third == null) continue;
                 metasJson.Add(name, third);
             }
-
         }
-        string extraPlain = "{";
+        foreach (var item in pluginsMeta)
+        {
+            if (!metasJson.ContainsKey(item.Key)) metasJson.Add(item.Key, item.Value);
+            else
+            {
+                IDictionary<string, object> metaDict = getPropertiesToDictionary(metasJson[item.Key]);
+                IDictionary<string, object> pluginMetaDict = getPropertiesToDictionary(item.Value);
+                foreach (var pm in pluginMetaDict)
+                {
+                    if (!metaDict.ContainsKey(pm.Key)) metaDict.Add(pm.Key, pm.Value);
+                }
+                metasJson[item.Key] = metaDict;
+            }
+        }
+        var extra = (IDictionary<string, object>)bbobMeta.extra;
         foreach (var item in metasJson)
         {
-            extraPlain += $"\"{item.Key}\":{JsonSerializer.Serialize(item.Value)},";
+            if (!extra.ContainsKey(item.Key))
+            {
+                extra.Add(item.Key, item.Value);
+            }
+            else
+            {
+                System.Console.WriteLine($"extra meta already contain target meta '{item.Key}'");
+            }
         }
-        if (metasJson.Count > 0)
+    }
+
+    private static IDictionary<string, object> getPropertiesToDictionary(object obj)
+    {
+        if (obj is IDictionary<string, object>) return (IDictionary<string, object>)obj;
+        var properties = obj.GetType().GetProperties();
+        Dictionary<string, object> objDict = new ();
+        foreach (var property in properties)
         {
-            bbobMeta.extra = JsonSerializer.Deserialize(extraPlain.Remove(extraPlain.Length - 1) + '}', typeof(object));
+            var value = property.GetValue(obj);
+            System.Console.WriteLine(property.Name);
+            if (value != null) objDict.Add(property.Name, value);
         }
+        return objDict;
     }
 
     private static FilterSource[] generateArchives(List<dynamic> LinkInfos, string dist, string name)

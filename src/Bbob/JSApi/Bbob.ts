@@ -32,7 +32,7 @@ export interface BbobMeta{
     blogCountOneTime: number,
     allLink: string,
     baseUrl: string,
-    extra: object
+    extra: any
 }
 export interface BbobJSApi {
     blog: {

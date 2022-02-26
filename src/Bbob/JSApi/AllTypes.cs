@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using static Bbob.Main.Cli.Generator;
 using Bbob.Plugin;
+using System.Dynamic;
 
 namespace Bbob.Main.JSApi;
 
@@ -26,7 +27,7 @@ public class JSApiType
         public int blogCountOneTime { get; set; }
         public string allLink { get; set; }
         public string baseUrl{get;set;}
-        public object? extra { get; set; }
+        public dynamic extra { get; set; }
         public BbobMeta(Configuration.ConfigManager.ConfigJson config)
         {
             this.blogName = config.blogName;
@@ -37,7 +38,7 @@ public class JSApiType
             this.blogCountOneTime = config.blogCountOneTime;
             this.allLink = config.allLink;
             this.baseUrl = config.baseUrl;
-            extra = new Object();
+            extra = new ExpandoObject();
         }
     }
 
@@ -46,14 +47,17 @@ public class JSApiType
         public List<dynamic> LinkInfos { get; set; }
         public List<KeyValuePair<string, List<dynamic>>> Categories { get; set; }
         public List<KeyValuePair<string, List<dynamic>>> Tags { get; set; }
+        public Dictionary<string, dynamic> Metas {get;set;}
 
         public BuildData(List<dynamic> LinkInfos,
                         List<KeyValuePair<string, List<dynamic>>> categories,
-                        List<KeyValuePair<string, List<dynamic>>> tags)
+                        List<KeyValuePair<string, List<dynamic>>> tags,
+                        Dictionary<string, dynamic> metas)
         {
             this.LinkInfos = LinkInfos;
-            Categories = categories;
-            Tags = tags;
+            this.Categories = categories;
+            this.Tags = tags;
+            this.Metas = metas;
         }
     }
 }
