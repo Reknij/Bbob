@@ -68,9 +68,13 @@ public static class PluginSystem
                         System.Console.WriteLine("Plugin json file can't loaded.");
                         break;
                     }
-                    if (pluginInfo.name == null)
+                    try
                     {
-                        pluginInfo.name = Path.GetDirectoryName(folder);
+                        var a = pluginInfo.name;
+                    }
+                    catch (NullReferenceException)
+                    {
+                        pluginInfo.name = Path.GetDirectoryName(folder) ?? $"UnknownPluginName.{Path.GetRandomFileName()}";
                     }
                     string pluginDll = Path.Combine(folder, pluginInfo.entry);
                     var mainPlugin = new PluginAssemblyLoadContext(pluginDll, pluginInfo);
