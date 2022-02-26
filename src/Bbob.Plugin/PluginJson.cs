@@ -2,11 +2,16 @@ namespace Bbob.Plugin;
 
 public class PluginJson
 {
-    public string? name{get;set;}
-    public string description{get;set;}
-    public string author{get;set;}
-    public string? repository{get;set;}
-    public string entry{get;set;}
+    private string? _name;
+    public string name
+    {
+        get => _name ?? throw new NullReferenceException("Plugin name is null");
+        set => _name = value;
+    }
+    public string description { get; set; }
+    public string author { get; set; }
+    public string? repository { get; set; }
+    public string entry { get; set; }
     public PluginJson()
     {
         entry = "MainPlugin.dll";

@@ -27,6 +27,7 @@ public static class PluginHelper
         public delegate void ModifyObjectDelegate<T>(ref T? obj);
     }
     static Dictionary<string, object?> pluginsObject = new Dictionary<string, object?>();
+    static Dictionary<string, object> metas = new Dictionary<string, object>();
 
     public static void registerObject(string name, object? obj)
     {
@@ -82,17 +83,30 @@ public static class PluginHelper
         }
         return false;
     }
+    public static bool unregisterObject(string name)
+    {
+        return pluginsObject.Remove(name);
+    }
     public static bool getPluginJsonConfig<T>(string pluginName, out T? config)
     {
         string configsDirectory = Path.Combine(CurrentDirectory, "configs");
 
         string pluginConfigJson = Path.Combine(configsDirectory, $"{pluginName}.config.json");
         if (File.Exists(pluginConfigJson))
-            using (FileStream fs = new FileStream(pluginConfigJson, FileMode.Open, FileAccess.Read))
+        {
+            try
             {
-                config = JsonSerializer.Deserialize<T>(fs);
-                return true;
+                using (FileStream fs = new FileStream(pluginConfigJson, FileMode.Open, FileAccess.Read))
+                {
+                    config = JsonSerializer.Deserialize<T>(fs);
+                    return true;
+                }
             }
+            catch (System.Exception ex)
+            {
+                System.Console.WriteLine($"Get plugin config error:\n{ex.ToString()}");
+            }
+        }
         config = default(T);
         return false;
     }
@@ -101,20 +115,48 @@ public static class PluginHelper
 
     public static void savePluginJsonConfig<T>(string pluginName, T config)
     {
-        string configsDirectory = Path.Combine(CurrentDirectory, "configs");
-        string pluginConfigJson = Path.Combine(configsDirectory, $"{pluginName}.config.json");
-        if (File.Exists(pluginConfigJson)) File.Delete(pluginConfigJson);
-        using (FileStream fs = File.OpenWrite(pluginConfigJson))
+        try
         {
-            JsonSerializer.Serialize<T>(fs, config);
+            string configsDirectory = Path.Combine(CurrentDirectory, "configs");
+            string pluginConfigJson = Path.Combine(configsDirectory, $"{pluginName}.config.json");
+            if (File.Exists(pluginConfigJson)) File.Delete(pluginConfigJson);
+            using (FileStream fs = File.OpenWrite(pluginConfigJson))
+            {
+                JsonSerializer.Serialize<T>(fs, config);
+            }
+        }
+        catch (System.Exception ex)
+        {
+            System.Console.WriteLine($"Save plugin config error:\n{ex.ToString()}");
         }
     }
     public static void savePluginJsonConfig<T>(T config) =>
-    savePluginJsonConfig<T>(ExecutingPlugin.name ?? throw new NullReferenceException("Executing plugin name is null."), config);
+    savePluginJsonConfig<T>(ExecutingPlugin.name, config);
     public static void printConsole(string msg)
     {
         System.Console.WriteLine($"[{ExecutingPlugin.name}]: {msg}");
     }
+
+    public static void registerMeta(object meta)
+    {
+        registerMeta(ExecutingPlugin.name, meta);
+    }
+    public static void registerMeta(string metaName, object meta)
+    {
+        if (metas.ContainsKey(metaName)) metas.Remove(metaName);
+        metas.Add(metaName, meta);
+    }
+    public static bool unregisterMeta() => unregisterMeta(ExecutingPlugin.name);
+    public static bool unregisterMeta(string metaName)
+    {
+        if (metas.ContainsKey(metaName))
+        {
+            metas.Remove(metaName);
+            return true;
+        }
+        return false;
+    }
+    public static Dictionary<string, object> _getAllMetas() => metas;
 
     public static sortArticlesDelegate? sortArticles { get; set; }
     public static sortCategoriesDelegate? sortCategories { get; set; }
