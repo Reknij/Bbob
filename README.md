@@ -2,7 +2,10 @@
 One serverless blog framework.
 
 # How to use?
-Please see the (Document)[https://reknij.github.io/Bbob.Doc/]
+Please see the [Documents](https://reknij.github.io/Bbob.Doc/)
 
 # Why make it?
 Feel funny
+
+# Wait to solve
+- seo
