@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using Bbob.Plugin;
 
@@ -23,7 +24,7 @@ public class GitDeploy : IPlugin
             {
                 if (!Regex.IsMatch(runCommand("git remote -v", ghDirectory), @$"origin\s+{config.repos}"))
                 {
-                     PluginHelper.printConsole("Exists other repository, replace it.");
+                    PluginHelper.printConsole("Exists other repository, replace it.");
                     Shared.SharedLib.DirectoryHelper.DeleteDirectory(ghDirectory);
                     cloneReposAndCheckout(config);
                 }
@@ -44,6 +45,7 @@ public class GitDeploy : IPlugin
             runCommand($"git add .", ghDirectory);
             runCommand($"git commit -m \"{config.message}\"", ghDirectory);
             PluginHelper.printConsole(runCommand($"git push -f origin {config.branch}", ghDirectory));
+            updateSitemap(distribution);
             PluginHelper.printConsole("Done..");
         }
         else
@@ -51,7 +53,51 @@ public class GitDeploy : IPlugin
             PluginHelper.printConsole("Config is null, please save you config into ../configs/GitDeploy.config.json");
         }
     }
-
+    private void updateSitemap(string distribution)
+    {
+        string robots = Path.Combine(distribution, "robots.txt");
+        if (File.Exists(robots))
+        {
+            var result = Regex.Match(File.ReadAllText(robots), "Sitemap: (.*)(\n|$)", RegexOptions.Singleline);
+            if (result.Success)
+            {
+                PluginHelper.printConsole("Found sitemap in robots.txt file, will update sitemap if modified.");
+                string urlOfSitemap = result.Result("$1");
+                string sitemap = urlOfSitemap.Substring(urlOfSitemap.IndexOf("sitemap."));
+                PluginHelper.printConsole($"Sitemap name: {sitemap}");
+                string sitemapDist = Path.Combine(distribution, sitemap);
+                string sitemapRepos = Path.Combine(ghDirectory, sitemap);
+                if (File.Exists(sitemapDist))
+                {
+                    SHA256 sHA256 = SHA256.Create();
+                    string hashDist = Shared.SharedLib.BytesToString(sHA256.ComputeHash(File.OpenRead(sitemapDist)));
+                    string hashRepos = "";
+                    if (File.Exists(sitemapRepos))
+                    {
+                        hashRepos = Shared.SharedLib.BytesToString(sHA256.ComputeHash(File.OpenRead(sitemapRepos)));
+                    }
+                    if (hashDist != hashRepos)
+                    {
+                        HttpClient client = new HttpClient();
+                        PluginHelper.printConsole("ping sitemap to google now.");
+                        var task = client.GetAsync($"https://www.google.com/ping?sitemap={urlOfSitemap}");
+                        task.Wait();
+                        PluginHelper.printConsole((task.Result.IsSuccessStatusCode ? "Success" : "Failed") + $" ping google update sitemap with url '{urlOfSitemap}'");
+                    }
+                    else
+                    {
+                        PluginHelper.printConsole("Sitemap file content is same with git repository.");
+                        PluginHelper.printConsole($"Hash of distribution: {hashDist}");
+                        PluginHelper.printConsole($"Hash of git repository: {hashRepos}");
+                    }
+                }
+                else
+                {
+                    PluginHelper.printConsole($"robots.txt contain sitemap but physical path '{sitemapDist}' not exists.");
+                }
+            }
+        }
+    }
     private void cloneReposAndCheckout(GitConfig config)
     {
         PluginHelper.printConsole(runCommand($"git clone {config.repos} {ghDirectoryName}", PluginHelper.CurrentDirectory));
@@ -103,6 +149,6 @@ public class GitDeploy : IPlugin
         public string? repos { get; set; }
         public string? branch { get; set; }
         public string? message { get; set; }
-        public string? type {get;set;}
+        public string? type { get; set; }
     }
 }
