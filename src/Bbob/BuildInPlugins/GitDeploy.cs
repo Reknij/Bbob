@@ -69,27 +69,11 @@ public class GitDeploy : IPlugin
                 string sitemapRepos = Path.Combine(ghDirectory, sitemap);
                 if (File.Exists(sitemapDist))
                 {
-                    SHA256 sHA256 = SHA256.Create();
-                    string hashDist = Shared.SharedLib.BytesToString(sHA256.ComputeHash(File.OpenRead(sitemapDist)));
-                    string hashRepos = "";
-                    if (File.Exists(sitemapRepos))
-                    {
-                        hashRepos = Shared.SharedLib.BytesToString(sHA256.ComputeHash(File.OpenRead(sitemapRepos)));
-                    }
-                    if (hashDist != hashRepos)
-                    {
-                        HttpClient client = new HttpClient();
-                        PluginHelper.printConsole("ping sitemap to google now.");
-                        var task = client.GetAsync($"https://www.google.com/ping?sitemap={urlOfSitemap}");
-                        task.Wait();
-                        PluginHelper.printConsole((task.Result.IsSuccessStatusCode ? "Success" : "Failed") + $" ping google update sitemap with url '{urlOfSitemap}'");
-                    }
-                    else
-                    {
-                        PluginHelper.printConsole("Sitemap file content is same with git repository.");
-                        PluginHelper.printConsole($"Hash of distribution: {hashDist}");
-                        PluginHelper.printConsole($"Hash of git repository: {hashRepos}");
-                    }
+                    HttpClient client = new HttpClient();
+                    PluginHelper.printConsole("ping sitemap to google now.");
+                    var task = client.GetAsync($"https://www.google.com/ping?sitemap={urlOfSitemap}");
+                    task.Wait();
+                    PluginHelper.printConsole((task.Result.IsSuccessStatusCode ? "Success" : "Failed") + $" ping google update sitemap with url '{urlOfSitemap}'");
                 }
                 else
                 {
