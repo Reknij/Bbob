@@ -1,3 +1,14 @@
+# 2022-2-26 16:53:00
+## Bbob
+- Optimize meta process
+- Add SitemapGenerator build-in plugin.
+- Add CopyToDist build-in plugin.
+- BuildWebArticleJson build-in plugin now support shortAddress, must enable in config file `"shortAddress": true`.
+## Bbob.Plugin
+- Plugin can register meta by self.
+- PluginHelper optimize.
+- CommandOperation add `RunMeAgain`.
+
 # 2022-2-24 11:31:00
 ## Bbob
 - All assets of generation now migrate to one folder 'bbob.assets'.
