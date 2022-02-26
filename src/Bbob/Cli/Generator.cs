@@ -5,6 +5,7 @@ using Bbob.Main.Configuration;
 using Bbob.Main.JSApi;
 using static Bbob.Main.JSApi.JSApiType;
 using System.Text.RegularExpressions;
+using System.Dynamic;
 
 namespace Bbob.Main.Cli;
 
@@ -81,48 +82,16 @@ public class Generator : ICommand
                 }
             }
             if (isSkip()) continue;
-
-            PluginHelper.getRegisteredObject<dynamic>("link", out dynamic? link);
-            if (link == null) continue;
-            allLink.Add(link);
-
-            PluginHelper.getRegisteredObject<dynamic>("article", out dynamic? article);
-            if (article == null) continue;
-
-            if (((IDictionary<string, object?>)article).TryGetValue("categories", out object? c) && c is List<object> categories)
+            if (!ProcessData())
             {
-                foreach (var category in categories)
-                {
-                    if (category is string text)
-                    {
-                        if (!allCategory.ContainsKey(text))
-                        {
-                            allCategory.Add(text, new List<dynamic> { link });
-                        }
-                        else allCategory[text].Add(link);
-                    }
-                }
-            }
-
-            if (((IDictionary<string, object?>)article).TryGetValue("tags", out object? t) && t is List<object> tags)
-            {
-                foreach (var tag in tags)
-                {
-                    if (tag is string text)
-                    {
-                        if (!allTag.ContainsKey(text))
-                        {
-                            allTag.Add(text, new List<dynamic> { link });
-                        }
-                        else allTag[text].Add(link);
-                    }
-                }
+                System.Console.WriteLine("Process data failed because no exists target objects.");
+                continue;
             }
         }
         BuildData jsBuildData;
         try
         {
-            jsBuildData = SortAll();
+            jsBuildData = GetBuildData();
         }
         catch (System.Exception ex)
         {
@@ -141,7 +110,8 @@ public class Generator : ICommand
             string newName = JSAPiHelper.BuildBbobJS(distribution, jsBuildData, theme.Info);
             System.Console.WriteLine($"Hook in {mainName} to index file...");
             JSAPiHelper.Hook(distribution, theme.Info.index, newName);
-            PluginSystem.cyclePlugins((plugin)=>{
+            PluginSystem.cyclePlugins((plugin) =>
+            {
                 plugin.CommandComplete(Commands.GenerateCommand);
             });
         }
@@ -154,7 +124,48 @@ public class Generator : ICommand
         return true;
     }
 
-    private BuildData SortAll()
+    private bool ProcessData()
+    {
+        
+        PluginHelper.getRegisteredObject<dynamic>("link", out dynamic? link);
+        PluginHelper.getRegisteredObject<dynamic>("article", out dynamic? article);
+        if (link == null) return false;
+        if (article == null) return false;
+        allLink.Add(link);
+
+        if (((IDictionary<string, object?>)article).TryGetValue("categories", out object? c) && c is List<object> categories)
+        {
+            foreach (var category in categories)
+            {
+                if (category is string text)
+                {
+                    if (!allCategory.ContainsKey(text))
+                    {
+                        allCategory.Add(text, new List<dynamic> { link });
+                    }
+                    else allCategory[text].Add(link);
+                }
+            }
+        }
+
+        if (((IDictionary<string, object?>)article).TryGetValue("tags", out object? t) && t is List<object> tags)
+        {
+            foreach (var tag in tags)
+            {
+                if (tag is string text)
+                {
+                    if (!allTag.ContainsKey(text))
+                    {
+                        allTag.Add(text, new List<dynamic> { link });
+                    }
+                    else allTag[text].Add(link);
+                }
+            }
+        }
+        return true;
+    }
+
+    private BuildData GetBuildData()
     {
         var listCategory = allCategory.ToList();
         var listTag = allTag.ToList();
@@ -182,7 +193,7 @@ public class Generator : ICommand
             listTag.Sort((item1, item2) => PluginHelper.sortTags(item1, item2));
         }
 
-        return new BuildData(allLink, listCategory, listTag);
+        return new BuildData(allLink, listCategory, listTag, PluginHelper._getAllMetas());
     }
 
     private void printResult()
