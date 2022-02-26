@@ -12,13 +12,14 @@ public class BuildWebArticleJson : IPlugin
 
         PluginHelper.getRegisteredObject<dynamic>("article", out var article);
         if (article == null) return;
-        DateTime dateTime = article.date != null ? DateTime.Parse(article.date) : DateTime.Now;
-        string year = dateTime.Year.ToString();
-        string month = dateTime.Month.ToString();
-        string day = dateTime.Day.ToString();
+        // DateTime dateTime = article.date != null ? DateTime.Parse(article.date) : DateTime.Now;
+        // string year = dateTime.Year.ToString();
+        // string month = dateTime.Month.ToString();
+        // string day = dateTime.Day.ToString();
         string targetFile = $"{Path.GetFileNameWithoutExtension(filePath)}.json";
         string folder = "articles";
-        string FileLocalFolder = Path.Combine(distribution, JSApi.JSAPiHelper.bbobAssets, folder, year, month, day);
+        //string FileLocalFolder = Path.Combine(distribution, JSApi.JSAPiHelper.bbobAssets, folder, year, month, day);
+        string FileLocalFolder = Path.Combine(distribution, JSApi.JSAPiHelper.bbobAssets, folder);
         string FileLocal = Path.Combine(FileLocalFolder, targetFile);
         Directory.CreateDirectory(FileLocalFolder);
         SHA256 sha256 = SHA256.Create();
@@ -41,11 +42,23 @@ public class BuildWebArticleJson : IPlugin
         {
             throw new NullReferenceException("baseUrl is null");
         }
-        PluginHelper.modifyRegisteredObject<dynamic>("link", (ref dynamic? link)=>{
+        PluginHelper.getPluginJsonConfig<Config>(out Config? config);
+        bool isShortAddress = config != null ? config.shortAddress : false;
+        PluginHelper.modifyRegisteredObject<dynamic>("link", (ref dynamic? link) =>
+        {
             if (link == null) return;
-            link.address = $"{publicPath}{JSApi.JSAPiHelper.bbobAssets}/{folder}/{year}/{month}/{day}/{newName}";
+            link.address = isShortAddress ? Path.GetFileNameWithoutExtension(newName) : $"{publicPath}{JSApi.JSAPiHelper.bbobAssets}/{folder}/{newName}";
+            //link.address = $"{publicPath}{JSApi.JSAPiHelper.bbobAssets}/{folder}/{year}/{month}/{day}/{newName}";
         });
+        if (isShortAddress)
+        {
+            Meta meta = new Meta($"{publicPath}{JSApi.JSAPiHelper.bbobAssets}/{folder}/", ".json");
+            PluginHelper.registerMeta("shortAddress", meta);
+        }
     }
+
+    public record class Config(bool shortAddress);
+    public record class Meta(string startOfAddress, string endOfAddress);
 
     private class MarkdownFrontMatter
     {
