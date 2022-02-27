@@ -27,6 +27,7 @@ public class JSApiType
         public int blogCountOneTime { get; set; }
         public string allLink { get; set; }
         public string baseUrl{get;set;}
+        public string lastBuild {get;set;}
         public dynamic extra { get; set; }
         public BbobMeta(Configuration.ConfigManager.ConfigJson config)
         {
@@ -38,6 +39,7 @@ public class JSApiType
             this.blogCountOneTime = config.blogCountOneTime;
             this.allLink = config.allLink;
             this.baseUrl = config.baseUrl;
+            this.lastBuild = Shared.SharedLib.DateTimeHelper.GetDateTimeNowString();
             extra = new ExpandoObject();
         }
     }
