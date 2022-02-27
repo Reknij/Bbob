@@ -1,3 +1,8 @@
+# 2022-2-27 17:34:00
+## Bbob
+- meta add `lastBuild`.
+- SitemapGenerator can generate sitemap type html. Type txt change to xml.
+
 # 2022-2-26 16:53:00
 ## Bbob
 - Optimize meta process
