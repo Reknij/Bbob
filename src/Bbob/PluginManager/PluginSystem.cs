@@ -2,6 +2,7 @@ using Bbob.Main.BuildInPlugin;
 using Bbob.Plugin;
 using System.Reflection;
 using System.Text.Json;
+using static Bbob.Plugin.ConfigJson;
 
 namespace Bbob.Main.PluginManager;
 
@@ -19,7 +20,6 @@ public static class PluginSystem
         System.Console.WriteLine("Loading Plugin System...");
         PluginHelper.CurrentDirectory = Environment.CurrentDirectory;
         PluginHelper.BaseDirectory = AppContext.BaseDirectory;
-        PluginHelper.clearAllObject();
         LoadBuildInPlugins();
         LoadThirdPlugins();
         System.Console.WriteLine($"Loaded {AllPluginCount} plugins. ({BuildInPluginCount}|{ThirdPluginCount})");
@@ -40,6 +40,7 @@ public static class PluginSystem
                 if (type.FullName == null) continue;
                 if (type.FullName.StartsWith(buildInTypesPath) && plugin == type.Name)
                 {
+                    InitializeExecutingPlugin(getPluginInfo(type));
                     var p = (IPlugin?)Activator.CreateInstance(type);
                     if (p == null) continue;
                     buildInPlugins.Add(p);
@@ -77,6 +78,7 @@ public static class PluginSystem
                         pluginInfo.name = Path.GetDirectoryName(folder) ?? $"UnknownPluginName.{Path.GetRandomFileName()}";
                     }
                     string pluginDll = Path.Combine(folder, pluginInfo.entry);
+                    InitializeExecutingPlugin(pluginInfo);
                     var mainPlugin = new PluginAssemblyLoadContext(pluginDll, pluginInfo);
                     if (mainPlugin.Plugin != null)
                     {
@@ -121,14 +123,14 @@ public static class PluginSystem
         }
     }
 
-    private static void InitializeExecutingPlugin(IPlugin plugin)=>InitializeExecutingPlugin(getPluginInfo(plugin));
-    private static void InitializeExecutingPlugin(PluginAssemblyLoadContext pContent)=>InitializeExecutingPlugin(pContent.PluginInfo);
+    private static void InitializeExecutingPlugin(IPlugin plugin) => InitializeExecutingPlugin(getPluginInfo(plugin));
+    private static void InitializeExecutingPlugin(PluginAssemblyLoadContext pContent) => InitializeExecutingPlugin(pContent.PluginInfo);
     private static void InitializeExecutingPlugin(PluginJson info)
     {
         PluginHelper.ExecutingPlugin = info;
         PluginHelper.ExecutingCommandResult = new CommandResult();
     }
-    
+
     private static bool checkCommandResult()
     {
         if (PluginHelper.ExecutingCommandResult.Operation == CommandOperation.Stop ||
@@ -137,11 +139,11 @@ public static class PluginSystem
         return true;
     }
 
-    public static PluginJson getPluginInfo(IPlugin plugin)
+    public static PluginJson getPluginInfo(IPlugin plugin) => getPluginInfo(plugin.GetType());
+    public static PluginJson getPluginInfo(Type typeOfPlugin)
     {
-        Type type = plugin.GetType();
         PluginJson info = new PluginJson();
-        info.name = type.Name;
+        info.name = typeOfPlugin.Name;
         info.author = "Bbob";
         info.description = "This is build-in plugin.";
         info.repository = "No have repository";
