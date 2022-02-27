@@ -68,57 +68,92 @@ public class SitemapGenerator : IPlugin
         if (config != null)
         {
             string robot = Path.Combine(distribution, "robots.txt");
-            string sitemapPath = $"Sitemap: {config.domain}sitemap.txt";
+            string sitemapPath = $"Sitemap: {config.domain}sitemap.xml";
             File.WriteAllText(robot, sitemapPath);
         }
     }
 
     private void generateSitemap(string distribution)
     {
-        string sitemap = Path.Combine(distribution, "sitemap.txt");
+        string sitemapFile = Path.Combine(distribution, "sitemap.xml");
         List<string> aurl = new List<string>();
-        if (File.Exists(sitemap))
+        if (File.Exists(sitemapFile))
         {
-            aurl.AddRange(File.ReadAllLines(sitemap));
+            aurl.AddRange(File.ReadAllLines(sitemapFile));
         }
         aurl.AddRange(articlesUrl);
-        File.WriteAllLines(sitemap, aurl);
+        SitemapXml sitemapXml = new SitemapXml() { Format = true };
+        sitemapXml.AddRange(aurl);
+        sitemapXml.WriteToFile(sitemapFile);
         generateSitemapHtml(distribution, aurl);
     }
 
     private void generateSitemapHtml(string distribution, List<string> addressList)
     {
         string sitemap = Path.Combine(distribution, "itissm.html");
-        string metas = "<meta charset=\"UTF-8\"/>"+
-                        "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />"+
+        string metas = "<meta charset=\"UTF-8\"/>" +
+                        "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />" +
                         "<meta name=\"robots\" content=\"noindex\">";
         string style = "<style>li{margin: 15px auto}</style>";
         UnsortedList unsortedList = new UnsortedList();
         foreach (string address in addressList)
         {
-            unsortedList.AddItem($"<a href=\"{address}\">address</a>");
+            unsortedList.Add($"<a href=\"{address}\">address</a>");
         }
         string html = $"<!DOCTYPE html><html lang=\"en\"><head>{metas}<title>Sitemap Html</title>{style}</head><body>{unsortedList}</body></html>";
         File.WriteAllText(sitemap, html);
     }
 
+    class SitemapXml
+    {
+        List<string> address = new List<string>();
+        public bool Format { get; set; } = false;
+        public SitemapXml()
+        {
+        }
+        public void Add(string url) => address.Add(url);
+        public void AddRange(IEnumerable<string> range) => address.AddRange(range);
+        public override string ToString()
+        {
+            string real = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+            if (Format) real += "\n";
+            real += "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">";
+
+            foreach (string a in address)
+            {
+                string add = replaceIt(a);
+                real += Format ? $"\n  <url>\n    <loc>{add}</loc>\n  </url>" : $"<url><loc>{add}</loc></url>";
+            }
+            return real + "\n</urlset> ";
+        }
+        public void WriteToFile(string file) => File.WriteAllText(file, this.ToString());
+        public string replaceIt(string t)
+        {
+            return t.Replace(" ", "&nbsp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("&", "&amp;").Replace("\"", "&quot;").Replace("'", "&apos;");
+        }
+    }
+
     class UnsortedList
     {
         string html;
-        bool Format {get;set;} = false;
+        public bool Format { get; set; } = false;
+        List<string> items = new List<string>();
         public UnsortedList()
         {
             html = "<ul>";
             if (Format) html += '\n';
         }
-        public void AddItem(string item)
-        {
-            html += $"<li>{item}</li>";
-            if (Format) html += '\n';
-        }
+        public void Add(string item) => items.Add(item);
+        public void AddRange(IEnumerable<string> range) => items.AddRange(range);
         public override string ToString()
         {
-            return html + "</ul>";
+            string real = html;
+            foreach (string item in items)
+            {
+                real += $"<li>{item}</li>";
+                if (Format) html += '\n';
+            }
+            return real + "</ul>";
         }
     }
 
