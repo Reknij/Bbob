@@ -5,7 +5,10 @@ import Bbob from '../../../Bbob/JSApi/Bbob'
 
 <template>
     <p class="copyright">
-        © 2022 {{Bbob.meta.author}} Powered by <a class="beautifulLink" href="https://github.com/Reknij/Bbob">Bbob</a> & default v1.0
+        © 2022 {{Bbob.meta.author}} Powered by <a class="beautifulLink" href="https://github.com/Reknij/Bbob">Bbob</a> & default
+    </p>
+    <p class="copyright">
+        Last build: {{Bbob.meta.lastBuild}}
     </p>
 </template>
 
