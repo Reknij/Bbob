@@ -52,7 +52,7 @@ public static class JSAPiHelper
         string bbobAssetsPath = Path.Combine(dist, bbobAssets);
         string mjs = File.ReadAllText(mainjsOriginal);
         (dynamic[], string[]) allLinkInfos = getLinkInfos(buildData.LinkInfos, bbobAssetsPath);
-        ConfigManager.ConfigJson config = ConfigManager.GetConfigManager().MainConfig;
+        ConfigJson config = ConfigManager.GetConfigManager().MainConfig;
         JSApiType.Blog blog = new JSApiType.Blog()
         {
             categories = BuildListToFolder(buildData.Categories, bbobAssetsPath, "categories"),
@@ -196,7 +196,7 @@ public static class JSAPiHelper
 
     private static (dynamic[], string[]) getLinkInfos(List<dynamic> LinkInfos, string dist)
     {
-        ConfigManager.ConfigJson config = ConfigManager.GetConfigManager().MainConfig;
+        ConfigJson config = ConfigManager.GetConfigManager().MainConfig;
         List<dynamic> current = new List<dynamic>();
         string nextLinkInfoFilesFolder = "nextLinkInfoFiles";
         string nextLinkInfoFilesFolderLocal = Path.Combine(dist, nextLinkInfoFilesFolder);

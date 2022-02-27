@@ -29,7 +29,7 @@ public class JSApiType
         public string baseUrl{get;set;}
         public string lastBuild {get;set;}
         public dynamic extra { get; set; }
-        public BbobMeta(Configuration.ConfigManager.ConfigJson config)
+        public BbobMeta(ConfigJson config)
         {
             this.blogName = config.blogName;
             this.author = config.author;
