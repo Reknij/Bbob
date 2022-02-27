@@ -1,3 +1,10 @@
+# 2022-2-27 21:50:00
+## Bbob
+- remake SiteGenerator plugin. now is require theme info, no need config.
+- optimzie loading of Bbob.
+## Bbob.Plugin
+- add getTheme function
+
 # 2022-2-27 17:34:00
 ## Bbob
 - meta add `lastBuild`.
