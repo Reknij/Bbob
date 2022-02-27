@@ -43,7 +43,7 @@ class ConsoleParser
                         {
                             case Commands.Deploy.Current:
                             case Commands.Deploy.CurrentAka:
-                                DeployIt(dist, false);
+                                DeployIt(dist);
                                 break;
                             case Commands.Preview.Current:
                             case Commands.Preview.CurrentAka:
@@ -97,9 +97,9 @@ class ConsoleParser
         }
     }
 
-    private void DeployIt(string dist, bool load = true)
+    private void DeployIt(string dist)
     {
-        Deploy deploy = new Deploy(dist, load);
+        Deploy deploy = new Deploy(dist);
         if (deploy.Process()) System.Console.WriteLine("Run deploy done.");
         else System.Console.WriteLine("Run deploy failed.");
     }
