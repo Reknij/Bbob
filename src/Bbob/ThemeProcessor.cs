@@ -1,4 +1,6 @@
+using System.Dynamic;
 using System.Text.Json;
+using Bbob.Plugin;
 using Bbob.Shared;
 
 namespace Bbob.Main;
@@ -35,6 +37,26 @@ public static class ThemeProcessor
             }
         }
         return null;
+    }
+
+    public static bool getTheme(out Theme? info) => getTheme(Configuration.ConfigManager.GetConfigManager().MainConfig.theme, out info);
+    public static bool getTheme(string themeName, out Theme? info)
+    {
+        info = null;
+        if (themes.TryGetValue(themeName, out Theme? theme))
+        {
+            if (theme != null)
+            {
+                info = theme;
+                return true;
+            }
+        }
+        return false;
+    }
+    public static bool registerThemeInfoToPluginSystem(dynamic themeInfo)
+    {
+        PluginHelper.registerObject("theme", themeInfo);
+        return true;
     }
 
     private static bool IsTheme(string dir, out ThemeInfo themeInfo)
@@ -76,7 +98,7 @@ public static class ThemeProcessor
             get => _name ?? throw new NullReferenceException();
             set => _name = value;
         }
-        public string index {get;set;}
+        public string index { get; set; }
         public string description { get; set; }
         public string author { get; set; }
 
