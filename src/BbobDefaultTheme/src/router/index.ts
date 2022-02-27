@@ -32,7 +32,7 @@ const routes = [
 ]
 
 const router = createRouter({
-    history: createWebHistory(Bbob.meta.baseUrl),
+    history: createWebHistory(Bbob.meta.baseUrl.replace(window.location.origin, "")),
     routes
 })
 
