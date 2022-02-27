@@ -18,18 +18,18 @@ public class ConfigManager
     {
         ConfigPath = Path.Combine(Environment.CurrentDirectory, "config.json");
 
-        MainConfig = new ConfigJson();
-        DefaultConfig = new ConfigJson();
+        MainConfig = new ConfigJsonFix();
+        DefaultConfig = new ConfigJsonFix();
         if (File.Exists(ConfigPath))
         {
             using (FileStream fs = new FileStream(ConfigPath, FileMode.Open, FileAccess.Read))
             {
 
-                ConfigJson? targetConfig = JsonSerializer.Deserialize<ConfigJson>(fs);
+                ConfigJsonFix? targetConfig = JsonSerializer.Deserialize<ConfigJsonFix>(fs);
                 if (targetConfig != null)
                 {
+                    targetConfig.Recheck();
                     MainConfig = targetConfig;
-                    MainConfig.Recheck();
 
                     System.Console.WriteLine("Loaded config file.");
                 }
@@ -58,23 +58,12 @@ public class ConfigManager
         }
     }
 
-    public class ConfigJson
+    public void registerConfigToPluginSystem() => registerConfigToPluginSystem(MainConfig);
+    public void registerConfigToPluginSystem(ConfigJson config) => PluginHelper.registerObject("config", config);
+
+    public class ConfigJsonFix : ConfigJson
     {
-        public string theme { get; set; }
-        public string author { get; set; }
-        public string description { get; set; }
-        public string about { get; set; }
-        public string blogName { get; set; }
-
-        public int blogCountOneTime { get; set; }
-        public string allLink { get; set; }
-        public bool recursion { get; set; }
-        public string baseUrl { get; set; }
-        public int previewPort {get;set;}
-
-        public string[] buildInPlugins { get; set; }
-
-        public ConfigJson()
+        public ConfigJsonFix()
         {
             theme = "default";
             author = "Jinker";
@@ -113,16 +102,6 @@ public class ConfigManager
             return result;
         }
 
-        public void registerToPluginSystem()
-        {
-            System.Console.WriteLine("Register configs...");
-            var properties = this.GetType().GetProperties();
-            foreach (var property in properties)
-            {
-                PluginHelper.registerObject($"config.{property.Name}", property.GetValue(this));
-            }
-        }
-
         public void Recheck()
         {
             if (blogCountOneTime < 3)
@@ -142,12 +121,6 @@ public class ConfigManager
                 System.Console.WriteLine("Warning: config.publicPath value is null.");
                 System.Console.WriteLine("Auto set to '/'");
                 baseUrl = "/";
-            }
-            else if (baseUrl.First() != '/')
-            {
-                System.Console.WriteLine("Warning: config.publicPath value start character is not '/'.");
-                System.Console.WriteLine("Auto added the '/'");
-                baseUrl = $"/{baseUrl}";
             }
             if (baseUrl.Last() != '/')
             {
