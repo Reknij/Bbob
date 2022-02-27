@@ -3,22 +3,16 @@ using Bbob.Plugin;
 
 namespace Bbob.Main.Cli;
 
-public class Deploy : ICommand
+public class Deploy : Command
 {
     string distribution;
-    bool load;
 
-    public Deploy(string dist, bool load)
+    public Deploy(string dist)
     {
         distribution = dist;
-        this.load = load;
     }
-    public bool Process()
+    public override bool Process()
     {
-        if (load)
-        {
-            PluginSystem.LoadAllPlugins();
-        }
         if (!Directory.Exists(distribution))
         {
             System.Console.WriteLine("Distribution not exists!");

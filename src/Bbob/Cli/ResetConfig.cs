@@ -3,14 +3,14 @@ using Bbob.Plugin;
 
 namespace Bbob.Main.Cli;
 
-public class ResetConfig : ICommand
+public class ResetConfig : Command
 {
     string configName;
     public ResetConfig(string configName)
     {
         this.configName = configName;
     }
-    public bool Process()
+    public override bool Process()
     {
         var configManager = Configuration.ConfigManager.GetConfigManager();
         var properties = configManager.MainConfig.GetType().GetProperties();

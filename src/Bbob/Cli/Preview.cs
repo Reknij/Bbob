@@ -5,14 +5,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Bbob.Main.Cli;
 
-public class Preview : ICommand
+public class Preview : Command
 {
     string distribution;
     public Preview(string distribution)
     {
         this.distribution = distribution;
     }
-    public bool Process()
+    public override bool Process()
     {
         if (!Directory.Exists(distribution))
         {

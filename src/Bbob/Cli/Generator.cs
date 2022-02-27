@@ -9,7 +9,7 @@ using System.Dynamic;
 
 namespace Bbob.Main.Cli;
 
-public class Generator : ICommand
+public class Generator : Command
 {
     string articlesFolderPath;
     public string ArticlesFolderPath { get => articlesFolderPath; }
@@ -22,8 +22,6 @@ public class Generator : ICommand
     {
         distribution = _distribution;
         articlesFolderPath = _articlesFolderPath;
-        PluginSystem.LoadAllPlugins();
-        ThemeProcessor.LoadAllTheme();
     }
 
     private bool isSkip(bool displayMessage = true)
@@ -40,13 +38,12 @@ public class Generator : ICommand
         }
         return false;
     }
-    public bool Process()
+    public override bool Process()
     {
         if (Directory.Exists(distribution)) Shared.SharedLib.DirectoryHelper.DeleteDirectory(distribution);
         Directory.CreateDirectory(distribution);
         Directory.CreateDirectory(articlesFolderPath);
         var config = ConfigManager.GetConfigManager().MainConfig;
-        ConfigManager.GetConfigManager().MainConfig.registerToPluginSystem();
 
         string[] files = Directory.GetFiles(articlesFolderPath, "*.*", config.recursion ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 

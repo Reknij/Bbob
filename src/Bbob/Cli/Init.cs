@@ -3,16 +3,14 @@ using Bbob.Plugin;
 
 namespace Bbob.Main.Cli;
 
-public class Init : ICommand
+public class Init : Command
 {
     public Init()
     {
     }
-    public bool Process()
+    public override bool Process()
     {
         Configuration.ConfigManager.GetConfigManager();
-        PluginSystem.LoadAllPlugins();
-        ThemeProcessor.LoadAllTheme();
         Directory.CreateDirectory(JSApi.JSAPiHelper.metasFolder);
         try
         {

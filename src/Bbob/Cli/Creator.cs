@@ -3,7 +3,7 @@ using Bbob.Plugin;
 
 namespace Bbob.Main.Cli;
 
-public class Creator : ICommand
+public class Creator : Command
 {
     NewTypes newType;
     public NewTypes NewType { get => newType; }
@@ -16,9 +16,8 @@ public class Creator : ICommand
         newType = NewType;
         filename = _filename ?? Shared.SharedLib.DateTimeHelper.GetDateTimeNowString().Replace(':', '-');
         articlesFolderPath = _articlesFolderPath;
-        PluginSystem.LoadAllPlugins();
     }
-    public bool Process()
+    public override bool Process()
     {
         CheckExists();
         string filePath = Path.Combine(articlesFolderPath, filename + ".md");
