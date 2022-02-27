@@ -11,12 +11,11 @@ public class ConfigManagerTest
     {
         ConfigManager.ConfigPath = "unknown";
         ConfigManager main = ConfigManager.GetConfigManager();
-        ConfigManager.ConfigJson mainConfig = main.MainConfig;
 
-        var propertyInfos = mainConfig.GetType().GetProperties();
+        var propertyInfos = main.MainConfig.GetType().GetProperties();
         foreach (var item in propertyInfos)
         {
-            Assert.IsNotNull(item.GetValue(mainConfig));
+            Assert.IsNotNull(item.GetValue(main.MainConfig));
         }
     }
 }

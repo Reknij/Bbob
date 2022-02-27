@@ -44,7 +44,7 @@ public class PluginSystemTest
     [TestMethod]
     public void IsPluginCountSame()
     {
-        int expectBIP = 4;
+        int expectBIP = 7;
         int expectTP = 2;
         Assert.AreEqual(expectBIP, PluginSystem.BuildInPluginCount);
         Assert.AreEqual(expectTP, PluginSystem.ThirdPluginCount);
@@ -54,7 +54,6 @@ public class PluginSystemTest
     [TestMethod]
     public void RunGenerateStage1()
     {
-        Main.Configuration.ConfigManager.GetConfigManager().MainConfig.registerToPluginSystem();
         PluginSystem.cyclePlugins((IPlugin plugin) =>
         {
             plugin.GenerateCommand(testMDPath, dist, GenerationStage.Initialize);
