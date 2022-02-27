@@ -7,32 +7,40 @@ public class SitemapGenerator : IPlugin
 {
     string? distribution { get; set; }
     List<string> articlesUrl = new List<string>();
-    private Config? config = null;
+    ConfigJson config = PluginHelper.getRegisteredObjectNoNull<ConfigJson>("config");
+    string? articleBaseUrl;
+    public SitemapGenerator()
+    {
+        var theme = PluginHelper.getThemeInfo<Theme>();
+        if (theme != null)
+        {
+            articleBaseUrl = theme.articleBaseUrl;
+        }
+        if (articleBaseUrl == null)
+        {
+            PluginHelper.printConsole("theme.articleBaseUrl is null, target theme is not support.");
+        }
+    }
+    class Theme
+    {
+        public string? articleBaseUrl { get; set; }
+    }
     public void GenerateCommand(string filePath, string distribution, GenerationStage stage)
     {
         switch (stage)
         {
             case GenerationStage.Initialize:
                 this.distribution = distribution;
-                if (PluginHelper.getPluginJsonConfig<Config>(out this.config) && this.config != null)
-                {
-                    if (this.config.domain != null && this.config.domain.Last() != '/') this.config.domain += '/';
-                }
-                else
-                {
-                    PluginHelper.printConsole("No generate sitemap because no config.");
-                }
                 break;
             case GenerationStage.FinalProcess:
                 if (PluginHelper.getRegisteredObject<dynamic>("link", out dynamic? value))
                 {
                     if (value == null) return;
-                    if (config != null && config.articleBaseUrl != null)
+                    if (articleBaseUrl != null)
                     {
                         string address = value.address;
-                        string baseUrl = PluginHelper.getRegisteredObjectNoNull<string>("config.baseUrl");
-                        string remake = config.articleBaseUrl.Replace("&", "~and~").Replace('?', '&');
-                        string redirectUrl = $"{config.domain}?{remake}{address}";
+                        string remake = articleBaseUrl.Replace("&", "~and~").Replace('?', '&');
+                        string redirectUrl = $"{config.baseUrl}?{remake}{address}";
                         articlesUrl.Add(redirectUrl);
                     }
                 }
@@ -47,7 +55,6 @@ public class SitemapGenerator : IPlugin
     {
         if (commands == Commands.GenerateCommand && distribution != null && articlesUrl.Count > 0)
         {
-            string baseUrl = PluginHelper.getRegisteredObjectNoNull<string>("config.baseUrl");
             string indexFile = Path.Combine(distribution, "index.html");
             string script = "<script>!function(n){var a;'/'===n.search[1]&&(a=n.search.slice(1).split('&').map(function(n){return n.replace(/~and~/g,'&')}).join('?'),window.history.replaceState(null,null,n.pathname.slice(0,-1)+a+n.hash))}(window.location);</script>";
             string add = "<a href=\"/itissm.html\" hidden>Sitemap html</a>";
@@ -61,16 +68,14 @@ public class SitemapGenerator : IPlugin
             File.WriteAllText(indexFile, indexPlain);
             generateSitemap(distribution);
             generateRobotTxt(distribution);
+            PluginHelper.printConsole("Success generate sitemap.");
         }
     }
     private void generateRobotTxt(string distribution)
     {
-        if (config != null)
-        {
-            string robot = Path.Combine(distribution, "robots.txt");
-            string sitemapPath = $"Sitemap: {config.domain}sitemap.xml";
-            File.WriteAllText(robot, sitemapPath);
-        }
+        string robot = Path.Combine(distribution, "robots.txt");
+        string sitemapPath = $"Sitemap: {config.baseUrl}sitemap.xml";
+        File.WriteAllText(robot, sitemapPath);
     }
 
     private void generateSitemap(string distribution)
@@ -155,11 +160,5 @@ public class SitemapGenerator : IPlugin
             }
             return real + "</ul>";
         }
-    }
-
-    public record class Config
-    {
-        public string? articleBaseUrl { get; set; }
-        public string? domain { get; set; }
     }
 }
