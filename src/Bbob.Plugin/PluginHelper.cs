@@ -4,6 +4,7 @@ using System.Text.Json;
 namespace Bbob.Plugin;
 public static class PluginHelper
 {
+    public static string ThemePath { get; set; } = "null";
     private static PluginJson? _ExecutingPlugin;
     public static PluginJson ExecutingPlugin
     {
@@ -155,6 +156,13 @@ public static class PluginHelper
             return true;
         }
         return false;
+    }
+    public static T? getThemeInfo<T>()
+    {
+        using (FileStream fs = File.OpenRead(Path.Combine(ThemePath, "theme.json")))
+        {
+            return JsonSerializer.Deserialize<T>(fs);
+        }
     }
     public static Dictionary<string, object> _getAllMetas() => metas;
 
