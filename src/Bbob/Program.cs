@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using Bbob.Main.PluginManager;
 
 namespace Bbob.Main;
 
@@ -9,6 +8,7 @@ public class Program
     {
         string version = Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "'ErrorGetVersion'";
         Console.WriteLine($"【Bbob v{version}】");
+        InitializeBbob.Initialize(InitializeBbob.InitializeOptions.All);
         ConsoleParser parser = new ConsoleParser(args);
         parser.Parse();
         Console.WriteLine("-----End-----");
