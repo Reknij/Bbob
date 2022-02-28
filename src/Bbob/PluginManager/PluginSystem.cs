@@ -33,21 +33,25 @@ public static class PluginSystem
         string buildInTypesPath = "Bbob.Main.BuildInPlugin.";
         Assembly main = Assembly.GetExecutingAssembly();
         Type[] types = main.GetTypes();
-        foreach (var plugin in config.buildInPlugins)
+        foreach (var type in types)
         {
-            foreach (var type in types)
+            if (type.FullName == null) continue;
+            if (type.FullName.StartsWith(buildInTypesPath) && type.GetInterface("IPlugin") == typeof(IPlugin))
             {
-                if (type.FullName == null) continue;
-                if (type.FullName.StartsWith(buildInTypesPath) && plugin == type.Name)
+                var buildInPlugin = getPluginInfo(type);
+                if (!config.isPluginEnable(buildInPlugin))
                 {
-                    InitializeExecutingPlugin(getPluginInfo(type));
-                    var p = (IPlugin?)Activator.CreateInstance(type);
-                    if (p == null) continue;
-                    buildInPlugins.Add(p);
-                    System.Console.WriteLine($"Loaded build-in plugin <{type.Name}>");
+                    System.Console.WriteLine($"Disable build-in plugin <{buildInPlugin.name}>");
+                    continue;
                 }
+                InitializeExecutingPlugin(getPluginInfo(type));
+                var p = (IPlugin?)Activator.CreateInstance(type);
+                if (p == null) continue;
+                buildInPlugins.Add(p);
+                System.Console.WriteLine($"Loaded build-in plugin <{buildInPlugin.name}>");
             }
         }
+
 
         if (buildInPlugins.Count == 0) System.Console.WriteLine("Warning: No build-in plugins are loaded.");
     }
@@ -77,10 +81,15 @@ public static class PluginSystem
                     {
                         pluginInfo.name = Path.GetDirectoryName(folder) ?? $"UnknownPluginName.{Path.GetRandomFileName()}";
                     }
+                    if (!Configuration.ConfigManager.GetConfigManager().MainConfig.isPluginEnable(pluginInfo))
+                    {
+                        System.Console.WriteLine($"Disable third plugin <{pluginInfo.name}>");
+                        continue;
+                    }
                     string pluginDll = Path.Combine(folder, pluginInfo.entry);
                     InitializeExecutingPlugin(pluginInfo);
                     var mainPlugin = new PluginAssemblyLoadContext(pluginDll, pluginInfo);
-                    if (mainPlugin.Plugin != null)
+                    if (mainPlugin.havePlugin)
                     {
                         System.Console.WriteLine($"Loaded third plugin <{pluginInfo.name}>");
                         thirdPlugins.Add(mainPlugin);
@@ -151,7 +160,23 @@ public static class PluginSystem
         return info;
     }
 
-    public static IPlugin? GetThirdPlugin(int index) => thirdPlugins?[index].Plugin;
+
+    public static bool containPluginWithName(string name)
+    {
+        name = name.ToUpper();
+        foreach (var plugin in buildInPlugins)
+        {
+            if (getPluginInfo(plugin).name.ToUpper() == name) return true;
+        }
+        foreach (var pluginContext in thirdPlugins)
+        {
+            if (pluginContext.PluginInfo.name.ToUpper() == name) return true;
+        }
+
+        return false;
+    }
+    public static IPlugin GetBuildInPlugin(int index) => buildInPlugins[index];
+    public static IPlugin GetThirdPlugin(int index) => thirdPlugins[index].Plugin;
     public static int AllPluginCount => buildInPlugins.Count + thirdPlugins.Count;
     public static int BuildInPluginCount => buildInPlugins.Count;
     public static int ThirdPluginCount => thirdPlugins.Count;
