@@ -13,14 +13,16 @@ public class Deploy : Command
     }
     public override bool Process()
     {
+        const string SUCCESS = "Success deploy: ";
+        const string FAILED = "Failed deploy: ";
         if (!Directory.Exists(distribution))
         {
-            System.Console.WriteLine("Distribution not exists!");
+            System.Console.WriteLine($"{FAILED}Distribution not exists!");
             return false;
         }
         if (Directory.GetFiles(distribution, "*", SearchOption.AllDirectories).Length == 0)
         {
-            System.Console.WriteLine("Distribution is not exists any files!");
+            System.Console.WriteLine($"${FAILED}Distribution is not exists any files!");
             return false;
         }
         try
@@ -39,9 +41,10 @@ public class Deploy : Command
 #if DEBUG
             msg = ex.ToString();
 #endif
-            System.Console.WriteLine("Error executing plugin deploy command:\n" + msg);
+            System.Console.WriteLine($"{FAILED}Error executing plugin deploy command:\n" + msg);
             return false;
         }
+        System.Console.WriteLine($"{SUCCESS}Deployment has been run");
         return true;
     }
 }

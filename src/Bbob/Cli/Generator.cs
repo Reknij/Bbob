@@ -40,6 +40,8 @@ public class Generator : Command
     }
     public override bool Process()
     {
+        const string SUCCESS = "Success generate: ";
+        const string FAILED = "Failed generate: ";
         if (Directory.Exists(distribution)) Shared.SharedLib.DirectoryHelper.DeleteDirectory(distribution);
         Directory.CreateDirectory(distribution);
         Directory.CreateDirectory(articlesFolderPath);
@@ -65,6 +67,7 @@ public class Generator : Command
                         System.Console.WriteLine($"<{PluginHelper.ExecutingPlugin.name}> Stop command execution");
                         if (!string.IsNullOrWhiteSpace(PluginHelper.ExecutingCommandResult.Message))
                             System.Console.WriteLine($"Message: {PluginHelper.ExecutingCommandResult.Message}");
+                        System.Console.WriteLine($"{FAILED}Plugin stop execution.");
                         return false;
                     }
                 }
@@ -74,14 +77,14 @@ public class Generator : Command
 #if DEBUG
                     msg = ex.ToString();
 #endif
-                    System.Console.WriteLine($"Executing generate functions of plugin error in stage {stage}:\n" + msg);
+                    System.Console.WriteLine($"{FAILED}Executing generate functions of plugin error in stage {stage}:\n" + msg);
                     return false;
                 }
             }
             if (isSkip()) continue;
             if (!ProcessData())
             {
-                System.Console.WriteLine("Process data failed because no exists target objects.");
+                System.Console.WriteLine($"Process data of {Path.GetFileName(file)} failed because no exists target objects convention.");
                 continue;
             }
         }
@@ -96,7 +99,7 @@ public class Generator : Command
 #if DEBUG
             msg = ex.ToString();
 #endif
-            System.Console.WriteLine("Executing sort functions error:\n" + msg);
+            System.Console.WriteLine($"{FAILED}Executing sort functions error:\n" + msg);
             return false;
         }
         if (theme != null)
@@ -114,10 +117,10 @@ public class Generator : Command
         }
         else
         {
-            System.Console.WriteLine("Not found theme.");
+            System.Console.WriteLine($"{FAILED}Not found theme.");
             return false;
         }
-
+        System.Console.WriteLine($"{SUCCESS} Generation has been run.");
         return true;
     }
 

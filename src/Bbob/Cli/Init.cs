@@ -10,6 +10,8 @@ public class Init : Command
     }
     public override bool Process()
     {
+        const string SUCCESS = "Success initialize: ";
+        const string FAILED = "Failed initialize: ";
         Configuration.ConfigManager.GetConfigManager();
         Directory.CreateDirectory(JSApi.JSAPiHelper.metasFolder);
         try
@@ -28,9 +30,10 @@ public class Init : Command
 #if DEBUG
             msg = ex.ToString();
 #endif
-            System.Console.WriteLine("Executing init command error:\n" + msg);
+            System.Console.WriteLine($"{FAILED}Executing init command error:\n" + msg);
             return false;
         }
+        System.Console.WriteLine($"{SUCCESS}Initialize has been run.");
         return true;
     }
 }

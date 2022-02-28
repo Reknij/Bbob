@@ -19,11 +19,13 @@ public class Creator : Command
     }
     public override bool Process()
     {
+        const string FAILED = "Failed create: ";
+        const string SUCCESS = "Success create: ";
         CheckExists();
         string filePath = Path.Combine(articlesFolderPath, filename + ".md");
         if (File.Exists(filePath))
         {
-            System.Console.WriteLine("Already exists target article.");
+            System.Console.WriteLine($"{FAILED}Already exists target article.");
             return false;
         }
         System.Console.WriteLine($"Processing <{filename}> file content...");
@@ -40,9 +42,11 @@ public class Creator : Command
                 System.Console.WriteLine($"<{PluginHelper.ExecutingPlugin.name}> Stop command execution");
                 if (!string.IsNullOrWhiteSpace(PluginHelper.ExecutingCommandResult.Message))
                     System.Console.WriteLine($"Message: {PluginHelper.ExecutingCommandResult.Message}");
+                System.Console.WriteLine($"{FAILED}Plugin stop execution."); ;
                 return false;
             }
-            PluginSystem.cyclePlugins((plugin)=>{
+            PluginSystem.cyclePlugins((plugin) =>
+            {
                 plugin.CommandComplete(Commands.NewCommand);
             });
             File.WriteAllText(filePath, content);
@@ -53,9 +57,11 @@ public class Creator : Command
 #if DEBUG
             msg = ex.ToString();
 #endif
-            System.Console.WriteLine("Error executing plugin new command:\n" + msg);
+            System.Console.WriteLine();
+            System.Console.WriteLine($"{FAILED}Error executing plugin new command:\n" + msg);
             return false;
         }
+        System.Console.WriteLine($"{SUCCESS}Article file in '{filePath}'");
         return true;
     }
 

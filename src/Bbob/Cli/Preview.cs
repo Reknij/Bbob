@@ -14,17 +14,20 @@ public class Preview : Command
     }
     public override bool Process()
     {
+        const string SUCCESS = "Success preview: ";
+        const string FAILED = "Failed preview: ";
         if (!Directory.Exists(distribution))
         {
-            System.Console.WriteLine("Distribution not exists!");
+            System.Console.WriteLine($"{FAILED}Distribution not exists!"); 
             return false;
         }
         if (Directory.GetFiles(distribution, "*", SearchOption.AllDirectories).Length == 0)
         {
-            System.Console.WriteLine("Distribution is not exists any files!");
+            System.Console.WriteLine($"{FAILED}Distribution is not exists any files!");
             return false;
         }
         StartPreview();
+        System.Console.WriteLine($"{SUCCESS}Preview has been run.");
         return true;
     }
 

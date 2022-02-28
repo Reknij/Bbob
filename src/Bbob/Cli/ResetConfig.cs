@@ -12,6 +12,8 @@ public class ResetConfig : Command
     }
     public override bool Process()
     {
+        const string SUCCESS = "Success reset: ";
+        const string FAILED = "Failed reset: ";
         var configManager = Configuration.ConfigManager.GetConfigManager();
         var properties = configManager.MainConfig.GetType().GetProperties();
         foreach (var property in properties)
@@ -20,11 +22,12 @@ public class ResetConfig : Command
             {
                 object? value = property.GetValue(configManager.DefaultConfig);
                 property.SetValue(configManager.MainConfig, value);
-                System.Console.WriteLine($"Reset '{property.Name}' to default config.");
                 configManager.SaveConfig(configManager.MainConfig, Configuration.ConfigManager.ConfigPath ?? throw new NullReferenceException("configPath is null"));
+                System.Console.WriteLine($"{SUCCESS}Reset '{property.Name}' to default config.");
                 return true;
             }
         }
+        System.Console.WriteLine($"{FAILED}Not found property of given argument.");
         return false;
     }
 }
