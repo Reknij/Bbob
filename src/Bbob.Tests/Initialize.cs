@@ -5,6 +5,8 @@ using Bbob.Main.Configuration;
 using System;
 using System.IO;
 using static Bbob.Main.ThemeProcessor;
+using System.Text.Json;
+using Bbob.Plugin;
 
 namespace Bbob.Tests;
 
@@ -16,12 +18,20 @@ public class Initialize
     {
         ConfigManager.GetConfigManager().MainConfig = ConfigManager.GetConfigManager().DefaultConfig;
         ConfigManager.GetConfigManager().registerConfigToPluginSystem();
-        ThemeProcessor.registerThemeInfoToPluginSystem(new ThemeInfo()
+        string themeTest = "./testTheme/theme.json";
+        string themeFolder = "./testTheme";
+        Directory.CreateDirectory(themeFolder);
+        if (File.Exists(themeTest)) File.Delete(themeTest);
+        using (FileStream fs = File.OpenWrite(themeTest))
         {
-            name = "default",
-            description = "default theme for bbob",
-            author = "Jinker"
-        });
+            JsonSerializer.Serialize(fs, new ThemeInfo()
+            {
+                name = "default",
+                description = "default theme for bbob",
+                author = "Jinker"
+            });
+        }
+        PluginHelper.ThemePath = themeFolder;
         PluginSystem.LoadAllPlugins();
     }
 }
