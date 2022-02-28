@@ -29,15 +29,13 @@ class ConsoleParser
             case Commands.Init.Current:
             case Commands.Init.CurrentAka:
                 Init init = new Init();
-                if (init.Process()) System.Console.WriteLine("Init done.");
-                else System.Console.WriteLine("Init failed.");
+                init.Process();
                 break;
             case Commands.Generate.Current:
             case Commands.Generate.CurrentAka:
                 Generator generater = new Generator(dist, afp);
                 if (generater.Process())
                 {
-                    System.Console.WriteLine("Generate success.");
                     if (++i < length)
                         switch (arguments[i])
                         {
@@ -52,7 +50,6 @@ class ConsoleParser
                             default: break;
                         }
                 }
-                else System.Console.WriteLine("Generate failed.");
                 break;
 
             case Commands.New.Current:
@@ -70,8 +67,7 @@ class ConsoleParser
                     }
                 if (++i < length) filename = arguments[i];
                 Creator creater = new Creator(filename, afp, types);
-                if (creater.Process()) System.Console.WriteLine($"Created {filename} success.");
-                else System.Console.WriteLine($"Create {filename} failed.");
+                creater.Process();
                 break;
             case Commands.Deploy.Current:
             case Commands.Deploy.CurrentAka:
@@ -86,8 +82,7 @@ class ConsoleParser
                 if (++i < length)
                 {
                     ResetConfig resetConfig = new ResetConfig(arguments[i]);
-                    if (resetConfig.Process()) System.Console.WriteLine($"Reset config {arguments[i]} success.");
-                    else System.Console.WriteLine("No found config with given name.");
+                    resetConfig.Process();
                 }
                 break;
 
@@ -100,16 +95,14 @@ class ConsoleParser
     private void DeployIt(string dist)
     {
         Deploy deploy = new Deploy(dist);
-        if (deploy.Process()) System.Console.WriteLine("Run deploy done.");
-        else System.Console.WriteLine("Run deploy failed.");
+        deploy.Process();
     }
 
     private void PreviewIt(string dist)
     {
         var preview = new Bbob.Main.Cli.Preview(dist);
         System.Console.WriteLine("Running preview...");
-        if (preview.Process()) System.Console.WriteLine("Run preview done.");
-        else System.Console.WriteLine("Can't run preview!");
+        preview.Process();
     }
 
     static class Commands
