@@ -53,11 +53,6 @@ public static class ThemeProcessor
         }
         return false;
     }
-    public static bool registerThemeInfoToPluginSystem(dynamic themeInfo)
-    {
-        PluginHelper.registerObject("theme", themeInfo);
-        return true;
-    }
 
     private static bool IsTheme(string dir, out ThemeInfo themeInfo)
     {
