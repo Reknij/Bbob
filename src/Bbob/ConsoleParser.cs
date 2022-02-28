@@ -74,10 +74,12 @@ class ConsoleParser
                 break;
             case Commands.Deploy.Current:
             case Commands.Deploy.CurrentAka:
+                InitializeBbob.Initialize(InitializeBbob.InitializeOptions.All);
                 DeployIt(dist);
                 break;
             case Commands.Preview.Current:
             case Commands.Preview.CurrentAka:
+                InitializeBbob.Initialize(InitializeBbob.InitializeOptions.All);
                 PreviewIt(dist);
                 break;
             case Commands.ResetConfig.Current:
@@ -126,14 +128,12 @@ class ConsoleParser
 
     private void DeployIt(string dist)
     {
-        InitializeBbob.Initialize(InitializeBbob.InitializeOptions.All);
         Deploy deploy = new Deploy(dist);
         deploy.Process();
     }
 
     private void PreviewIt(string dist)
     {
-        InitializeBbob.Initialize(InitializeBbob.InitializeOptions.All);
         var preview = new Bbob.Main.Cli.Preview(dist);
         System.Console.WriteLine("Running preview...");
         preview.Process();
