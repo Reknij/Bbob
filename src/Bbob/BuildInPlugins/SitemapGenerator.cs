@@ -7,7 +7,6 @@ public class SitemapGenerator : IPlugin
 {
     string? distribution { get; set; }
     List<string> articlesUrl = new List<string>();
-    ConfigJson config = PluginHelper.getRegisteredObjectNoNull<ConfigJson>("config");
     string? articleBaseUrl;
     public SitemapGenerator()
     {
@@ -40,7 +39,7 @@ public class SitemapGenerator : IPlugin
                     {
                         string address = value.address;
                         string remake = articleBaseUrl.Replace("&", "~and~").Replace('?', '&');
-                        string redirectUrl = $"{config.baseUrl}?{remake}{address}";
+                        string redirectUrl = $"{PluginHelper.ConfigBbob.baseUrl}?{remake}{address}";
                         articlesUrl.Add(redirectUrl);
                     }
                 }
@@ -74,7 +73,7 @@ public class SitemapGenerator : IPlugin
     private void generateRobotTxt(string distribution)
     {
         string robot = Path.Combine(distribution, "robots.txt");
-        string sitemapPath = $"Sitemap: {config.baseUrl}sitemap.xml";
+        string sitemapPath = $"Sitemap: {PluginHelper.ConfigBbob.baseUrl}sitemap.xml";
         File.WriteAllText(robot, sitemapPath);
     }
 

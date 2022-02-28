@@ -37,18 +37,18 @@ public class BuildWebArticleJson : IPlugin
         string newName = $"{Path.GetFileNameWithoutExtension(filePath)}.{hash.Substring(0, 9)}.json";
         string newLocal = Path.Combine(FileLocalFolder, newName);
         File.Move(FileLocal, newLocal, true);
-        var config = PluginHelper.getRegisteredObjectNoNull<ConfigJson>("config");
+        string baseUrl = PluginHelper.ConfigBbob.baseUrl;
         PluginHelper.getPluginJsonConfig<ConfigPlugin>(out ConfigPlugin? configPlugin);
         bool isShortAddress = configPlugin != null ? configPlugin.shortAddress : false;
         PluginHelper.modifyRegisteredObject<dynamic>("link", (ref dynamic? link) =>
         {
             if (link == null) return;
-            link.address = isShortAddress ? Path.GetFileNameWithoutExtension(newName) : $"{config.baseUrl}{JSApi.JSAPiHelper.bbobAssets}/{folder}/{newName}";
+            link.address = isShortAddress ? Path.GetFileNameWithoutExtension(newName) : $"{baseUrl}{JSApi.JSAPiHelper.bbobAssets}/{folder}/{newName}";
             //link.address = $"{publicPath}{JSApi.JSAPiHelper.bbobAssets}/{folder}/{year}/{month}/{day}/{newName}";
         });
         if (isShortAddress)
         {
-            Meta meta = new Meta($"{config.baseUrl}{JSApi.JSAPiHelper.bbobAssets}/{folder}/", ".json");
+            Meta meta = new Meta($"{baseUrl}{JSApi.JSAPiHelper.bbobAssets}/{folder}/", ".json");
             PluginHelper.registerMeta("shortAddress", meta);
         }
     }

@@ -6,7 +6,7 @@ namespace Bbob.Main.Configuration;
 
 public class ConfigManager
 {
-    public static string? ConfigPath { get; set; }
+    public static string ConfigPath { get; set; } = "null";
     private static ConfigManager mainConfigManager = new ConfigManager();
     public ConfigJson MainConfig { get; set; }
     public ConfigJson DefaultConfig { get; set; }
@@ -80,6 +80,9 @@ public class ConfigManager
             JsonSerializer.Serialize(fs, target, options);
         }
     }
+    public void SaveConfig(ConfigJson target) => SaveConfig(target, ConfigPath);
+    public void SaveConfig(string configPath) => SaveConfig(MainConfig, configPath);
+    public void SaveConfig() => SaveConfig(MainConfig, ConfigPath);
 
     public void registerConfigToPluginSystem() => registerConfigToPluginSystem(MainConfig);
     public void registerConfigToPluginSystem(ConfigJson config) => PluginHelper.ConfigBbob = config;
