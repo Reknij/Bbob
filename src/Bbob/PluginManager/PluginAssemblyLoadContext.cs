@@ -9,9 +9,10 @@ public class PluginAssemblyLoadContext : AssemblyLoadContext
 {
     AssemblyDependencyResolver resolver;
     IPlugin? plugin;
-    public IPlugin? Plugin => plugin;
+    public IPlugin Plugin => plugin ?? throw new NullReferenceException("Plugin is null in PluginAssemblyLoadCOntext");
+    public bool havePlugin = false;
 
-    public PluginJson PluginInfo {get; protected set;}
+    public PluginJson PluginInfo { get; protected set; }
     public PluginAssemblyLoadContext(string pluginPath, PluginJson info) : base(isCollectible: false)
     {
         resolver = new AssemblyDependencyResolver(pluginPath);
@@ -21,19 +22,20 @@ public class PluginAssemblyLoadContext : AssemblyLoadContext
             Assembly assembly = this.LoadFromStream(fs);
             foreach (Type type in assembly.GetTypes())
             {
-                if (type.GetInterface("IPlugin") != null)
+                if (type.GetInterface("IPlugin") == typeof(IPlugin))
                 {
                     try
                     {
                         object? instance = Activator.CreateInstance(type);
                         this.plugin = (IPlugin?)instance;
+                        if (instance != null) havePlugin = true;
                     }
                     catch (System.Exception ex)
                     {
-                        Console.WriteLine( ex.ToString());
+                        Console.WriteLine(ex.ToString());
                     }
                 }
-                    
+
             }
         }
     }
