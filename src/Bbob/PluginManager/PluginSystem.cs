@@ -22,7 +22,59 @@ public static class PluginSystem
         PluginHelper.BaseDirectory = AppContext.BaseDirectory;
         LoadBuildInPlugins();
         LoadThirdPlugins();
-        System.Console.WriteLine($"Loaded {AllPluginCount} plugins. ({BuildInPluginCount}|{ThirdPluginCount})");
+        if ((BuildInPluginCount + ThirdPluginCount) > 0) System.Console.WriteLine($"Loaded {AllPluginCount} plugins. ({BuildInPluginCount}|{ThirdPluginCount})");
+        else System.Console.WriteLine("Warning: plugins are loaded.");
+    }
+
+    private static Type[] GetBuildInPlugins()
+    {
+        var config = Configuration.ConfigManager.GetConfigManager().MainConfig;
+        string buildInTypesPath = "Bbob.Main.BuildInPlugin.";
+        Assembly main = Assembly.GetExecutingAssembly();
+        Type[] types = main.GetTypes();
+        List<Type> bip = new List<Type>();
+        foreach (var type in types)
+        {
+            if (type.FullName == null) continue;
+            if (type.FullName.StartsWith(buildInTypesPath) && type.GetInterface("IPlugin") == typeof(IPlugin))
+            {
+                bip.Add(type);
+            }
+        }
+        return bip.ToArray();
+    }
+    private static PluginJson[] GetThirdPluginsInfo()
+    {
+        List<PluginJson> infos = new List<PluginJson>();
+        Directory.CreateDirectory(pluginDirectory);
+        thirdPlugins.Clear();
+        string[] folders = Directory.GetDirectories(pluginDirectory);
+        foreach (string folder in folders)
+        {
+            string pluginJsonPath = Path.Combine(folder, "plugin.json");
+            if (File.Exists(pluginJsonPath))
+            {
+                using (FileStream fs = new FileStream(pluginJsonPath, FileMode.Open, FileAccess.ReadWrite))
+                {
+                    PluginJson? pluginInfo = JsonSerializer.Deserialize<PluginJson>(fs);
+                    if (pluginInfo == null)
+                    {
+                        System.Console.WriteLine("Plugin json file can't loaded.");
+                        break;
+                    }
+                    try
+                    {
+                        var a = pluginInfo.name;
+                    }
+                    catch (NullReferenceException)
+                    {
+                        pluginInfo.name = Path.GetDirectoryName(folder) ?? $"UnknownPluginName.{Path.GetRandomFileName()}";
+                    }
+                    infos.Add(pluginInfo);
+                }
+            }
+        }
+        return infos.ToArray();
     }
 
     private static void LoadBuildInPlugins()
@@ -30,30 +82,21 @@ public static class PluginSystem
         var config = Configuration.ConfigManager.GetConfigManager().MainConfig;
         buildInPlugins.Clear();
 
-        string buildInTypesPath = "Bbob.Main.BuildInPlugin.";
-        Assembly main = Assembly.GetExecutingAssembly();
-        Type[] types = main.GetTypes();
+        Type[] types = GetBuildInPlugins();
         foreach (var type in types)
         {
-            if (type.FullName == null) continue;
-            if (type.FullName.StartsWith(buildInTypesPath) && type.GetInterface("IPlugin") == typeof(IPlugin))
+            var buildInPlugin = getPluginInfo(type);
+            if (!config.isPluginEnable(buildInPlugin))
             {
-                var buildInPlugin = getPluginInfo(type);
-                if (!config.isPluginEnable(buildInPlugin))
-                {
-                    System.Console.WriteLine($"Disable build-in plugin <{buildInPlugin.name}>");
-                    continue;
-                }
-                InitializeExecutingPlugin(getPluginInfo(type));
-                var p = (IPlugin?)Activator.CreateInstance(type);
-                if (p == null) continue;
-                buildInPlugins.Add(p);
-                System.Console.WriteLine($"Loaded build-in plugin <{buildInPlugin.name}>");
+                System.Console.WriteLine($"Disable build-in plugin <{buildInPlugin.name}>");
+                continue;
             }
+            InitializeExecutingPlugin(getPluginInfo(type));
+            var p = (IPlugin?)Activator.CreateInstance(type);
+            if (p == null) continue;
+            buildInPlugins.Add(p);
+            System.Console.WriteLine($"Loaded build-in plugin <{buildInPlugin.name}>");
         }
-
-
-        if (buildInPlugins.Count == 0) System.Console.WriteLine("Warning: No build-in plugins are loaded.");
     }
     private static void LoadThirdPlugins()
     {
@@ -164,13 +207,15 @@ public static class PluginSystem
     public static bool containPluginWithName(string name)
     {
         name = name.ToUpper();
-        foreach (var plugin in buildInPlugins)
+        Type[] types = GetBuildInPlugins();
+        foreach (var plugin in types)
         {
             if (getPluginInfo(plugin).name.ToUpper() == name) return true;
         }
-        foreach (var pluginContext in thirdPlugins)
+        PluginJson[] infosThird = GetThirdPluginsInfo();
+        foreach (var info in infosThird)
         {
-            if (pluginContext.PluginInfo.name.ToUpper() == name) return true;
+            if (info.name.ToUpper() == name) return true;
         }
 
         return false;
