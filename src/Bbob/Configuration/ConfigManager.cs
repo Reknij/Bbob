@@ -24,13 +24,35 @@ public class ConfigManager
         {
             using (FileStream fs = new FileStream(ConfigPath, FileMode.Open, FileAccess.Read))
             {
-
-                ConfigJsonFix? targetConfig = JsonSerializer.Deserialize<ConfigJsonFix>(fs);
-                if (targetConfig != null)
+                bool loaded = false;
+                try
                 {
-                    targetConfig.Recheck();
-                    MainConfig = targetConfig;
-
+                    ConfigJsonFix? targetConfig = JsonSerializer.Deserialize<ConfigJsonFix>(fs);
+                    if (targetConfig != null)
+                    {
+                        MainConfig = targetConfig;
+                        loaded = true;
+                    }
+                }
+                catch (System.Exception)
+                {
+                    System.Console.WriteLine("Error load config, reset config now? (y/n): ");
+                    var key = Console.ReadKey().Key;
+                    System.Console.WriteLine();
+                    if (key == ConsoleKey.Y)
+                    {
+                        MainConfig = DefaultConfig;
+                        System.Console.WriteLine("Reset to default config.");
+                    }
+                    else
+                    {
+                        System.Console.WriteLine("Error config can't continue load.");
+                        Environment.Exit(-1);
+                    }
+                }
+                if (loaded)
+                {
+                    ((ConfigJsonFix)MainConfig).Recheck();
                     System.Console.WriteLine("Loaded config file.");
                 }
                 else
@@ -48,6 +70,7 @@ public class ConfigManager
 
     public void SaveConfig(ConfigJson target, string savePath)
     {
+        if (File.Exists(savePath)) File.Delete(savePath);
         using (FileStream fs = File.OpenWrite(savePath))
         {
             JsonSerializerOptions options = new JsonSerializerOptions()
@@ -59,7 +82,7 @@ public class ConfigManager
     }
 
     public void registerConfigToPluginSystem() => registerConfigToPluginSystem(MainConfig);
-    public void registerConfigToPluginSystem(ConfigJson config) => PluginHelper.registerObject("config", config);
+    public void registerConfigToPluginSystem(ConfigJson config) => PluginHelper.ConfigBbob = config;
 
     public class ConfigJsonFix : ConfigJson
     {
@@ -77,16 +100,7 @@ public class ConfigManager
             previewPort = 3000;
             var main = Assembly.GetExecutingAssembly();
             var types = main?.GetTypes();
-            List<string> buildInList = new List<string>();
-            if (types != null)
-                foreach (Type type in types)
-                {
-                    if (type.GetInterface("IPlugin") != null && type.FullName != null)
-                    {
-                        buildInList.Add(type.Name);
-                    }
-                }
-            buildInPlugins = buildInList.ToArray();
+            pluginsDisable = new List<string>();
         }
 
         public override string ToString()

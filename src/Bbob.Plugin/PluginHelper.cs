@@ -5,6 +5,7 @@ namespace Bbob.Plugin;
 public static class PluginHelper
 {
     public static string ThemePath { get; set; } = "null";
+    public static ConfigJson ConfigBbob {get;set;} = new ConfigJson();
     private static PluginJson? _ExecutingPlugin;
     public static PluginJson ExecutingPlugin
     {
