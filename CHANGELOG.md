@@ -1,4 +1,8 @@
 # 2022-3-1 12:42:00
+- add `--version` command.
+- add `--help` command.
+
+# 2022-3-1 12:42:00
 - Load plugins support load from nuget packages.
 - package as tool.
 
