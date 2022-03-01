@@ -22,6 +22,11 @@ public static class InitializeBbob
             {
                 PluginHelper.ThemePath = info.Path;
             }
+            else
+            {
+                System.Console.WriteLine($"Not found theme '{Configuration.ConfigManager.GetConfigManager().MainConfig.theme}'");
+                Environment.Exit(-1);
+            }
         }
         if ((options & InitializeOptions.Config) != 0)
         {
@@ -29,7 +34,19 @@ public static class InitializeBbob
         }
         if ((options & InitializeOptions.Plugin) != 0)
         {
-            PluginSystem.LoadAllPlugins();
+            try
+            {
+                PluginSystem.LoadAllPlugins();
+            }
+            catch (System.Exception ex)
+            {
+                string msg = ex.Message;
+                #if DEBUG
+                    msg = ex.ToString();
+                #endif
+                System.Console.WriteLine($"Load plugin and create instance of plugin object error:\n{msg}");
+                Environment.Exit(-1);
+            }
         }
 
     }
