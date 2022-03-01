@@ -90,7 +90,7 @@ public static class ThemeProcessor
         private string? _name;
         public string name
         {
-            get => _name ?? throw new NullReferenceException();
+            get => _name ?? throw new NullReferenceException("Theme name is null");
             set => _name = value;
         }
         public string index { get; set; }
