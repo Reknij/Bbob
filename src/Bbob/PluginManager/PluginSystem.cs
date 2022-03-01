@@ -8,7 +8,7 @@ namespace Bbob.Main.PluginManager;
 
 public static class PluginSystem
 {
-    public static readonly string pluginDirectory = Path.Combine(AppContext.BaseDirectory, "plugins"); //plugins in base of Bbob directory.
+    public static readonly string pluginDirectory = Path.Combine(Environment.CurrentDirectory, "plugins"); //plugins in base of Bbob directory.
     public static readonly string configsFolder = Path.Combine(Environment.CurrentDirectory, "configs");
     static List<PluginAssemblyLoadContext> thirdPlugins = new List<PluginAssemblyLoadContext>();
 
