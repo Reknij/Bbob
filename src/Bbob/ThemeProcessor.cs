@@ -8,6 +8,7 @@ namespace Bbob.Main;
 public static class ThemeProcessor
 {
     static readonly string themesFolder = Path.Combine(AppContext.BaseDirectory, "themes"); //themes in base of Bbob directory.
+    static readonly string thirdThemesFolder = Path.Combine(Environment.CurrentDirectory, "themes"); //themes in base of Bbob directory.
 
     static Dictionary<string, Theme> themes = new Dictionary<string, Theme>();
     public static void LoadAllTheme()
@@ -15,11 +16,14 @@ public static class ThemeProcessor
         System.Console.WriteLine("Loading Themes...");
         themes.Clear();
         Directory.CreateDirectory(themesFolder);
-        string[] directories = Directory.GetDirectories(themesFolder);
+        Directory.CreateDirectory(thirdThemesFolder);
+        List<string> directories = new List<string>(Directory.GetDirectories(themesFolder));
+        directories.AddRange(Directory.GetDirectories(thirdThemesFolder));
         foreach (var dir in directories)
         {
             if (IsTheme(dir, out ThemeInfo themeInfo))
             {
+                if (themes.ContainsKey(themeInfo.name)) themes.Remove(themeInfo.name);
                 themes.Add(themeInfo.name, new Theme(themeInfo, dir));
             }
         }
