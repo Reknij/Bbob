@@ -6,8 +6,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <SelfContained>false</SelfContained>
-    <PublishSingleFile>true</PublishSingleFile>
-    <Version>1.1.3</Version>
+    <PublishSingleFile>false</PublishSingleFile>
+    <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
+    <Version>1.2.2</Version>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>bbob</ToolCommandName>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/Reknij/Bbob</RepositoryUrl> 
+    <RepositoryType>git</RepositoryType> 
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,9 +27,24 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
-  <Target Name="CopyJSApi" AfterTargets="AfterBuild">
-    <Copy SourceFiles="./JSApi/bbobMain.js" DestinationFolder="$(OutDir)/JSApi"></Copy>
-    <Copy SourceFiles="./JSApi/Bbob.ts" DestinationFolder="$(OutDir)/JSApi"></Copy>
-  </Target>
+  <ItemGroup>
+    <Content Include="./JSApi/Bbob.ts">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+    </Content>
+    <Content Include="./JSApi/bbobMain.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+    </Content>
+    <Content Include="../BbobDefaultTheme/dist/**/*" DestinationFolder="$(TargetDir)/%(RecursiveDir)">
+      <LinkBase>themes/default</LinkBase>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+    </Content>
+  </ItemGroup>
+
+  <!-- <Target Name="BuildThemeDefault" AfterTargets="AfterBuild">
+    <Exec WorkingDirectory="../BbobDefaultTheme/" Command="npm run build" />
+  </Target> -->
 
 </Project>
