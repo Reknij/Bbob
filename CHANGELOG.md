@@ -1,3 +1,7 @@
+# 2022-3-1 12:42:00
+- Load plugins support load from nuget packages.
+- package as tool.
+
 # 2022-2-27 21:50:00
 ## Bbob
 - remake SiteGenerator plugin. now is require theme info, no need config.
