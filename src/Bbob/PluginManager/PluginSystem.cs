@@ -43,13 +43,12 @@ public static class PluginSystem
         }
         return bip.ToArray();
     }
-    private static PluginJson[] GetThirdPluginsInfo()
+    private static List<KeyValuePair<string, PluginJson>> GetThirdPluginsInfo()
     {
-        List<PluginJson> infos = new List<PluginJson>();
+        List<KeyValuePair<string, PluginJson>> infos = new ();
         Directory.CreateDirectory(pluginDirectory);
         thirdPlugins.Clear();
-        string[] folders = Directory.GetDirectories(pluginDirectory);
-        foreach (string folder in folders)
+        Action<string> addInfo = (folder) =>
         {
             string pluginJsonPath = Path.Combine(folder, "plugin.json");
             if (File.Exists(pluginJsonPath))
@@ -60,7 +59,7 @@ public static class PluginSystem
                     if (pluginInfo == null)
                     {
                         System.Console.WriteLine("Plugin json file can't loaded.");
-                        break;
+                        return;
                     }
                     try
                     {
@@ -70,11 +69,60 @@ public static class PluginSystem
                     {
                         pluginInfo.name = Path.GetDirectoryName(folder) ?? $"UnknownPluginName.{Path.GetRandomFileName()}";
                     }
-                    infos.Add(pluginInfo);
+                    infos.Add(new KeyValuePair<string, PluginJson>(folder, pluginInfo));
                 }
             }
+        };
+        string[] folders = Directory.GetDirectories(pluginDirectory);
+        foreach (string folder in folders)
+        {
+            addInfo(folder);
         }
-        return infos.ToArray();
+        string nugetPackages = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
+        string[] packages = Directory.GetDirectories(nugetPackages);
+        Func<string, string> getVersion = (package) =>
+        {
+            List<string> directories = new List<string>(Directory.GetDirectories(package));
+            directories.Sort();
+            directories.Reverse();
+            return directories.Count > 0 ? directories[0] : string.Empty;
+        };
+        foreach (var package in packages)
+        {
+            if (!package.StartsWith("bbob-plugin-")) continue;
+            string version = getVersion(package);
+            string tar = Path.Combine(version, "lib");
+            if (version == string.Empty || !Directory.Exists(tar)) continue;
+            string[] frameworks = Directory.GetDirectories(tar);
+            string[] FIXS =
+            {
+                "net6",
+                "netcoreapp",
+                "netstandard"
+            };
+            string fix = "";
+            List<string> fs = new List<string>();
+            foreach (var framework in frameworks)
+            {
+                string frameworkName = new DirectoryInfo(framework).Name ?? "";
+                foreach (var f in FIXS)
+                {
+                    if (frameworkName.StartsWith(f) && (fix == "" || f == fix))
+                    {
+                        fs.Add(framework);
+                        fix = f;
+                        break;
+                    }
+                }
+            }
+            if (fs.Count > 0)
+            {
+                fs.Sort();
+                fs.Reverse();
+                addInfo(fs[0]);
+            }
+        }
+        return infos;
     }
 
     private static void LoadBuildInPlugins()
@@ -100,44 +148,16 @@ public static class PluginSystem
     }
     private static void LoadThirdPlugins()
     {
-        Directory.CreateDirectory(pluginDirectory);
-        thirdPlugins.Clear();
-        string[] folders = Directory.GetDirectories(pluginDirectory);
-        foreach (string folder in folders)
+        List<KeyValuePair<string, PluginJson>> thirdPluginsInfo = GetThirdPluginsInfo();
+        foreach (var third in thirdPluginsInfo)
         {
-            string pluginJsonPath = Path.Combine(folder, "plugin.json");
-            if (File.Exists(pluginJsonPath))
+            string pluginDll = Path.Combine(third.Key, third.Value.entry);
+            InitializeExecutingPlugin(third.Value);
+            var mainPlugin = new PluginAssemblyLoadContext(pluginDll, third.Value);
+            if (mainPlugin.havePlugin)
             {
-                using (FileStream fs = new FileStream(pluginJsonPath, FileMode.Open, FileAccess.ReadWrite))
-                {
-                    PluginJson? pluginInfo = JsonSerializer.Deserialize<PluginJson>(fs);
-                    if (pluginInfo == null)
-                    {
-                        System.Console.WriteLine("Plugin json file can't loaded.");
-                        break;
-                    }
-                    try
-                    {
-                        var a = pluginInfo.name;
-                    }
-                    catch (NullReferenceException)
-                    {
-                        pluginInfo.name = Path.GetDirectoryName(folder) ?? $"UnknownPluginName.{Path.GetRandomFileName()}";
-                    }
-                    if (!Configuration.ConfigManager.GetConfigManager().MainConfig.isPluginEnable(pluginInfo))
-                    {
-                        System.Console.WriteLine($"Disable third plugin <{pluginInfo.name}>");
-                        continue;
-                    }
-                    string pluginDll = Path.Combine(folder, pluginInfo.entry);
-                    InitializeExecutingPlugin(pluginInfo);
-                    var mainPlugin = new PluginAssemblyLoadContext(pluginDll, pluginInfo);
-                    if (mainPlugin.havePlugin)
-                    {
-                        System.Console.WriteLine($"Loaded third plugin <{pluginInfo.name}>");
-                        thirdPlugins.Add(mainPlugin);
-                    }
-                }
+                System.Console.WriteLine($"Loaded third plugin <{third.Value.name}>");
+                thirdPlugins.Add(mainPlugin);
             }
         }
     }
@@ -212,10 +232,10 @@ public static class PluginSystem
         {
             if (getPluginInfo(plugin).name.ToUpper() == name) return true;
         }
-        PluginJson[] infosThird = GetThirdPluginsInfo();
+        List<KeyValuePair<string, PluginJson>> infosThird = GetThirdPluginsInfo();
         foreach (var info in infosThird)
         {
-            if (info.name.ToUpper() == name) return true;
+            if (info.Value.name.ToUpper() == name) return true;
         }
 
         return false;
