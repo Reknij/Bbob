@@ -5,6 +5,11 @@ namespace Bbob.Main.Cli;
 
 public class ResetConfig : Command
 {
+    public new static string Name => "reset-config";
+    public new static string Help => "Reset target config to default value.\n"+
+    "Use:\n"+
+    "// reset-config <configName>\n"+
+    "// rc <configName>";
     string configName;
     public ResetConfig(string configName)
     {

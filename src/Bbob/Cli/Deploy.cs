@@ -5,6 +5,11 @@ namespace Bbob.Main.Cli;
 
 public class Deploy : Command
 {
+    public new static string Name => "deploy";
+    public new static string Help => "Deploy the blog.\n"+
+    "Use:\n"+
+    "// deploy\n"+
+    "// d";
     string distribution;
 
     public Deploy(string dist)

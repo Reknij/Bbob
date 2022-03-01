@@ -5,9 +5,11 @@ namespace Bbob.Main.Cli;
 
 public class Init : Command
 {
-    public Init()
-    {
-    }
+    public new static string Name => "init";
+    public new static string Help => "Initialize the blog. No do anything.\n"+
+    "Use:\n"+
+    "// init\n"+
+    "// i";
     public override bool Process()
     {
         const string SUCCESS = "Success initialize: ";
@@ -20,7 +22,8 @@ public class Init : Command
             {
                 plugin.InitCommand();
             });
-            PluginSystem.cyclePlugins((plugin)=>{
+            PluginSystem.cyclePlugins((plugin) =>
+            {
                 plugin.CommandComplete(Commands.InitCommand);
             });
         }

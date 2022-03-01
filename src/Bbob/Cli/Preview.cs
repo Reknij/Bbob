@@ -7,6 +7,12 @@ namespace Bbob.Main.Cli;
 
 public class Preview : Command
 {
+    public new static string Name => "preview";
+    public new static string Help => "Preview the blog from distribution (folder name 'dist').\n"+
+    "Use:\n"+
+    "// preview\n"+
+    "// p";
+
     string distribution;
     public Preview(string distribution)
     {

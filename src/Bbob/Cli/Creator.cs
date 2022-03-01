@@ -5,6 +5,12 @@ namespace Bbob.Main.Cli;
 
 public class Creator : Command
 {
+    public new static string Name => "new";
+    public new static string Help => "Create the blog. Default create blog.\n"+
+    "[option]:\n"+
+    "--blog | -b : create article.\n\n"+
+    "Use:\n"+
+    "// new [option] [blogName]";
     NewTypes newType;
     public NewTypes NewType { get => newType; }
     string filename;

@@ -1,3 +1,4 @@
+using System.Reflection;
 using Bbob.Main;
 using Bbob.Main.Cli;
 using Bbob.Main.PluginManager;
@@ -41,12 +42,12 @@ class ConsoleParser
                     if (++i < length)
                         switch (arguments[i])
                         {
-                            case Commands.Deploy.Current:
-                            case Commands.Deploy.CurrentAka:
+                            case Commands.Deploy.BeOption:
+                            case Commands.Deploy.BeOptionAka:
                                 DeployIt(dist);
                                 break;
-                            case Commands.Preview.Current:
-                            case Commands.Preview.CurrentAka:
+                            case Commands.Preview.BeOption:
+                            case Commands.Preview.BeOptionAka:
                                 PreviewIt(dist);
                                 break;
                             default: break;
@@ -65,7 +66,9 @@ class ConsoleParser
                         case Commands.New.BlogAka:
                             types = NewTypes.blog;
                             break;
-                        default: break;
+                        default: 
+                        --i;
+                        break;
                     }
                 if (++i < length) filename = arguments[i];
                 InitializeBbob.Initialize(InitializeBbob.InitializeOptions.All);
@@ -94,10 +97,12 @@ class ConsoleParser
                 {
                     string pluginName = "";
                     bool direct = false;
+                    if (++i < length && arguments[i] == Commands.EnableAndDisable.Direct) direct = true;
+                    else --i;
                     if (++i < length)
                     {
                         pluginName = arguments[i];
-                        if (++i < length && arguments[i] == "d") direct = true;
+                        
                     }
                     eodPlugin(EnableAndDisable.Options.enable, pluginName, direct);
                 }
@@ -106,10 +111,11 @@ class ConsoleParser
                 {
                     string pluginName = "";
                     bool direct = false;
+                    if (++i < length && arguments[i] == Commands.EnableAndDisable.Direct) direct = true;
+                    else --i;
                     if (++i < length)
                     {
                         pluginName = arguments[i];
-                        if (++i < length && arguments[i] == "d") direct = true;
                     }
                     eodPlugin(EnableAndDisable.Options.disable, pluginName, direct);
                 }
@@ -141,6 +147,16 @@ class ConsoleParser
 
     static class Commands
     {
+        public static class Help
+        {
+            public const string Current = "--help";
+            public const string CurrentAka = "-h";
+        }
+        public static class Version
+        {
+            public const string Current = "--version";
+            public const string CurrentAka = "-v";
+        }
         public static class Init
         {
             public const string Current = "init";
@@ -150,8 +166,8 @@ class ConsoleParser
         {
             public const string Current = "new";
             public const string CurrentAka = "n";
-            public const string Blog = "blog";
-            public const string BlogAka = "b";
+            public const string Blog = "--blog";
+            public const string BlogAka = "-b";
         }
         public static class Generate
         {
@@ -163,12 +179,16 @@ class ConsoleParser
         {
             public const string Current = "deploy";
             public const string CurrentAka = "d";
+            public const string BeOption = "--deploy";
+            public const string BeOptionAka = "-d";
         }
 
         public static class Preview
         {
             public const string Current = "preview";
             public const string CurrentAka = "p";
+            public const string BeOption = "--preview";
+            public const string BeOptionAka = "-p";
         }
 
         public static class ResetConfig
@@ -180,6 +200,7 @@ class ConsoleParser
         {
             public const string Enable = "enable";
             public const string Disable = "disable";
+            public const string Direct = "-d";
         }
     }
 }

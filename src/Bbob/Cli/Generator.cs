@@ -11,6 +11,15 @@ namespace Bbob.Main.Cli;
 
 public class Generator : Command
 {
+    public new static string Name => "generate";
+    public new static string Help => "Generate the blog to distribution (folder name 'dist').\n"+
+    "[option]:\n"+
+    "--deploy | -d : Deploy the blog after generation.\n"+
+    "--preview | -p : Preview the blog after generation.\n\n"+
+    "Use:\n"+
+    "// generate [option]\n"+
+    "// g [option]";
+
     string articlesFolderPath;
     public string ArticlesFolderPath { get => articlesFolderPath; }
     string distribution;

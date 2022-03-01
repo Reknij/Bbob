@@ -5,6 +5,13 @@ namespace Bbob.Main.Cli;
 
 public class EnableAndDisable : Command
 {
+    public new static string Name => "enable/disable";
+    public new static string Help => "Enable/Disable the plugin.\n"+
+    "[option]:\n"+
+    "-d : direct enable or disable plugin.\n\n"+
+    "Use:\n"+
+    "// enable [option] <pluginName>\n"+
+    "// disable [option] <pluginName>";
     public enum Options
     {
         enable, disable
