@@ -8,7 +8,7 @@
     <SelfContained>false</SelfContained>
     <PublishSingleFile>false</PublishSingleFile>
     <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
-    <Version>1.2.2</Version>
+    <Version>1.2.3</Version>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>bbob</ToolCommandName>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
