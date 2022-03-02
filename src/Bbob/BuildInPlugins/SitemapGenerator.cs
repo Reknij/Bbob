@@ -7,9 +7,12 @@ public class SitemapGenerator : IPlugin
 {
     string? distribution { get; set; }
     List<string> articlesUrl = new List<string>();
+    MyConfig config;
     string? articleBaseUrl;
     public SitemapGenerator()
     {
+        PluginHelper.getPluginJsonConfig<MyConfig>(out MyConfig? tar);
+        config = tar ?? new MyConfig();
         var theme = PluginHelper.getThemeInfo<Theme>();
         if (theme != null)
         {
@@ -23,6 +26,10 @@ public class SitemapGenerator : IPlugin
     class Theme
     {
         public string? articleBaseUrl { get; set; }
+    }
+    class MyConfig
+    {
+        public bool redirectUrl { get; set; } = true;
     }
     public void GenerateCommand(string filePath, string distribution, GenerationStage stage)
     {
@@ -40,7 +47,8 @@ public class SitemapGenerator : IPlugin
                         string address = value.address;
                         string remake = articleBaseUrl.Replace("&", "~and~").Replace('?', '&');
                         string redirectUrl = $"{PluginHelper.ConfigBbob.baseUrl}?{remake}{address}";
-                        articlesUrl.Add(redirectUrl);
+                        string normalUrl = $"{PluginHelper.ConfigBbob.baseUrl}{articleBaseUrl}{address}".Replace("//", "/");
+                        articlesUrl.Add(config.redirectUrl ? redirectUrl : normalUrl);
                     }
                 }
                 else PluginHelper.ExecutingCommandResult = new CommandResult("Can't get link object.", CommandOperation.RunMeAgain);
@@ -54,22 +62,28 @@ public class SitemapGenerator : IPlugin
     {
         if (commands == Commands.GenerateCommand && distribution != null && articlesUrl.Count > 0)
         {
-            string indexFile = Path.Combine(distribution, "index.html");
-            string script = "<script>!function(n){var a;'/'===n.search[1]&&(a=n.search.slice(1).split('&').map(function(n){return n.replace(/~and~/g,'&')}).join('?'),window.history.replaceState(null,null,n.pathname.slice(0,-1)+a+n.hash))}(window.location);</script>";
-            string add = "<a href=\"/itissm.html\" hidden>Sitemap html</a>";
-            string indexPlain = File.ReadAllText(indexFile);
-            string patternHead = @"<head>(.*)</head>";
-            string patternBody = @"<body>(.*)</body>";
-            string replacement1 = $"<head>{script}$1</head>";
-            string replacement2 = $"<body>{add}$1</body>";
-            indexPlain = Regex.Replace(indexPlain, patternHead, replacement1, RegexOptions.Singleline);
-            indexPlain = Regex.Replace(indexPlain, patternBody, replacement2, RegexOptions.Singleline);
-            File.WriteAllText(indexFile, indexPlain);
+            if (config.redirectUrl) InsertFuncToIndex(distribution);
             generateSitemap(distribution);
             generateRobotTxt(distribution);
             PluginHelper.printConsole("Success generate sitemap.");
         }
     }
+
+    private void InsertFuncToIndex(string distribution)
+    {
+        string indexFile = Path.Combine(distribution, "index.html");
+        string script = "<script>!function(n){var a;'/'===n.search[1]&&(a=n.search.slice(1).split('&').map(function(n){return n.replace(/~and~/g,'&')}).join('?'),window.history.replaceState(null,null,n.pathname.slice(0,-1)+a+n.hash))}(window.location);</script>";
+        string add = "<a href=\"/itissm.html\" hidden>Sitemap html</a>";
+        string indexPlain = File.ReadAllText(indexFile);
+        string patternHead = @"<head>(.*)</head>";
+        string patternBody = @"<body>(.*)</body>";
+        string replacement1 = $"<head>{script}$1</head>";
+        string replacement2 = $"<body>{add}$1</body>";
+        indexPlain = Regex.Replace(indexPlain, patternHead, replacement1, RegexOptions.Singleline);
+        indexPlain = Regex.Replace(indexPlain, patternBody, replacement2, RegexOptions.Singleline);
+        File.WriteAllText(indexFile, indexPlain);
+    }
+
     private void generateRobotTxt(string distribution)
     {
         string robot = Path.Combine(distribution, "robots.txt");
