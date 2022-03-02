@@ -5,6 +5,6 @@ public enum GenerationStage
     Initialize,
     Process,
     Parse,
-    FinalProcess
-    
+    FinalProcess,
+    Confirm
 }
