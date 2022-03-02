@@ -1,3 +1,10 @@
+# 2022-3-2 20:44:00
+## Bbob
+- Refactoring code.
+## Bbob.Plugin
+- Add `Confirm` stage.
+- `PluginHelper` optimize.
+
 # 2022-3-2 13:28:00
 ## Bbob
 - Add `InitializeBbob` build-in plugin.
