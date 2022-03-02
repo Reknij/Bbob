@@ -12,21 +12,17 @@ namespace Bbob.Main.Cli;
 public class Generator : Command
 {
     public new static string Name => "generate";
-    public new static string Help => "Generate the blog to distribution (folder name 'dist').\n"+
-    "[option]:\n"+
-    "--deploy | -d : Deploy the blog after generation.\n"+
-    "--preview | -p : Preview the blog after generation.\n\n"+
-    "Use:\n"+
-    "// generate [option]\n"+
+    public new static string Help => "Generate the blog to distribution (folder name 'dist').\n" +
+    "[option]:\n" +
+    "--deploy | -d : Deploy the blog after generation.\n" +
+    "--preview | -p : Preview the blog after generation.\n\n" +
+    "Use:\n" +
+    "// generate [option]\n" +
     "// g [option]";
 
     string articlesFolderPath;
     public string ArticlesFolderPath { get => articlesFolderPath; }
     string distribution;
-
-    List<dynamic> allLink = new List<dynamic>();
-    Dictionary<string, List<dynamic>> allCategory = new Dictionary<string, List<dynamic>>();
-    Dictionary<string, List<dynamic>> allTag = new Dictionary<string, List<dynamic>>();
     public Generator(string _distribution, string _articlesFolderPath)
     {
         distribution = _distribution;
@@ -59,6 +55,7 @@ public class Generator : Command
         string[] files = Directory.GetFiles(articlesFolderPath, "*.*", config.recursion ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
         ThemeProcessor.Theme? theme = ThemeProcessor.BuildThemeToDist(config.theme, distribution);
+        InitializeConventionObjects();
         foreach (string file in files)
         {
             System.Console.WriteLine($"Run generate all stage for <{file}>");
@@ -91,38 +88,20 @@ public class Generator : Command
                 }
             }
             if (isSkip()) continue;
-            if (!ProcessData())
-            {
-                System.Console.WriteLine($"Process data of {Path.GetFileName(file)} failed because no exists target objects convention.");
-                continue;
-            }
         }
-        BuildData jsBuildData;
-        try
-        {
-            jsBuildData = GetBuildData();
-        }
-        catch (System.Exception ex)
-        {
-            string msg = ex.Message;
-#if DEBUG
-            msg = ex.ToString();
-#endif
-            System.Console.WriteLine($"{FAILED}Executing sort functions error:\n" + msg);
-            return false;
-        }
+        
         if (theme != null)
         {
-            printResult();
+            PluginSystem.cyclePlugins((plugin) =>
+           {
+               plugin.CommandComplete(Commands.GenerateCommand);
+           });
             string mainName = "bbob.js";
             System.Console.WriteLine($"Building {mainName}");
-            string newName = JSAPiHelper.BuildBbobJS(distribution, jsBuildData, theme.Info);
+            string newName = JSAPiHelper.BuildBbobJS(distribution, GetBuildData(), theme.Info);
             System.Console.WriteLine($"Hook in {mainName} to index file...");
             JSAPiHelper.Hook(distribution, theme.Info.index, newName);
-            PluginSystem.cyclePlugins((plugin) =>
-            {
-                plugin.CommandComplete(Commands.GenerateCommand);
-            });
+
         }
         else
         {
@@ -133,82 +112,21 @@ public class Generator : Command
         return true;
     }
 
-    private bool ProcessData()
+    private void InitializeConventionObjects()
     {
-        
-        PluginHelper.getRegisteredObject<dynamic>("link", out dynamic? link);
-        PluginHelper.getRegisteredObject<dynamic>("article", out dynamic? article);
-        if (link == null) return false;
-        if (article == null) return false;
-        allLink.Add(link);
-
-        if (((IDictionary<string, object?>)article).TryGetValue("categories", out object? c) && c is List<object> categories)
-        {
-            foreach (var category in categories)
-            {
-                if (category is string text)
-                {
-                    if (!allCategory.ContainsKey(text))
-                    {
-                        allCategory.Add(text, new List<dynamic> { link });
-                    }
-                    else allCategory[text].Add(link);
-                }
-            }
-        }
-
-        if (((IDictionary<string, object?>)article).TryGetValue("tags", out object? t) && t is List<object> tags)
-        {
-            foreach (var tag in tags)
-            {
-                if (tag is string text)
-                {
-                    if (!allTag.ContainsKey(text))
-                    {
-                        allTag.Add(text, new List<dynamic> { link });
-                    }
-                    else allTag[text].Add(link);
-                }
-            }
-        }
-        return true;
+        PluginHelper.registerObject("blog", new ExpandoObject());
     }
 
     private BuildData GetBuildData()
     {
-        var listCategory = allCategory.ToList();
-        var listTag = allTag.ToList();
-
-        if (PluginHelper.sortArticles != null)
+        if (PluginHelper.getRegisteredObject<dynamic>("blog", out dynamic? blog) && blog != null)
         {
-            allLink.Sort((item1, item2) => PluginHelper.sortArticles(item1, item2));
-            foreach (var category in listCategory)
-            {
-                category.Value.Sort((item1, item2) => PluginHelper.sortArticles(item1, item2));
-            }
-            foreach (var tag in listTag)
-            {
-                tag.Value.Sort((item1, item2) => PluginHelper.sortArticles(item1, item2));
-            }
+            return new BuildData(blog, PluginHelper._getAllMetas());
         }
-
-        if (PluginHelper.sortCategories != null)
+        else
         {
-            listCategory.Sort((item1, item2) => PluginHelper.sortCategories(item1, item2));
+            System.Console.WriteLine("'blog' is missing!");
         }
-
-        if (PluginHelper.sortTags != null)
-        {
-            listTag.Sort((item1, item2) => PluginHelper.sortTags(item1, item2));
-        }
-
-        return new BuildData(allLink, listCategory, listTag, PluginHelper._getAllMetas());
-    }
-
-    private void printResult()
-    {
-        System.Console.WriteLine($"Resolved {allLink.Count} files.");
-        System.Console.WriteLine($"Resolved {allCategory.Count} categories.");
-        System.Console.WriteLine($"Resolved {allTag.Count} tags.");
+        return new BuildData(new ExpandoObject(), PluginHelper._getAllMetas());
     }
 }

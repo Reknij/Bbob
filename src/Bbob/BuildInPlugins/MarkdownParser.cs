@@ -77,17 +77,14 @@ public class MarkdownParser : IPlugin
     {
         Dictionary<string, object> yaml = serializer.Deserialize<Dictionary<string, object>>(plain);
         dynamic article = new ExpandoObject();
-        dynamic link = new ExpandoObject();
         foreach (var y in yaml)
         {
             if (y.Value != null)
             {
                 ((IDictionary<String, Object>)article).Add(y.Key, y.Value);
-                ((IDictionary<String, Object>)link).Add(y.Key, y.Value);
             }
         }
         PluginHelper.registerObject("article", article);
-        PluginHelper.registerObject("link", link);
     }
     private void parseMarkdownToHtml()
     {

@@ -40,12 +40,7 @@ public class BuildWebArticleJson : IPlugin
         string baseUrl = PluginHelper.ConfigBbob.baseUrl;
         PluginHelper.getPluginJsonConfig<ConfigPlugin>(out ConfigPlugin? configPlugin);
         bool isShortAddress = configPlugin != null ? configPlugin.shortAddress : false;
-        PluginHelper.modifyRegisteredObject<dynamic>("link", (ref dynamic? link) =>
-        {
-            if (link == null) return;
-            link.address = isShortAddress ? Path.GetFileNameWithoutExtension(newName) : $"{baseUrl}{JSApi.JSAPiHelper.bbobAssets}/{folder}/{newName}";
-            //link.address = $"{publicPath}{JSApi.JSAPiHelper.bbobAssets}/{folder}/{year}/{month}/{day}/{newName}";
-        });
+        article.address = isShortAddress ? Path.GetFileNameWithoutExtension(newName) : $"{baseUrl}{JSApi.JSAPiHelper.bbobAssets}/{folder}/{newName}";
         if (isShortAddress)
         {
             Meta meta = new Meta($"{baseUrl}{JSApi.JSAPiHelper.bbobAssets}/{folder}/", ".json");

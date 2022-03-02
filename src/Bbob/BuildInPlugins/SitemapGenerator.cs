@@ -39,7 +39,7 @@ public class SitemapGenerator : IPlugin
                 this.distribution = distribution;
                 break;
             case GenerationStage.FinalProcess:
-                if (PluginHelper.getRegisteredObject<dynamic>("link", out dynamic? value))
+                if (PluginHelper.getRegisteredObject<dynamic>("article", out dynamic? value))
                 {
                     if (value == null) return;
                     if (articleBaseUrl != null)
@@ -51,7 +51,7 @@ public class SitemapGenerator : IPlugin
                         articlesUrl.Add(config.redirectUrl ? redirectUrl : normalUrl);
                     }
                 }
-                else PluginHelper.ExecutingCommandResult = new CommandResult("Can't get link object.", CommandOperation.RunMeAgain);
+                else PluginHelper.ExecutingCommandResult = new CommandResult("Can't get article object.", CommandOperation.RunMeAgain);
                 break;
 
             default:

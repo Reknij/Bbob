@@ -7,16 +7,6 @@ namespace Bbob.Main.JSApi;
 
 public class JSApiType
 {
-    public record class FilterSource(string text, string address);
-    public class Blog
-    {
-        public FilterSource[]? categories { get; set; }
-        public FilterSource[]? tags { get; set; }
-        public FilterSource[]? archives {get;set;}
-        public dynamic[]? links { get; set; }
-        public string[]? nextFileLinks { get; set; }
-    }
-
     public class BbobMeta
     {
         public string blogName { get; set; }
@@ -46,19 +36,12 @@ public class JSApiType
 
     public class BuildData
     {
-        public List<dynamic> LinkInfos { get; set; }
-        public List<KeyValuePair<string, List<dynamic>>> Categories { get; set; }
-        public List<KeyValuePair<string, List<dynamic>>> Tags { get; set; }
+        public dynamic blog {get;set;}
         public Dictionary<string, dynamic> Metas {get;set;}
 
-        public BuildData(List<dynamic> LinkInfos,
-                        List<KeyValuePair<string, List<dynamic>>> categories,
-                        List<KeyValuePair<string, List<dynamic>>> tags,
-                        Dictionary<string, dynamic> metas)
+        public BuildData(dynamic blog, Dictionary<string, dynamic> metas)
         {
-            this.LinkInfos = LinkInfos;
-            this.Categories = categories;
-            this.Tags = tags;
+            this.blog = blog;
             this.Metas = metas;
         }
     }

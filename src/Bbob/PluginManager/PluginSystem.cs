@@ -45,7 +45,7 @@ public static class PluginSystem
     }
     private static List<KeyValuePair<string, PluginJson>> GetThirdPluginsInfo()
     {
-        List<KeyValuePair<string, PluginJson>> infos = new ();
+        List<KeyValuePair<string, PluginJson>> infos = new();
         Directory.CreateDirectory(pluginDirectory);
         thirdPlugins.Clear();
         Action<string> addInfo = (folder) =>
@@ -165,50 +165,95 @@ public static class PluginSystem
     public delegate void CyclePluginDelegate(IPlugin plugin);
     public static void cyclePlugins(CyclePluginDelegate cyclePluginDelegate)
     {
-        List<IPlugin> requireRunAgain = new List<IPlugin>();
+        List<KeyValuePair<IPlugin, PluginJson>> requireRunAgain = new();
+        List<KeyValuePair<IPlugin, PluginJson>> pluginRefs = new();
+        PluginHelper._pluginsDone.Clear();
         foreach (var p in buildInPlugins)
         {
-            InitializeExecutingPlugin(p);
-            cyclePluginDelegate?.Invoke(p);
-            if (PluginHelper.ExecutingCommandResult.Operation == CommandOperation.RunMeAgain) requireRunAgain.Add(p);
-            if (!checkCommandResult()) return;
+            pluginRefs.Add(new KeyValuePair<IPlugin, PluginJson>(p, getPluginInfo(p)));
         }
         foreach (var p in thirdPlugins)
         {
-            if (p.Plugin == null) continue;
-            InitializeExecutingPlugin(p);
-            cyclePluginDelegate?.Invoke(p.Plugin);
-            if (PluginHelper.ExecutingCommandResult.Operation == CommandOperation.RunMeAgain) requireRunAgain.Add(p.Plugin);
-            if (!checkCommandResult()) return;
+            pluginRefs.Add(new KeyValuePair<IPlugin, PluginJson>(p.Plugin, p.PluginInfo));
         }
+        foreach (var p in pluginRefs)
+        {
+            InitializeExecutingPlugin(p.Value);
+            cyclePluginDelegate?.Invoke(p.Key);
+            switch (PluginHelper.ExecutingCommandResult.Operation)
+            {
+                default:
+                case CommandOperation.None:
+                    PluginHelper._pluginsDone.Add(p.Value.name);
+                    break;
+                case CommandOperation.RunMeAgain:
+                    requireRunAgain.Add(p);
+                    break;
+                case CommandOperation.Stop:
+                case CommandOperation.Skip:
+                    return;
+            }
+        }
+        RunCount[] runCounts = RunCount.InitializeArray(requireRunAgain.Count);
         while (requireRunAgain.Count > 0)
         {
-            for (int i = requireRunAgain.Count; i >= 0; i--)
+            for (int i = requireRunAgain.Count - 1; i >= 0; i--)
             {
-                PluginHelper.ExecutingPlugin = getPluginInfo(requireRunAgain[i]);
-                System.Console.WriteLine($"Run again <{PluginHelper.ExecutingPlugin.name}>");
-                System.Console.WriteLine($"Message: {PluginHelper.ExecutingCommandResult.Message}");
-                cyclePluginDelegate?.Invoke(requireRunAgain[i]);
-                if (PluginHelper.ExecutingCommandResult.Operation != CommandOperation.RunMeAgain) requireRunAgain.RemoveAt(i);
-                if (!checkCommandResult()) return;
+                PluginHelper.ExecutingPlugin = requireRunAgain[i].Value;
+                cyclePluginDelegate?.Invoke(requireRunAgain[i].Key);
+                runCounts[i].Count++;
+                switch (PluginHelper.ExecutingCommandResult.Operation)
+                {
+                    case CommandOperation.None:
+                        PluginHelper._pluginsDone.Add(requireRunAgain[i].Value.name);
+                        requireRunAgain.RemoveAt(i); //dont use i because may be already remove.
+                        break;
+                    case CommandOperation.RunMeAgain:
+                        break;
+                    case CommandOperation.Stop:
+                    case CommandOperation.Skip:
+                        return;
+                    default: break;
+                }
+                if (runCounts[i].Count > runCounts[i].WarningCount){
+                    System.Console.WriteLine($"Plugin <{PluginHelper.ExecutingPlugin.name}> has been run count more than {runCounts[i].WarningCount}");
+                    System.Console.WriteLine($"Message: {PluginHelper.ExecutingCommandResult.Message}");
+                    runCounts[i].WarningCount *=2;
+                }
             }
         }
     }
+    private class RunCount
+    {
+        public int Count {get;set;}
+        public int WarningCount {get;set;}
+        public RunCount(int c = 0, int wc = 20)
+        {
+            Count = 0;
+            WarningCount = 20;
+        }
+        public static void SetWarningCount(IEnumerable<RunCount> runCounts, int wc)
+        {
+            foreach (RunCount rc in runCounts)
+            {
+                rc.WarningCount = wc;
+            }
+        }
 
-    private static void InitializeExecutingPlugin(IPlugin plugin) => InitializeExecutingPlugin(getPluginInfo(plugin));
-    private static void InitializeExecutingPlugin(PluginAssemblyLoadContext pContent) => InitializeExecutingPlugin(pContent.PluginInfo);
+        public static RunCount[] InitializeArray(int length, int c = 0, int wc = 20)
+        {
+            RunCount[] runCounts = new RunCount[length];
+            for (int i = 0; i < runCounts.Count(); i++)
+            {
+                runCounts[i] = new RunCount(0, wc);
+            }
+            return runCounts;
+        }
+    }
     private static void InitializeExecutingPlugin(PluginJson info)
     {
         PluginHelper.ExecutingPlugin = info;
         PluginHelper.ExecutingCommandResult = new CommandResult();
-    }
-
-    private static bool checkCommandResult()
-    {
-        if (PluginHelper.ExecutingCommandResult.Operation == CommandOperation.Stop ||
-            PluginHelper.ExecutingCommandResult.Operation == CommandOperation.Skip)
-            return false;
-        return true;
     }
 
     public static PluginJson getPluginInfo(IPlugin plugin) => getPluginInfo(plugin.GetType());
