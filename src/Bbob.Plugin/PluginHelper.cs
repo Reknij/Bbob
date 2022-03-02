@@ -134,9 +134,9 @@ public static class PluginHelper
     }
     public static void savePluginJsonConfig<T>(T config) =>
     savePluginJsonConfig<T>(ExecutingPlugin.name, config);
-    public static void printConsole(string msg)
+    public static void printConsole(object msg)
     {
-        System.Console.WriteLine($"[{ExecutingPlugin.name}]: {msg}");
+        System.Console.WriteLine($"[{ExecutingPlugin.name}]: {msg.ToString()}");
     }
 
     public static void registerMeta(object meta)
@@ -165,10 +165,20 @@ public static class PluginHelper
             return JsonSerializer.Deserialize<T>(fs);
         }
     }
+    public static bool isTargetPluginDone(string[] names)
+    {
+        foreach (var name in names)
+        {
+            if (!isTargetPluginDone(name)) return false;
+        }
+        return true;
+    }
+    public static bool isTargetPluginDone(string name)
+    {
+        return _pluginsDone.Contains(name);
+    }
+    public static bool isTargetPluginEnable(string name) => ConfigBbob.isPluginEnable(name);
     public static Dictionary<string, object> _getAllMetas() => metas;
-
-    public static sortArticlesDelegate? sortArticles { get; set; }
-    public static sortCategoriesDelegate? sortCategories { get; set; }
-    public static sortTagsDelegate? sortTags { get; set; }
+    public static HashSet<string> _pluginsDone = new HashSet<string>();
     public static CommandResult ExecutingCommandResult { get; set; }
 }
