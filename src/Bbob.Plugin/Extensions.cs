@@ -10,7 +10,7 @@ public static class Extensions
     public static bool IsPropertyExists<T>(object obj, string property)
     {
         bool exists = IsPropertyExistsMain(obj, property, out object? pObj);
-        if (exists && pObj?.GetType() is T)
+        if (exists && pObj is T)
         {
             return true;
         }
@@ -19,7 +19,7 @@ public static class Extensions
     public static bool IsPropertyExists<T>(object obj, string property, out T? propertyWithType)
     {
         bool exists = IsPropertyExistsMain(obj, property, out object? pObj);
-        if (exists && pObj?.GetType() == typeof(T))
+        if (exists && pObj is T)
         {
             propertyWithType = (T)pObj;
             return true;
