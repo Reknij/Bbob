@@ -1,29 +1,45 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import Bbob, { LinkInfo } from '../../../Bbob/JSApi/Bbob';
 import { rawHtml, toc } from '../composition/documentData';
 
 let activeName = ref('0');
-
+const router = useRouter();
 let props = defineProps({
     readyClick: {
         type: Function,
         default: undefined
     }
 })
+let rpa = router.currentRoute.value.params.address as string;
+if (!rpa || rpa == '') rpa = 'default';
+getArticle(rpa);
+
 let clickDoc = (link: LinkInfo) => {
-    Bbob.api.getArticleFromAddress(link.address, (article) => {
+    console.log(link.address)
+    router.replace({ params: { address: link.address } });
+    getArticle(link.address);
+}
+function getArticle(address: string) {
+    if (address == 'default')return;
+    let a =address;
+    const sa = Bbob.meta.extra.shortAddress;
+    if (sa) {
+        a = `${sa.startOfAddress}${address}${sa.endOfAddress}`;
+    }
+    Bbob.api.getArticleFromAddress(a, (article) => {
         if (article.contentParsed) {
             rawHtml.value = article.contentParsed;
         }
         if (article.toc) {
             toc.value = article.toc;
         }
+        activeName.value = address;
     })
     if (props.readyClick) {
         props.readyClick();
     }
-
 }
 
 let blogs: any = {}
@@ -47,10 +63,10 @@ for (let index = 0; index < Bbob.blog.categories.length; index++) {
                         v-for="(link, index) in blogs[category.text].value"
                         @click="clickDoc(link)"
                         :key="index"
-                        :name="`${category.text}/${index}`"
+                        :name="link.address"
                     >
-                        <template #title>
-                            <h4 v-if="activeName == `${category.text}/${index}`">{{ link.title }}</h4>
+                        <template #title style="word-wrap: break-all;">
+                            <h4 v-if="activeName == link.address">{{ link.title }}</h4>
                             <span v-else>{{ link.title }}</span>
                         </template>
                         <span v-html="toc"></span>
@@ -65,11 +81,6 @@ for (let index = 0; index < Bbob.blog.categories.length; index++) {
 .articlesTitle {
     margin-left: 15px;
 }
-#articleContent {
-    max-width: 768px;
-    margin-left: auto;
-    margin-right: auto;
-}
 .toc-item a {
     color: #303133;
     text-decoration: none;
@@ -80,5 +91,9 @@ for (let index = 0; index < Bbob.blog.categories.length; index++) {
 }
 .toc-number {
     display: none;
+}
+.el-collapse-item__header{
+    line-height:normal;
+    padding: 5px 0px;
 }
 </style>

@@ -10,8 +10,8 @@ const routes = [
         component: Home
     },
     {
-        path: '/documents',
-        component: Documents,
+        path: '/documents/:address',
+        component: Documents
     },
     {
         path: '/about',

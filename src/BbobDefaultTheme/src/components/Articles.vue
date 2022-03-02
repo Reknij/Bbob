@@ -72,7 +72,7 @@ onBeforeUnmount(()=>{
                 <h3>
                     <router-link
                         class="articleTitle"
-                        :to="`/article?address=${link.address}`"
+                        :to="`/article/${link.address}`"
                     >{{ link.title }}</router-link>
                 </h3>
                 <el-divider v-if="link.categories" content-position="left">

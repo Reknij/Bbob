@@ -7,7 +7,7 @@ const paths = [
     },
     {
         name: 'Documents',
-        path: '/documents'
+        path: '/documents/default'
     },
     {
         name: 'About',

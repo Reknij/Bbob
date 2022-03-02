@@ -1,24 +1,21 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { onBeforeRouteLeave, useRoute } from 'vue-router';
 import Bbob, { Article } from '../../../Bbob/JSApi/Bbob'
 import { normal } from '../composition/changeSize';
 import hljs from '../composition/gethljs';
 
-interface query {
-    address: string
-}
 const noArticle = 'No exists article!';
 const route = useRoute();
-const query = route.query as any as query;
-if (Bbob.meta.extra.shortAddress){
-    query.address = `${Bbob.meta.extra.shortAddress.startOfAddress}${query.address}${Bbob.meta.extra.shortAddress.endOfAddress}`
+let address = route.params.address ? route.params.address as string : '';
+if (Bbob.meta.extra.shortAddress) {
+    address = `${Bbob.meta.extra.shortAddress.startOfAddress}${address}${Bbob.meta.extra.shortAddress.endOfAddress}`
 }
 let article = ref<Article>({
     title: noArticle,
     date: noArticle,
 })
-Bbob.api.getArticleFromAddress(query.address, (art) => {
+Bbob.api.getArticleFromAddress(address, (art) => {
     let htmlContent = document.getElementById('htmlContent');
     article.value = art;
     if (htmlContent && art.contentParsed) {
@@ -27,6 +24,7 @@ Bbob.api.getArticleFromAddress(query.address, (art) => {
     }
     document.title = art.title;
 })
+
 onBeforeRouteLeave(() => {
     document.title = Bbob.meta.blogName
     return true;
@@ -58,7 +56,7 @@ let tocDrawer = ref(false)
                 </template>
             </el-drawer>
 
-            <el-affix style="margin-left: 90%;" :offset="80" position="bottom">
+            <el-affix style="margin-left: calc(100% - 60px);" :offset="80" position="bottom">
                 <el-button @click="tocDrawer = true" type="primary">Toc</el-button>
             </el-affix>
         </div>
