@@ -1,3 +1,17 @@
+# 2022-3-2 13:28:00
+## Bbob
+- Add `InitializeBbob` build-in plugin.
+- `SitemapGenerator` support set config.
+- change hash generate.
+## BbobDefaultTheme
+- optimzie article url show.
+- optimize other.
+## BbobDocTheme
+- optimzie article url show.
+- optimize other.
+- support `SitemapGenerator`
+- support short address.
+# The following is v1.2.4
 # 2022-3-1 12:42:00
 - add `--version` command.
 - add `--help` command.
