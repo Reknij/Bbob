@@ -34,7 +34,7 @@ public class BuildWebArticleJson : IPlugin
             fs.Position = 0; //set to 0 to read.
             hash = Shared.SharedLib.BytesToString(sha256.ComputeHash(fs));
         }
-        string newName = $"{Path.GetFileNameWithoutExtension(filePath)}.{hash.Substring(0, 9)}.json";
+        string newName = $"{Path.GetFileNameWithoutExtension(filePath)}-{hash.Substring(0, 9)}.json";
         string newLocal = Path.Combine(FileLocalFolder, newName);
         File.Move(FileLocal, newLocal, true);
         string baseUrl = PluginHelper.ConfigBbob.baseUrl;

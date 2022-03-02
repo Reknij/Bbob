@@ -13,7 +13,7 @@ namespace Bbob.Main.JSApi;
 public static class JSAPiHelper
 {
     public static readonly string metasFolder = Path.Combine(Environment.CurrentDirectory, "metas");
-    public static readonly string bbobAssets = "bbob.assets";
+    public static readonly string bbobAssets = "bbob-assets";
 
     public static void Hook(string dist, string indexName, string hookFile)
     => Hook(dist, indexName, new string[] { hookFile });
@@ -78,7 +78,7 @@ public static class JSAPiHelper
             fs.Position = 0; //set to 0 to read.
             hash = Shared.SharedLib.BytesToString(sha256.ComputeHash(fs));
         }
-        string newName = $"bbob.{hash.Substring(0, 9)}.js";
+        string newName = $"bbob-{hash.Substring(0, 9)}.js";
         string newPath = Path.Combine(dist, newName);
         File.Move(mainjsDist, newPath);
         ProcessPublicPath(dist, themeInfo.index);
@@ -114,7 +114,7 @@ public static class JSAPiHelper
                 fs.Position = 0; //set to 0 to read.
                 hash = Shared.SharedLib.BytesToString(sha256.ComputeHash(fs));
             }
-            string newName = $"{item.Key}.{hash.Substring(0,9)}.json";
+            string newName = $"{item.Key}-{hash.Substring(0,9)}.json";
             string newPath = Path.Combine(localPath, newName);
             string webPath = Path.Combine($"{config.baseUrl}{bbobAssets}/{name}/{newName}");
             File.Move(vFile, newPath);
@@ -240,7 +240,7 @@ public static class JSAPiHelper
                 fs.Position = 0; //set to 0 to read.
                 hash = Shared.SharedLib.BytesToString(sha256.ComputeHash(fs));
             }
-            string newName = $"next.{hash.Substring(0, 9)}.js";
+            string newName = $"next-{hash.Substring(0, 9)}.js";
             string newPath = Path.Combine(nextLinkInfoFilesFolderLocal, newName);
             File.Move(nextLinkInfosFile, newPath);
             nextFileLinkInfos.Add($"{config.baseUrl}{bbobAssets}/{nextLinkInfoFilesFolder}/{newName}");
