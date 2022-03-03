@@ -47,19 +47,8 @@ public class Program
                 
                 System.Console.WriteLine($"Command '{Name}': {Help}");
                 System.Console.WriteLine();
-                printDividingLine();
+                Shared.SharedLib.ConsoleHelper.printDividingLine();
             }
         }
-    }
-
-    private static void printDividingLine() => printDividingLine('-');
-    private static void printDividingLine(char dividing) => printDividingLine(dividing.ToString());
-    private static void printDividingLine(string dividing)
-    {
-        for (int i = 0; i < Console.WindowWidth; i++)
-        {
-            Console.Write(dividing);
-        }
-        Console.Write('\n');
     }
 }

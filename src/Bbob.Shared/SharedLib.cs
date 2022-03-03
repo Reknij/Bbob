@@ -112,4 +112,18 @@ public static class SharedLib
             Directory.Delete(targetDir, false);
         }
     }
+
+    public static class ConsoleHelper
+    {
+        public static void printDividingLine() => printDividingLine('-');
+        public static void printDividingLine(char dividing) => printDividingLine(dividing.ToString());
+        public static void printDividingLine(string dividing)
+        {
+            for (int i = 0; i < Console.WindowWidth; i++)
+            {
+                Console.Write(dividing);
+            }
+            Console.Write('\n');
+        }
+    }
 }
