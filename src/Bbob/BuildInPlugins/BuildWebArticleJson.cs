@@ -6,6 +6,11 @@ using Bbob.Plugin;
 namespace Bbob.Main.BuildInPlugin;
 public class BuildWebArticleJson : IPlugin
 {
+    public void InitCommand()
+    {
+        PluginHelper.savePluginJsonConfig<ConfigPlugin>(new ConfigPlugin(false));
+        PluginHelper.printConsole("Initialize config file.");
+    }
     public void GenerateCommand(string filePath, string distribution, GenerationStage stage)
     {
         if (stage != GenerationStage.FinalProcess) return;

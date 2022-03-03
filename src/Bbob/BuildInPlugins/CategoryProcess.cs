@@ -10,6 +10,7 @@ public class CategoryProcess : IPlugin
     public void InitCommand()
     {
         PluginHelper.savePluginJsonConfig<MyConfig>(new MyConfig("default"));
+        PluginHelper.printConsole("Initialize config file.");
     }
 
     public void GenerateCommand(string filePath, string distribution, GenerationStage stage)

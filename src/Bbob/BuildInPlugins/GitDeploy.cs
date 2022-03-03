@@ -9,10 +9,21 @@ public class GitDeploy : IPlugin
 {
     static readonly string ghDirectoryName = ".deploy_git";
     static readonly string ghDirectory = Path.Combine(PluginHelper.CurrentDirectory, ghDirectoryName);
+
+    public void InitCommand()
+    {
+        PluginHelper.savePluginJsonConfig<GitConfig>(new GitConfig());
+        PluginHelper.printConsole("Initialize config file.");
+    }
     public void DeployCommand(string distribution)
     {
         if (PluginHelper.getPluginJsonConfig<GitConfig>("GitDeploy", out var config) && config != null)
         {
+            if (config.repos == null)
+            {
+                PluginHelper.printConsole("Please enter your repository url in the config.");
+                return;
+            }
             if (config.branch == null) config.branch = "main";
             if (config.message == null) config.message = $"{Shared.SharedLib.DateTimeHelper.GetDateTimeNowString()} Update";
             PluginHelper.printConsole($"Trying deploy to {config.repos}, branch {config.branch}");

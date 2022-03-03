@@ -5,6 +5,11 @@ namespace Bbob.Main.BuildInPlugin;
 
 public class SortData : IPlugin
 {
+    public void InitCommand()
+    {
+        PluginHelper.savePluginJsonConfig<MyConfig>(new MyConfig());
+        PluginHelper.printConsole("Initialize config file.");
+    }
     public void CommandComplete(Commands command)
     {
         if (command != Commands.GenerateCommand) return;
@@ -12,8 +17,8 @@ public class SortData : IPlugin
         {
             if (blog == null) return;
 
-            PluginHelper.getPluginJsonConfig<Config>(out var tar);
-            Config config = tar ?? new Config();
+            PluginHelper.getPluginJsonConfig<MyConfig>(out var tar);
+            MyConfig config = tar ?? new MyConfig();
             if (Extensions.IsPropertyExists<List<dynamic>>(blog, "links", out List<dynamic>? links))
             {
                 links?.Sort((art1, art2) =>
@@ -133,7 +138,7 @@ public class SortData : IPlugin
         return 0;
     }
 
-    private class Config
+    private class MyConfig
     {
         public string[] categories { get; set; } = Array.Empty<string>();
         public string[] tags { get; set; } = Array.Empty<string>();

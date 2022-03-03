@@ -31,6 +31,12 @@ public class SitemapGenerator : IPlugin
     {
         public bool redirectUrl { get; set; } = true;
     }
+    public void InitCommand()
+    {
+        PluginHelper.savePluginJsonConfig<MyConfig>(new MyConfig());
+        PluginHelper.printConsole("Initialize config file.");
+
+    }
     public void GenerateCommand(string filePath, string distribution, GenerationStage stage)
     {
         switch (stage)
