@@ -1,3 +1,12 @@
+# 2022-3-3 16:01:00
+## Bbob
+- `CategoryProcess` support use folder name.
+- ConsoleParser optimzie.
+- Some build-in plugins support initialize config using `init` command.
+- Build-in plugin `ArchiveProcess` require `LinkProcess` to run.
+## Bbob.Plugin
+- Add PluginCondition
+
 # 2022-3-2 20:44:00
 ## Bbob
 - Refactoring code.
