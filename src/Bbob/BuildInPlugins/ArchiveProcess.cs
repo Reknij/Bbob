@@ -3,6 +3,7 @@ using Bbob.Plugin;
 
 namespace Bbob.Main.BuildInPlugin;
 
+[PluginCondition(RequirePlugin = "LinkProcess")]
 public class ArchiveProcess : IPlugin
 {
     string distribution = "";
@@ -19,15 +20,6 @@ public class ArchiveProcess : IPlugin
     {
         if (command == Commands.GenerateCommand)
         {
-            if (!PluginHelper.isTargetPluginEnable("LinkProcess")) 
-            {
-                PluginHelper.printConsole("LinkProcess disable, please enable to generate archives.");
-            }
-            if (!PluginHelper.isTargetPluginDone("LinkProcess"))
-            {
-                 PluginHelper.ExecutingCommandResult = new CommandResult("Wait the links", CommandOperation.RunMeAgain);
-                 return;
-            }
             PluginHelper.getRegisteredObject<dynamic>("blog", out dynamic? blog);
             Dictionary<string, List<dynamic>> archives = new Dictionary<string, List<dynamic>>();
             if (blog != null)

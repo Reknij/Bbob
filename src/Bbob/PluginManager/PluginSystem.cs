@@ -161,6 +161,49 @@ public static class PluginSystem
             }
         }
     }
+    private static HashSet<string> showWarningSet = new HashSet<string>();
+    private static bool isConditionSuccess(IPlugin plugin, PluginJson info)
+    {
+        foreach (var attr in Attribute.GetCustomAttributes(plugin.GetType()))
+        {
+            if (attr is PluginCondition condition)
+            {
+                if (condition.RequirePlugin == null) continue;
+                if (!containPluginWithName(condition.RequirePlugin))
+                {
+                    if (condition.ShowWarning && !showWarningSet.Contains(info.name))
+                    {
+                        System.Console.WriteLine($"Warning: <{info.name}> require plugin <{condition.RequirePlugin}> but it is no contain!");
+                        showWarningSet.Add(info.name);
+                    }
+                    return false;
+                }
+                if (!PluginHelper.isTargetPluginEnable(condition.RequirePlugin))
+                {
+                    if (condition.ShowWarning && !showWarningSet.Contains(info.name))
+                    {
+                        System.Console.WriteLine($"Warning: <{info.name}> require plugin <{condition.RequirePlugin}> but it is disable.");
+                        showWarningSet.Add(info.name);
+                    }
+                    return false;
+                }
+                if (condition.RequirePluginStatus != null)
+                {
+                    switch (condition.RequirePluginStatus)
+                    {
+                        case PluginStatus.Waiting:
+                            if (PluginHelper.isTargetPluginDone(condition.RequirePlugin)) return false;
+                            break;
+                        case PluginStatus.Done:
+                            if (!PluginHelper.isTargetPluginDone(condition.RequirePlugin)) return false;
+                            break;
+                        default: break;
+                    }
+                }
+            }
+        }
+        return true;
+    }
 
     public delegate void CyclePluginDelegate(IPlugin plugin);
     public static void cyclePlugins(CyclePluginDelegate cyclePluginDelegate)
@@ -178,6 +221,7 @@ public static class PluginSystem
         }
         foreach (var p in pluginRefs)
         {
+            if (!isConditionSuccess(p.Key, p.Value)) continue;
             InitializeExecutingPlugin(p.Value);
             cyclePluginDelegate?.Invoke(p.Key);
             switch (PluginHelper.ExecutingCommandResult.Operation)
@@ -215,18 +259,19 @@ public static class PluginSystem
                         return;
                     default: break;
                 }
-                if (runCounts[i].Count > runCounts[i].WarningCount){
+                if (runCounts[i].Count > runCounts[i].WarningCount)
+                {
                     System.Console.WriteLine($"Plugin <{PluginHelper.ExecutingPlugin.name}> has been run count more than {runCounts[i].WarningCount}");
                     System.Console.WriteLine($"Message: {PluginHelper.ExecutingCommandResult.Message}");
-                    runCounts[i].WarningCount *=2;
+                    runCounts[i].WarningCount *= 2;
                 }
             }
         }
     }
     private class RunCount
     {
-        public int Count {get;set;}
-        public int WarningCount {get;set;}
+        public int Count { get; set; }
+        public int WarningCount { get; set; }
         public RunCount(int c = 0, int wc = 20)
         {
             Count = 0;
