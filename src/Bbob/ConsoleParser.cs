@@ -3,6 +3,7 @@ using Bbob.Main;
 using Bbob.Main.Cli;
 using Bbob.Main.PluginManager;
 using Bbob.Plugin;
+using static Bbob.Main.Cli.List;
 
 namespace Bbob.Main;
 
@@ -68,14 +69,14 @@ class ConsoleParser
                         case Commands.New.BlogAka:
                             types = NewTypes.blog;
                             break;
-                        default: 
+                        default:
                             if (arguments[i].StartsWith("-"))
                             {
                                 System.Console.WriteLine($"Unknown option '{arguments[i]}'!");
                                 return;
                             }
                             else --i;
-                        break;
+                            break;
                     }
                 if (++i < length) filename = arguments[i];
                 InitializeBbob.Initialize(InitializeBbob.InitializeOptions.All);
@@ -104,12 +105,28 @@ class ConsoleParser
                 {
                     string pluginName = "";
                     bool direct = false;
-                    if (++i < length && arguments[i] == Commands.EnableAndDisable.Direct) direct = true;
-                    else --i;
+                    if (++i < length)
+                    {
+                        switch (arguments[i])
+                        {
+                            case Commands.EnableAndDisable.Direct:
+                            case Commands.EnableAndDisable.DirectAka:
+                                direct = true;
+                                break;
+                            default:
+                                if (arguments[i].StartsWith("-"))
+                                {
+                                    System.Console.WriteLine($"Unknown option '{arguments[i]}'!");
+                                    return;
+                                }
+                                else --i;
+                                break;
+                        }
+                    }
                     if (++i < length)
                     {
                         pluginName = arguments[i];
-                        
+
                     }
                     eodPlugin(EnableAndDisable.Options.enable, pluginName, direct);
                 }
@@ -127,16 +144,48 @@ class ConsoleParser
                                 direct = true;
                                 break;
                             default:
-                                System.Console.WriteLine($"Unknown option '{arguments[i]}'!");
-                                return;
+                                if (arguments[i].StartsWith("-"))
+                                {
+                                    System.Console.WriteLine($"Unknown option '{arguments[i]}'!");
+                                    return;
+                                }
+                                else --i;
+                                break;
                         }
                     }
-                    else --i;
                     if (++i < length)
                     {
                         pluginName = arguments[i];
                     }
                     eodPlugin(EnableAndDisable.Options.disable, pluginName, direct);
+                }
+                break;
+            case Commands.List.Current:
+            case Commands.List.CurrentAka:
+                {
+                    DataType type = DataType.Plugins;
+                    if (++i < length)
+                    {
+                        switch (arguments[i])
+                        {
+                            case Commands.List.Plugins:
+                            case Commands.List.PluginsAka:
+                                type = DataType.Plugins;
+                                break;
+                            default:
+                                System.Console.WriteLine($"Unknown option '{arguments[i]}'!");
+                                --i;
+                                return;
+                        }
+                    }
+                    else
+                    {
+                        System.Console.WriteLine("Please enter option!");
+                        return;
+                    }
+                    InitializeBbob.Initialize(InitializeBbob.InitializeOptions.All);
+                    List list = new List(type);
+                    list.Process();
                 }
                 break;
             default:
@@ -221,6 +270,13 @@ class ConsoleParser
             public const string Disable = "disable";
             public const string Direct = "--direct";
             public const string DirectAka = "-d";
+        }
+        public static class List
+        {
+            public const string Current = "list";
+            public const string CurrentAka = "l";
+            public const string Plugins = "--plugins";
+            public const string PluginsAka = "-p";
         }
     }
 }
