@@ -50,7 +50,9 @@ class ConsoleParser
                             case Commands.Preview.BeOptionAka:
                                 PreviewIt(dist);
                                 break;
-                            default: break;
+                            default:
+                                System.Console.WriteLine($"Unknown option '{arguments[i]}'!");
+                                return;
                         }
                 }
                 break;
@@ -67,7 +69,12 @@ class ConsoleParser
                             types = NewTypes.blog;
                             break;
                         default: 
-                        --i;
+                            if (arguments[i].StartsWith("-"))
+                            {
+                                System.Console.WriteLine($"Unknown option '{arguments[i]}'!");
+                                return;
+                            }
+                            else --i;
                         break;
                     }
                 if (++i < length) filename = arguments[i];
@@ -111,7 +118,19 @@ class ConsoleParser
                 {
                     string pluginName = "";
                     bool direct = false;
-                    if (++i < length && arguments[i] == Commands.EnableAndDisable.Direct) direct = true;
+                    if (++i < length)
+                    {
+                        switch (arguments[i])
+                        {
+                            case Commands.EnableAndDisable.Direct:
+                            case Commands.EnableAndDisable.DirectAka:
+                                direct = true;
+                                break;
+                            default:
+                                System.Console.WriteLine($"Unknown option '{arguments[i]}'!");
+                                return;
+                        }
+                    }
                     else --i;
                     if (++i < length)
                     {
@@ -121,7 +140,7 @@ class ConsoleParser
                 }
                 break;
             default:
-                System.Console.WriteLine($"Unknown command: {arguments[i]}");
+                System.Console.WriteLine($"Unknown command: {arguments[i]}!");
                 break;
         }
     }
@@ -200,7 +219,8 @@ class ConsoleParser
         {
             public const string Enable = "enable";
             public const string Disable = "disable";
-            public const string Direct = "-d";
+            public const string Direct = "--direct";
+            public const string DirectAka = "-d";
         }
     }
 }
