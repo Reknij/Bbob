@@ -6,9 +6,9 @@ namespace Bbob.Main.Cli;
 public class Deploy : Command
 {
     public new static string Name => "deploy";
-    public new static string Help => "Deploy the blog.\n"+
-    "Use:\n"+
-    "// deploy\n"+
+    public new static string Help => "Deploy the blog.\n" +
+    "Use:\n" +
+    "// deploy\n" +
     "// d";
     string distribution;
 
@@ -36,7 +36,20 @@ public class Deploy : Command
             {
                 plugin.DeployCommand(distribution);
             });
-            PluginSystem.cyclePlugins((plugin)=>{
+        }
+        catch (System.Exception ex)
+        {
+            string msg = ex.Message;
+#if DEBUG
+            msg = ex.ToString();
+#endif
+            System.Console.WriteLine($"{FAILED}Error run deploy command in plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
+            return false;
+        }
+        try
+        {
+            PluginSystem.cyclePlugins((plugin) =>
+            {
                 plugin.CommandComplete(Commands.DeployCommand);
             });
         }
@@ -46,7 +59,7 @@ public class Deploy : Command
 #if DEBUG
             msg = ex.ToString();
 #endif
-            System.Console.WriteLine($"{FAILED}Error executing plugin deploy command:\n" + msg);
+            System.Console.WriteLine($"{FAILED}Error run deploy command complete in plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
             return false;
         }
         System.Console.WriteLine($"{SUCCESS}Deployment has been run");

@@ -83,19 +83,31 @@ public class Generator : Command
 #if DEBUG
                     msg = ex.ToString();
 #endif
-                    System.Console.WriteLine($"{FAILED}Executing generate functions of plugin error in stage {stage}:\n" + msg);
+                    System.Console.WriteLine($"{FAILED}Executing generate command of plugin <{PluginHelper.ExecutingPlugin.name}> error in stage {stage}:\n" + msg);
                     return false;
                 }
             }
             if (isSkip()) continue;
         }
-        
+
         if (theme != null)
         {
-            PluginSystem.cyclePlugins((plugin) =>
+            try
+            {
+                PluginSystem.cyclePlugins((plugin) =>
            {
                plugin.CommandComplete(Commands.GenerateCommand);
            });
+            }
+            catch (System.Exception ex)
+            {
+                string msg = ex.Message;
+#if DEBUG
+                msg = ex.ToString();
+#endif
+                System.Console.WriteLine($"{FAILED}Error run generate command complete in plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
+                return false;
+            }
             string mainName = "bbob.js";
             System.Console.WriteLine($"Building {mainName}");
             string newName = JSAPiHelper.BuildBbobJS(distribution, GetBuildData(), theme.Info);

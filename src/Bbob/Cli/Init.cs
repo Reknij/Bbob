@@ -22,6 +22,18 @@ public class Init : Command
             {
                 plugin.InitCommand();
             });
+        }
+        catch (System.Exception ex)
+        {
+            string msg = ex.Message;
+#if DEBUG
+            msg = ex.ToString();
+#endif
+            System.Console.WriteLine($"{FAILED}Error run init command plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
+            return false;
+        }
+        try
+        {
             PluginSystem.cyclePlugins((plugin) =>
             {
                 plugin.CommandComplete(Commands.InitCommand);
@@ -33,7 +45,7 @@ public class Init : Command
 #if DEBUG
             msg = ex.ToString();
 #endif
-            System.Console.WriteLine($"{FAILED}Executing init command error:\n" + msg);
+            System.Console.WriteLine($"{FAILED}Error run init command complete plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
             return false;
         }
         System.Console.WriteLine($"{SUCCESS}Initialize has been run.");

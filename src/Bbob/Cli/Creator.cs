@@ -6,10 +6,10 @@ namespace Bbob.Main.Cli;
 public class Creator : Command
 {
     public new static string Name => "new";
-    public new static string Help => "Create the blog. Default create blog.\n"+
-    "[option]:\n"+
-    "--blog | -b : create article.\n\n"+
-    "Use:\n"+
+    public new static string Help => "Create the blog. Default create blog.\n" +
+    "[option]:\n" +
+    "--blog | -b : create article.\n\n" +
+    "Use:\n" +
     "// new [option] [blogName]";
     NewTypes newType;
     public NewTypes NewType { get => newType; }
@@ -51,6 +51,18 @@ public class Creator : Command
                 System.Console.WriteLine($"{FAILED}Plugin stop execution."); ;
                 return false;
             }
+        }
+        catch (System.Exception ex)
+        {
+            string msg = ex.Message;
+#if DEBUG
+            msg = ex.ToString();
+#endif
+            System.Console.WriteLine($"{FAILED}Error run new command of plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
+            return false;
+        }
+        try
+        {
             PluginSystem.cyclePlugins((plugin) =>
             {
                 plugin.CommandComplete(Commands.NewCommand);
@@ -63,8 +75,7 @@ public class Creator : Command
 #if DEBUG
             msg = ex.ToString();
 #endif
-            System.Console.WriteLine();
-            System.Console.WriteLine($"{FAILED}Error executing plugin new command:\n" + msg);
+            System.Console.WriteLine($"{FAILED}Error run new command complete of plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
             return false;
         }
         System.Console.WriteLine($"{SUCCESS}Article file in '{filePath}'");
