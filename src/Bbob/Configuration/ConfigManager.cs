@@ -98,7 +98,7 @@ public class ConfigManager
             blogName = "Bbob - Serverless Blog Framework";
             blogCountOneTime = 10;
             allLink = "false";
-            recursion = false;
+            recursion = true;
             baseUrl = "/";
             previewPort = 3000;
             var main = Assembly.GetExecutingAssembly();
