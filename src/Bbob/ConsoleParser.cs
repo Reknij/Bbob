@@ -18,8 +18,22 @@ class ConsoleParser
     public void Parse()
     {
         string dist = Path.Combine(Environment.CurrentDirectory, "dist");
-        int i = 0;
         int length = arguments.Length;
+        if (length >= 3 && arguments[length - 2] == "--config-file")
+        {
+            string configPath = arguments[length - 1];
+            if (!File.Exists(configPath))
+            {
+                System.Console.WriteLine("Config file is not exists!");
+                return;
+            }
+            Configuration.ConfigManager.ConfigPath = configPath;
+            var l = arguments.ToList();
+            l.RemoveRange(length - 2, 2);
+            arguments = l.ToArray();
+            length = arguments.Length;
+        }
+        int i = 0;
         if (length == 0)
         {
             System.Console.WriteLine("Please enter commands!");
