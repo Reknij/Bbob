@@ -10,7 +10,7 @@ public class BuildWebArticleJson : IPlugin
     {
         if (!PluginHelper.isPluginJsonConfigExists())
         {
-            PluginHelper.savePluginJsonConfig<ConfigPlugin>(new ConfigPlugin(false));
+            PluginHelper.savePluginJsonConfig<MyConfig>(new MyConfig());
             PluginHelper.printConsole("Initialize config file.");
         }
         else
@@ -50,7 +50,7 @@ public class BuildWebArticleJson : IPlugin
         string newLocal = Path.Combine(FileLocalFolder, newName);
         File.Move(FileLocal, newLocal, true);
         string baseUrl = PluginHelper.ConfigBbob.baseUrl;
-        PluginHelper.getPluginJsonConfig<ConfigPlugin>(out ConfigPlugin? configPlugin);
+        PluginHelper.getPluginJsonConfig<MyConfig>(out MyConfig? configPlugin);
         bool isShortAddress = configPlugin != null ? configPlugin.shortAddress : false;
         article.address = isShortAddress ? Path.GetFileNameWithoutExtension(newName) : $"{baseUrl}{JSApi.JSAPiHelper.bbobAssets}/{folder}/{newName}";
         if (isShortAddress)
@@ -60,7 +60,10 @@ public class BuildWebArticleJson : IPlugin
         }
     }
 
-    public record class ConfigPlugin(bool shortAddress);
+    public class MyConfig
+    {
+        public bool shortAddress {get;set;} = false;
+    }
     public record class Meta(string startOfAddress, string endOfAddress);
 
     private class MarkdownFrontMatter
