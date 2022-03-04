@@ -5,8 +5,10 @@ using Bbob.Plugin;
 
 namespace Bbob.Main.BuildInPlugin;
 
+[PluginCondition("SortData", PluginStatus = PluginStatus.Waiting)]
 public class LinkProcess : IPlugin
 {
+    int resolveCount = 0;
     readonly string[] ignoreAttributes = 
     {
         "contentParsed",
@@ -40,6 +42,7 @@ public class LinkProcess : IPlugin
                         ((IDictionary<string, object>)link).Add(item.Key, item.Value);
                     }
                     blog.links.Add(link);
+                    resolveCount++;
                 }
             }
         }
@@ -69,7 +72,7 @@ public class LinkProcess : IPlugin
                 var pack = getLinkInfos(blog.links, distribution);
                 blog.links = pack.Item1;
                 blog.nextFileLinks = pack.Item2;
-                PluginHelper.printConsole($"Resolve {blog.links.Count} files.");
+                PluginHelper.printConsole($"Resolve {resolveCount} files.");
             }
         }
     }
