@@ -14,7 +14,7 @@ public class Init : Command
     {
         const string SUCCESS = "Success initialize: ";
         const string FAILED = "Failed initialize: ";
-        Configuration.ConfigManager.GetConfigManager();
+        Configuration.ConfigManager.LoadConfigs();
         Directory.CreateDirectory(JSApi.JSAPiHelper.metasFolder);
         try
         {

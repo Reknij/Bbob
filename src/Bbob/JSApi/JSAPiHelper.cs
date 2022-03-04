@@ -21,7 +21,7 @@ public static class JSAPiHelper
     {
         if (hookFiles.Length > 0)
         {
-            var config = ConfigManager.GetConfigManager().MainConfig;
+            var config = ConfigManager.MainConfig;
             string indexPath = Path.Combine(dist, indexName);
             string indexHtml = File.ReadAllText(indexPath);
             string src = "";
@@ -33,7 +33,7 @@ public static class JSAPiHelper
             string pattern = @"<head>(.*)</head>";
             string replacement = $"<head>{src}$1</head>";
             indexHtml = Regex.Replace(indexHtml, pattern, replacement, RegexOptions.Singleline);
-            indexHtml = changeIndexTitle(indexHtml, ConfigManager.GetConfigManager().MainConfig.blogName);
+            indexHtml = changeIndexTitle(indexHtml, ConfigManager.MainConfig.blogName);
             File.WriteAllText(indexPath, indexHtml);
         }
     }
@@ -51,7 +51,7 @@ public static class JSAPiHelper
         string mainjsDist = Path.Combine(dist, "bbob.js");
         string bbobAssetsPath = Path.Combine(dist, bbobAssets);
         string mjs = File.ReadAllText(mainjsOriginal);
-        ConfigJson config = ConfigManager.GetConfigManager().MainConfig;
+        ConfigJson config = ConfigManager.MainConfig;
         JSApiType.BbobMeta meta = new JSApiType.BbobMeta(config);
         meta.copyright = meta.copyright.Replace("year", DateTime.Now.Year.ToString()).Replace("author", config.author).Replace("themeName", themeInfo.name);
         LoadThirdMetas(meta, buildData.Metas);
@@ -78,7 +78,7 @@ public static class JSAPiHelper
 
     private static void ProcessPublicPath(string dist, string indexHtml)
     {
-        var config = ConfigManager.GetConfigManager().MainConfig;
+        var config = ConfigManager.MainConfig;
         string distIndex = Path.Combine(dist, indexHtml);
         string index = File.ReadAllText(distIndex);
         string pattern = "=\"/([^/].*)\"";

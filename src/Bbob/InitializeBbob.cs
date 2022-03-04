@@ -15,6 +15,11 @@ public static class InitializeBbob
     }
     public static void Initialize(InitializeOptions options)
     {
+        if ((options & InitializeOptions.Config) != 0)
+        {
+            Configuration.ConfigManager.LoadConfigs();
+            Configuration.ConfigManager.registerConfigToPluginSystem();
+        }
         if ((options & InitializeOptions.Theme) != 0)
         {
             ThemeProcessor.LoadAllTheme();
@@ -24,13 +29,9 @@ public static class InitializeBbob
             }
             else
             {
-                System.Console.WriteLine($"Not found theme '{Configuration.ConfigManager.GetConfigManager().MainConfig.theme}'");
+                System.Console.WriteLine($"Not found theme '{Configuration.ConfigManager.MainConfig.theme}'");
                 Environment.Exit(-1);
             }
-        }
-        if ((options & InitializeOptions.Config) != 0)
-        {
-            Configuration.ConfigManager.GetConfigManager().registerConfigToPluginSystem();
         }
         if ((options & InitializeOptions.Plugin) != 0)
         {
@@ -53,6 +54,6 @@ public static class InitializeBbob
 
     public static void registerDataAgain()
     {
-        Configuration.ConfigManager.GetConfigManager().registerConfigToPluginSystem();
+        Configuration.ConfigManager.registerConfigToPluginSystem();
     }
 }

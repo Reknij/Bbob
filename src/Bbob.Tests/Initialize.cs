@@ -16,8 +16,8 @@ public class Initialize
     [AssemblyInitialize]
     public static void MyTestInitialize(TestContext testContext)
     {
-        ConfigManager.GetConfigManager().MainConfig = ConfigManager.GetConfigManager().DefaultConfig;
-        ConfigManager.GetConfigManager().registerConfigToPluginSystem();
+        ConfigManager.MainConfig = ConfigManager.DefaultConfig;
+        ConfigManager.registerConfigToPluginSystem();
         string themeTest = "./testTheme/theme.json";
         string themeFolder = "./testTheme";
         Directory.CreateDirectory(themeFolder);

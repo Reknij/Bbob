@@ -50,7 +50,7 @@ public class Generator : Command
         if (Directory.Exists(distribution)) Shared.SharedLib.DirectoryHelper.DeleteDirectory(distribution);
         Directory.CreateDirectory(distribution);
         Directory.CreateDirectory(articlesFolderPath);
-        var config = ConfigManager.GetConfigManager().MainConfig;
+        var config = ConfigManager.MainConfig;
 
         string[] files = Directory.GetFiles(articlesFolderPath, "*.*", config.recursion ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 

@@ -47,7 +47,7 @@ public static class PluginSystem
 
     private static Type[] GetBuildInPlugins()
     {
-        var config = Configuration.ConfigManager.GetConfigManager().MainConfig;
+        var config = Configuration.ConfigManager.MainConfig;
         string buildInTypesPath = "Bbob.Main.BuildInPlugin.";
         Assembly main = Assembly.GetExecutingAssembly();
         Type[] types = main.GetTypes();
@@ -146,7 +146,7 @@ public static class PluginSystem
 
     private static void LoadBuildInPlugins()
     {
-        var config = Configuration.ConfigManager.GetConfigManager().MainConfig;
+        var config = Configuration.ConfigManager.MainConfig;
         buildInPlugins.Clear();
 
         Type[] types = GetBuildInPlugins();

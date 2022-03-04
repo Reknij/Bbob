@@ -39,7 +39,7 @@ public class Preview : Command
 
     public void StartPreview()
     {
-        var config = Configuration.ConfigManager.GetConfigManager().MainConfig;
+        var config = Configuration.ConfigManager.MainConfig;
         string url = $"http://localhost:{config.previewPort}";
         var builder = WebApplication.CreateBuilder();
         builder.Logging.ClearProviders();

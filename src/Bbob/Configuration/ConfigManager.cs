@@ -4,20 +4,15 @@ using Bbob.Plugin;
 
 namespace Bbob.Main.Configuration;
 
-public class ConfigManager
+public static class ConfigManager
 {
-    public static string ConfigPath { get; set; } = "null";
-    private static ConfigManager mainConfigManager = new ConfigManager();
-    public ConfigJson MainConfig { get; set; }
-    public ConfigJson DefaultConfig { get; set; }
-    public static ConfigManager GetConfigManager()
+    public static string ConfigPath { get; set; } = Path.Combine(Environment.CurrentDirectory, "config.json");
+    private static ConfigJson? mConfig;
+    private static ConfigJson? dConfig;
+    public static ConfigJson MainConfig { get=>mConfig ?? throw new NullReferenceException("MainConfig is null"); set=>mConfig = value; }
+    public static ConfigJson DefaultConfig { get=>mConfig ?? throw new NullReferenceException("DefaultConfig is null"); set=>dConfig = value; }
+    public static void LoadConfigs()
     {
-        return mainConfigManager;
-    }
-    private ConfigManager()
-    {
-        ConfigPath = Path.Combine(Environment.CurrentDirectory, "config.json");
-
         MainConfig = new ConfigJsonFix();
         DefaultConfig = new ConfigJsonFix();
         if (File.Exists(ConfigPath))
@@ -68,7 +63,7 @@ public class ConfigManager
         SaveConfig(MainConfig, ConfigPath); //always save as the config user may be old.
     }
 
-    public void SaveConfig(ConfigJson target, string savePath)
+    public static void SaveConfig(ConfigJson target, string savePath)
     {
         if (File.Exists(savePath)) File.Delete(savePath);
         using (FileStream fs = File.OpenWrite(savePath))
@@ -80,12 +75,12 @@ public class ConfigManager
             JsonSerializer.Serialize(fs, target, options);
         }
     }
-    public void SaveConfig(ConfigJson target) => SaveConfig(target, ConfigPath);
-    public void SaveConfig(string configPath) => SaveConfig(MainConfig, configPath);
-    public void SaveConfig() => SaveConfig(MainConfig, ConfigPath);
+    public static void SaveConfig(ConfigJson target) => SaveConfig(target, ConfigPath);
+    public static void SaveConfig(string configPath) => SaveConfig(MainConfig, configPath);
+    public static void SaveConfig() => SaveConfig(MainConfig, ConfigPath);
 
-    public void registerConfigToPluginSystem() => registerConfigToPluginSystem(MainConfig);
-    public void registerConfigToPluginSystem(ConfigJson config) => PluginHelper.ConfigBbob = config;
+    public static void registerConfigToPluginSystem() => registerConfigToPluginSystem(MainConfig);
+    public static void registerConfigToPluginSystem(ConfigJson config) => PluginHelper.ConfigBbob = config;
 
     public class ConfigJsonFix : ConfigJson
     {

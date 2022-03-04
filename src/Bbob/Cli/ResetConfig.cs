@@ -19,15 +19,14 @@ public class ResetConfig : Command
     {
         const string SUCCESS = "Success reset: ";
         const string FAILED = "Failed reset: ";
-        var configManager = Configuration.ConfigManager.GetConfigManager();
-        var properties = configManager.MainConfig.GetType().GetProperties();
+        var properties = Configuration.ConfigManager.MainConfig.GetType().GetProperties();
         foreach (var property in properties)
         {
             if (property.Name.ToLower() == configName.ToLower())
             {
-                object? value = property.GetValue(configManager.DefaultConfig);
-                property.SetValue(configManager.MainConfig, value);
-                configManager.SaveConfig(configManager.MainConfig, Configuration.ConfigManager.ConfigPath ?? throw new NullReferenceException("configPath is null"));
+                object? value = property.GetValue(Configuration.ConfigManager.DefaultConfig);
+                property.SetValue(Configuration.ConfigManager.MainConfig, value);
+                Configuration.ConfigManager.SaveConfig(Configuration.ConfigManager.MainConfig, Configuration.ConfigManager.ConfigPath ?? throw new NullReferenceException("configPath is null"));
                 System.Console.WriteLine($"{SUCCESS}Reset '{property.Name}' to default config.");
                 return true;
             }

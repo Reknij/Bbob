@@ -43,7 +43,7 @@ public static class ThemeProcessor
         return null;
     }
 
-    public static bool getTheme(out Theme? info) => getTheme(Configuration.ConfigManager.GetConfigManager().MainConfig.theme, out info);
+    public static bool getTheme(out Theme? info) => getTheme(Configuration.ConfigManager.MainConfig.theme, out info);
     public static bool getTheme(string themeName, out Theme? info)
     {
         info = null;

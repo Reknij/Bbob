@@ -28,7 +28,7 @@ public class EnableAndDisable : Command
     }
     public override bool Process()
     {
-        var config = Configuration.ConfigManager.GetConfigManager().MainConfig;
+        var config = Configuration.ConfigManager.MainConfig;
 
         if (!direct && !PluginSystem.containPluginWithName(pluginName))
         {
@@ -44,7 +44,7 @@ public class EnableAndDisable : Command
                     return true;
                 }
                 config.pluginsDisable.Add(pluginName.ToUpper());
-                Configuration.ConfigManager.GetConfigManager().SaveConfig();
+                Configuration.ConfigManager.SaveConfig();
                 System.Console.WriteLine($"Disable <{pluginName.ToUpper()}> success");
                 return true;
 
@@ -55,7 +55,7 @@ public class EnableAndDisable : Command
                     return true;
                 }
                 config.pluginsDisable.RemoveAt(index);
-                Configuration.ConfigManager.GetConfigManager().SaveConfig();
+                Configuration.ConfigManager.SaveConfig();
                 System.Console.WriteLine($"Enable <{pluginName.ToUpper()}> success");
                 return true;
             default:
