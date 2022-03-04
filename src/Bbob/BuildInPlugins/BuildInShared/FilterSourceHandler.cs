@@ -33,6 +33,7 @@ public static class FilterSourceHandler
             File.Move(vFile, newPath);
             filterSources.Add(new FilterSource(item.Key, webPath));
         }
+        PluginHelper.printConsole($"Resolve {filterSources.Count} {name}.");
         return filterSources.ToArray();
     }
 }

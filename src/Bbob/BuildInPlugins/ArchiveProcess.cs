@@ -3,7 +3,7 @@ using Bbob.Plugin;
 
 namespace Bbob.Main.BuildInPlugin;
 
-[PluginCondition(RequirePlugin = "LinkProcess")]
+[PluginCondition("LinkProcess", PluginStatus = PluginStatus.Done)]
 public class ArchiveProcess : IPlugin
 {
     string distribution = "";
@@ -45,7 +45,6 @@ public class ArchiveProcess : IPlugin
                     return 0;
                 });
                 blog.archives = FilterSourceHandler.BuildFilterFile(a, distribution, "archives");
-                PluginHelper.printConsole($"Resolve {BuildInShared.SharedFunctions.GetLengthFromAny(blog.archives)} archives.");
             }
         }
     }

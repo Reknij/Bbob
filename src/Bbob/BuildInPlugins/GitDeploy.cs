@@ -12,8 +12,15 @@ public class GitDeploy : IPlugin
 
     public void InitCommand()
     {
-        PluginHelper.savePluginJsonConfig<GitConfig>(new GitConfig());
-        PluginHelper.printConsole("Initialize config file.");
+        if (!PluginHelper.isPluginJsonConfigExists())
+        {
+            PluginHelper.savePluginJsonConfig<GitConfig>(new GitConfig());
+            PluginHelper.printConsole("Initialize config file.");
+        }
+        else
+        {
+            PluginHelper.printConsole("Already exists config.");
+        }
     }
     public void DeployCommand(string distribution)
     {

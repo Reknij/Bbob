@@ -8,8 +8,15 @@ public class BuildWebArticleJson : IPlugin
 {
     public void InitCommand()
     {
-        PluginHelper.savePluginJsonConfig<ConfigPlugin>(new ConfigPlugin(false));
-        PluginHelper.printConsole("Initialize config file.");
+        if (!PluginHelper.isPluginJsonConfigExists())
+        {
+            PluginHelper.savePluginJsonConfig<ConfigPlugin>(new ConfigPlugin(false));
+            PluginHelper.printConsole("Initialize config file.");
+        }
+        else
+        {
+            PluginHelper.printConsole("Already exists config.");
+        }
     }
     public void GenerateCommand(string filePath, string distribution, GenerationStage stage)
     {

@@ -3,6 +3,7 @@ using Bbob.Plugin;
 
 namespace Bbob.Main.BuildInPlugin;
 
+[PluginCondition("BuildWebArticleJson", PluginStatus = PluginStatus.Done)]
 public class SitemapGenerator : IPlugin
 {
     string? distribution { get; set; }
@@ -33,8 +34,15 @@ public class SitemapGenerator : IPlugin
     }
     public void InitCommand()
     {
-        PluginHelper.savePluginJsonConfig<MyConfig>(new MyConfig());
-        PluginHelper.printConsole("Initialize config file.");
+        if (!PluginHelper.isPluginJsonConfigExists())
+        {
+            PluginHelper.savePluginJsonConfig<MyConfig>(new MyConfig());
+            PluginHelper.printConsole("Initialize config file.");
+        }
+        else
+        {
+            PluginHelper.printConsole("Already exists config.");
+        }
 
     }
     public void GenerateCommand(string filePath, string distribution, GenerationStage stage)

@@ -7,8 +7,15 @@ public class SortData : IPlugin
 {
     public void InitCommand()
     {
-        PluginHelper.savePluginJsonConfig<MyConfig>(new MyConfig());
-        PluginHelper.printConsole("Initialize config file.");
+        if (!PluginHelper.isPluginJsonConfigExists())
+        {
+            PluginHelper.savePluginJsonConfig<MyConfig>(new MyConfig());
+            PluginHelper.printConsole("Initialize config file.");
+        }
+        else
+        {
+            PluginHelper.printConsole("Already exists config.");
+        }
     }
     public void CommandComplete(Commands command)
     {
