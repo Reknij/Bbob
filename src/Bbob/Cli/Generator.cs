@@ -56,9 +56,12 @@ public class Generator : Command
 
         ThemeProcessor.Theme? theme = ThemeProcessor.BuildThemeToDist(config.theme, distribution);
         InitializeConventionObjects();
+        if (files.Length > 0) System.Console.WriteLine($"Run generate all stage for article files in '{articlesFolderPath.Replace(Environment.CurrentDirectory, ".")}':");
+        else System.Console.WriteLine("Nothing files to generate.");
         foreach (string file in files)
         {
-            System.Console.WriteLine($"Run generate all stage for <{file}>");
+            string shortFilePath = file.Replace(articlesFolderPath, "").Remove(0,1);
+            System.Console.WriteLine($"- {shortFilePath}");
             foreach (GenerationStage stage in Enum.GetValues<GenerationStage>())
             {
                 try
