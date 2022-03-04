@@ -1,3 +1,7 @@
+# 2022-3-4 20:10:00
+## Bbob
+- Refactoring congiguration.
+
 # 2022-3-4 11:29:00
 ## Bbob
 - `LinkProcess` add condition.
