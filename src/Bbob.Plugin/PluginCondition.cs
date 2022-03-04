@@ -1,10 +1,10 @@
 namespace Bbob.Plugin;
 
-public enum PluginStatus
+public enum PluginOrder
 {
     Any,
-    Waiting,
-    Done
+    BeforeMe,
+    AfterMe
 }
 
 public enum ConditionType
@@ -18,7 +18,7 @@ public enum ConditionType
 public class PluginCondition : Attribute
 {
     public ConditionType ConditionType {get;set;} = ConditionType.All;
-    public PluginStatus PluginStatus {get;set;} = PluginStatus.Any;
+    public PluginOrder PluginOrder {get;set;} = PluginOrder.Any;
     public bool ShowWarning {get;set;} = true;
     public string PluginName {get;set;}
     public PluginCondition(string pluginName)

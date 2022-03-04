@@ -3,7 +3,7 @@ using Bbob.Plugin;
 
 namespace Bbob.Main.BuildInPlugin;
 
-[PluginCondition("LinkProcess", PluginStatus = PluginStatus.Done)]
+[PluginCondition("LinkProcess", PluginOrder = PluginOrder.BeforeMe)]
 public class ArchiveProcess : IPlugin
 {
     string distribution = "";

@@ -3,7 +3,7 @@ using Bbob.Plugin;
 
 namespace Bbob.Main.BuildInPlugin;
 
-[PluginCondition("BuildWebArticleJson", PluginStatus = PluginStatus.Done)]
+[PluginCondition("BuildWebArticleJson", PluginOrder = PluginOrder.BeforeMe)]
 public class SitemapGenerator : IPlugin
 {
     string? distribution { get; set; }

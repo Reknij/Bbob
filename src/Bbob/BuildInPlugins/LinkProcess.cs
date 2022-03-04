@@ -5,7 +5,7 @@ using Bbob.Plugin;
 
 namespace Bbob.Main.BuildInPlugin;
 
-[PluginCondition("SortData", PluginStatus = PluginStatus.Waiting)]
+[PluginCondition("SortData", PluginOrder = PluginOrder.AfterMe)]
 public class LinkProcess : IPlugin
 {
     int resolveCount = 0;

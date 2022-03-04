@@ -3,8 +3,8 @@ using Bbob.Plugin;
 
 namespace Bbob.Main.BuildInPlugin;
 
-[PluginCondition("LinkProcess", PluginStatus = PluginStatus.Done)]
-[PluginCondition("SortData", ConditionType = ConditionType.StatusCheck, PluginStatus = PluginStatus.Waiting)]
+[PluginCondition("LinkProcess", PluginOrder = PluginOrder.BeforeMe)]
+[PluginCondition("SortData", ConditionType = ConditionType.StatusCheck, PluginOrder = PluginOrder.AfterMe)]
 public class TagProcess : IPlugin
 {
     string distribution = "";
