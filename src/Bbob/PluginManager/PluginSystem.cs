@@ -1,8 +1,6 @@
-using Bbob.Main.BuildInPlugin;
 using Bbob.Plugin;
 using System.Reflection;
 using System.Text.Json;
-using static Bbob.Plugin.ConfigJson;
 
 namespace Bbob.Main.PluginManager;
 
@@ -11,8 +9,8 @@ public static class PluginSystem
     public static readonly string pluginDirectory = Path.Combine(Environment.CurrentDirectory, "plugins"); //plugins in base of Bbob directory.
     public static readonly string configsFolder = Path.Combine(Environment.CurrentDirectory, "configs");
     static List<PluginAssemblyLoadContext> thirdPlugins = new List<PluginAssemblyLoadContext>();
-
     static List<IPlugin> buildInPlugins = new List<IPlugin>();
+    static List<PluginContext> allPlugin = new List<PluginContext>();
 
     public static void LoadAllPlugins()
     {
@@ -24,6 +22,27 @@ public static class PluginSystem
         LoadThirdPlugins();
         if ((BuildInPluginCount + ThirdPluginCount) > 0) System.Console.WriteLine($"Loaded {AllPluginCount} plugins. ({BuildInPluginCount}|{ThirdPluginCount})");
         else System.Console.WriteLine("Warning: plugins are loaded.");
+        foreach (var p in buildInPlugins)
+        {
+            allPlugin.Add(new PluginContext(p, getPluginInfo(p)));
+        }
+        foreach (var p in thirdPlugins)
+        {
+            allPlugin.Add(new PluginContext(p.Plugin, p.PluginInfo));
+        }
+        processPlugins();
+    }
+
+    public static void printAllPlugin()
+    {
+        foreach (var item in allPlugin)
+        {
+            System.Console.WriteLine($"// {item.info.name}");
+        }
+        if (allPlugin.Count == 0)
+        {
+            System.Console.WriteLine("// no plugins loaded.");
+        }
     }
 
     private static Type[] GetBuildInPlugins()
@@ -162,111 +181,101 @@ public static class PluginSystem
         }
     }
     private static HashSet<string> showWarningSet = new HashSet<string>();
-    private static bool isConditionSuccess(IPlugin plugin, PluginJson info)
+    private static void processPlugins()
     {
-        foreach (var attr in Attribute.GetCustomAttributes(plugin.GetType()))
+        for (int i = allPlugin.Count - 1; i >= 0; i--)
         {
-            if (attr is PluginCondition condition)
+            IPlugin plugin = allPlugin[i].main;
+            PluginJson info = allPlugin[i].info;
+
+            foreach (var attr in Attribute.GetCustomAttributes(plugin.GetType()))
             {
-                if (condition.RequirePlugin == null) continue;
-                if (!containPluginWithName(condition.RequirePlugin))
+                if (attr is PluginCondition condition)
                 {
-                    if (condition.ShowWarning && !showWarningSet.Contains(info.name))
+                    if ((condition.ConditionType & ConditionType.Require) != 0)
                     {
-                        System.Console.WriteLine($"Warning: <{info.name}> require plugin <{condition.RequirePlugin}> but it is no contain!");
-                        showWarningSet.Add(info.name);
-                    }
-                    return false;
-                }
-                if (!PluginHelper.isTargetPluginEnable(condition.RequirePlugin))
-                {
-                    if (condition.ShowWarning && !showWarningSet.Contains(info.name))
-                    {
-                        System.Console.WriteLine($"Warning: <{info.name}> require plugin <{condition.RequirePlugin}> but it is disable.");
-                        showWarningSet.Add(info.name);
-                    }
-                    return false;
-                }
-                if (condition.RequirePluginStatus != null)
-                {
-                    switch (condition.RequirePluginStatus)
-                    {
-                        case PluginStatus.Waiting:
-                            if (PluginHelper.isTargetPluginDone(condition.RequirePlugin)) return false;
+                        if (!containPluginWithName(condition.PluginName))
+                        {
+                            if (condition.ShowWarning && !showWarningSet.Contains(info.name))
+                            {
+                                System.Console.WriteLine($"Warning: Will no run <{info.name}> because require plugin <{condition.PluginName}> is no contain!");
+                                showWarningSet.Add(info.name);
+                            }
+                            allPlugin.RemoveAt(i);
                             break;
-                        case PluginStatus.Done:
-                            if (!PluginHelper.isTargetPluginDone(condition.RequirePlugin)) return false;
+                        }
+                        if (!PluginHelper.isTargetPluginEnable(condition.PluginName))
+                        {
+                            if (condition.ShowWarning && !showWarningSet.Contains(info.name))
+                            {
+                                System.Console.WriteLine($"Warning: Will no run <{info.name}> because require plugin <{condition.PluginName}> is disable.");
+                                showWarningSet.Add(info.name);
+                            }
+                            allPlugin.RemoveAt(i);
                             break;
-                        default: break;
+                        }
                     }
                 }
             }
         }
-        return true;
+        PluginRelation pluginRelation = new PluginRelation(allPlugin);
+        allPlugin = pluginRelation.ProcessRelation();
     }
 
     public delegate void CyclePluginDelegate(IPlugin plugin);
     public static void cyclePlugins(CyclePluginDelegate cyclePluginDelegate)
     {
-        List<KeyValuePair<IPlugin, PluginJson>> requireRunAgain = new();
-        List<KeyValuePair<IPlugin, PluginJson>> pluginRefs = new();
         PluginHelper._pluginsDone.Clear();
-        foreach (var p in buildInPlugins)
+        List<PluginContext> requireRunAgain = new();
+
+        Func<PluginContext, bool> runPlugin = (context) =>
         {
-            pluginRefs.Add(new KeyValuePair<IPlugin, PluginJson>(p, getPluginInfo(p)));
-        }
-        foreach (var p in thirdPlugins)
-        {
-            pluginRefs.Add(new KeyValuePair<IPlugin, PluginJson>(p.Plugin, p.PluginInfo));
-        }
-        foreach (var p in pluginRefs)
-        {
-            if (!isConditionSuccess(p.Key, p.Value)) continue;
-            InitializeExecutingPlugin(p.Value);
-            cyclePluginDelegate?.Invoke(p.Key);
+            InitializeExecutingPlugin(context.info);
+            cyclePluginDelegate?.Invoke(context.main);
             switch (PluginHelper.ExecutingCommandResult.Operation)
             {
                 default:
                 case CommandOperation.None:
-                    PluginHelper._pluginsDone.Add(p.Value.name);
+                    PluginHelper._pluginsDone.Add(context.info.name);
                     break;
                 case CommandOperation.RunMeAgain:
-                    requireRunAgain.Add(p);
+                    requireRunAgain.Add(context);
                     break;
                 case CommandOperation.Stop:
                 case CommandOperation.Skip:
-                    return;
+                    return false;
             }
+            return true;
+        };
+
+        foreach (var p in allPlugin)
+        {
+            if (!runPlugin(p)) return;
         }
-        RunCount[] runCounts = RunCount.InitializeArray(requireRunAgain.Count);
+        Dictionary<PluginContext, RunCount> runCounts = new Dictionary<PluginContext, RunCount>();
         while (requireRunAgain.Count > 0)
         {
             for (int i = requireRunAgain.Count - 1; i >= 0; i--)
             {
-                PluginHelper.ExecutingPlugin = requireRunAgain[i].Value;
-                cyclePluginDelegate?.Invoke(requireRunAgain[i].Key);
-                runCounts[i].Count++;
-                switch (PluginHelper.ExecutingCommandResult.Operation)
+                if (!runCounts.ContainsKey(requireRunAgain[i])) runCounts.Add(requireRunAgain[i], new RunCount());
+                if (!runPlugin(requireRunAgain[i])) return;
+                RunCount runCount = runCounts[requireRunAgain[i]];
+                requireRunAgain.RemoveAt(i);
+                runCount.Count++;
+                if (runCount.Count > runCount.WarningCount)
                 {
-                    case CommandOperation.None:
-                        PluginHelper._pluginsDone.Add(requireRunAgain[i].Value.name);
-                        requireRunAgain.RemoveAt(i); //dont use i because may be already remove.
-                        break;
-                    case CommandOperation.RunMeAgain:
-                        break;
-                    case CommandOperation.Stop:
-                    case CommandOperation.Skip:
-                        return;
-                    default: break;
-                }
-                if (runCounts[i].Count > runCounts[i].WarningCount)
-                {
-                    System.Console.WriteLine($"Plugin <{PluginHelper.ExecutingPlugin.name}> has been run count more than {runCounts[i].WarningCount}");
+                    System.Console.WriteLine($"Plugin <{PluginHelper.ExecutingPlugin.name}> has been run count more than {runCount.WarningCount}");
                     System.Console.WriteLine($"Message: {PluginHelper.ExecutingCommandResult.Message}");
-                    runCounts[i].WarningCount *= 2;
+                    runCount.WarningCount *= 2;
                 }
             }
         }
+    }
+
+    private static bool runPlugin(IPlugin plugin, PluginJson info, CyclePluginDelegate cyclePluginDelegate)
+    {
+
+        return true;
     }
     private class RunCount
     {

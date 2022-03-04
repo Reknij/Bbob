@@ -2,14 +2,27 @@ namespace Bbob.Plugin;
 
 public enum PluginStatus
 {
+    Any,
     Waiting,
     Done
+}
+
+public enum ConditionType
+{
+    Require = 2,
+    StatusCheck = 4,
+    All = Require | StatusCheck
 }
 
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
 public class PluginCondition : Attribute
 {
-    public string? RequirePlugin {get;set;} = null;
-    public PluginStatus? RequirePluginStatus {get;set;} = null;
+    public ConditionType ConditionType {get;set;} = ConditionType.All;
+    public PluginStatus PluginStatus {get;set;} = PluginStatus.Any;
     public bool ShowWarning {get;set;} = true;
+    public string PluginName {get;set;}
+    public PluginCondition(string pluginName)
+    {
+        this.PluginName = pluginName;
+    }
 }

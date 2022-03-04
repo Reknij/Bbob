@@ -5,7 +5,7 @@ namespace Bbob.Plugin;
 public static class PluginHelper
 {
     public static string ThemePath { get; set; } = "null";
-    public static ConfigJson ConfigBbob {get;set;} = new ConfigJson();
+    public static ConfigJson ConfigBbob { get; set; } = new ConfigJson();
     private static PluginJson? _ExecutingPlugin;
     public static PluginJson ExecutingPlugin
     {
@@ -134,6 +134,14 @@ public static class PluginHelper
     }
     public static void savePluginJsonConfig<T>(T config) =>
     savePluginJsonConfig<T>(ExecutingPlugin.name, config);
+
+    public static bool isPluginJsonConfigExists(string pluginName)
+    {
+        string configsDirectory = Path.Combine(CurrentDirectory, "configs");
+        string pluginConfigJson = Path.Combine(configsDirectory, $"{pluginName}.config.json");
+        return File.Exists(pluginConfigJson);
+    }
+    public static bool isPluginJsonConfigExists() => isPluginJsonConfigExists(ExecutingPlugin.name);
     public static void printConsole(object msg)
     {
         System.Console.WriteLine($"[{ExecutingPlugin.name}]: {msg.ToString()}");
@@ -176,6 +184,10 @@ public static class PluginHelper
     public static bool isTargetPluginDone(string name)
     {
         return _pluginsDone.Contains(name);
+    }
+    public static bool isTargetPluginEnableAndDone(string name)
+    {
+        return isTargetPluginEnable(name) && isTargetPluginDone(name);
     }
     public static bool isTargetPluginEnable(string name) => ConfigBbob.isPluginEnable(name);
     public static Dictionary<string, object> _getAllMetas() => metas;
