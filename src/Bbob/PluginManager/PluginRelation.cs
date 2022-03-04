@@ -85,15 +85,15 @@ public class PluginRelation
                 PluginContext? other = plugins.Find((item) => item.info.name == condition.PluginName);
                 if (other == null) continue;
                 var otherPcr = GetPluginContextRef(other);
-                switch (condition.PluginStatus)
+                switch (condition.PluginOrder)
                 {
                     default:
-                    case PluginStatus.Any: break;
-                    case PluginStatus.Waiting:
+                    case PluginOrder.Any: break;
+                    case PluginOrder.AfterMe:
                         c.nexts.Add(otherPcr);
                         otherPcr.previous.Add(c);
                         break;
-                    case PluginStatus.Done:
+                    case PluginOrder.BeforeMe:
                         c.previous.Add(otherPcr);
                         otherPcr.nexts.Add(c);
                         break;
