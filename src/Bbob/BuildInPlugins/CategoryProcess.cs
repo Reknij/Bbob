@@ -4,7 +4,6 @@ using Bbob.Plugin;
 namespace Bbob.Main.BuildInPlugin;
 
 [PluginCondition("LinkProcess", PluginOrder = PluginOrder.BeforeMe)]
-[PluginCondition("SortData", ConditionType = ConditionType.StatusCheck, PluginOrder = PluginOrder.AfterMe)]
 public class CategoryProcess : IPlugin
 {
     string distribution = "";
@@ -13,7 +12,7 @@ public class CategoryProcess : IPlugin
     {
         if (!PluginHelper.isPluginJsonConfigExists())
         {
-            PluginHelper.savePluginJsonConfig<MyConfig>(new MyConfig("default"));
+            PluginHelper.savePluginJsonConfig<MyConfig>(new MyConfig());
             PluginHelper.printConsole("Initialize config file.");
         }
         else
@@ -32,14 +31,14 @@ public class CategoryProcess : IPlugin
             if (article == null) return;
 
             PluginHelper.getPluginJsonConfig<MyConfig>(out MyConfig? tar);
-            MyConfig config = tar ?? new MyConfig("default");
-            if (!Extensions.IsPropertyExists<List<object>>(article, "categories")) return;
-            var all = (List<object>)article.categories;
+            MyConfig config = tar ?? new MyConfig();
             switch (config.mode)
             {
                 case "default":
                     break;
                 case "folder":
+                    if (!Extensions.IsPropertyExists<List<object>>(article, "categories")) article.categories = new List<object>();
+                    var all = (List<object>)article.categories;
                     string folder = Directory.GetParent(filePath)?.Name ?? "get-folder-fail";
                     all.Clear();
                     all.Add(folder);
@@ -47,7 +46,7 @@ public class CategoryProcess : IPlugin
 
                 default:
                     PluginHelper.printConsole($"Unknown mode '{config.mode}'!");
-                    all.Clear();
+                    ((IDictionary<string, object>)article).Remove("categories");
                     break;
             }
         }
@@ -57,49 +56,73 @@ public class CategoryProcess : IPlugin
     {
         if (command == Commands.GenerateCommand)
         {
-            PluginHelper.getRegisteredObject<dynamic>("blog", out dynamic? blog);
-            if (blog != null)
+            PluginHelper.getRegisteredObject<List<dynamic>>("links", out List<dynamic>? links);
+            if (links != null)
             {
-                if (PluginHelper.isTargetPluginEnableAndDone("SortData"))
-                {
-                    blog.categories = FilterSourceHandler.BuildFilterFile(blog.categories, distribution, "categories");
-                    return;
-                }
                 Dictionary<string, List<dynamic>> all = new Dictionary<string, List<dynamic>>();
-                if (Extensions.IsPropertyExists<List<dynamic>>(blog, "links", out List<dynamic> links))
+                foreach (var link in links)
                 {
-                    foreach (var link in links)
+                    if (Extensions.IsPropertyExists<List<object>>(link, "categories", out List<object> categories))
                     {
-                        if (Extensions.IsPropertyExists<List<object>>(link, "categories", out List<object> categories))
+                        foreach (var t in categories)
                         {
-                            foreach (var t in categories)
+                            if (t is string text)
                             {
-                                if (t is string text)
+                                if (!all.ContainsKey(text))
                                 {
-                                    if (!all.ContainsKey(text))
-                                    {
-                                        all.Add(text, new List<dynamic> { link });
-                                    }
-                                    else all[text].Add(link);
+                                    all.Add(text, new List<dynamic> { link });
                                 }
+                                else all[text].Add(link);
                             }
                         }
                     }
                 }
-
-                blog.categories = all;
-                if (PluginHelper.isTargetPluginEnable("SortData"))
-                {
-                    PluginHelper.ExecutingCommandResult = new CommandResult("Wait to sort", CommandOperation.RunMeAgain);
-                    return;
-                }
-                else
-                {
-                    blog.categories = FilterSourceHandler.BuildFilterFile(blog.categories, distribution, "categories");
-                    return;
-                }
+                var list = all.ToList();
+                sort(list);
+                dynamic blog = PluginHelper.getRegisteredObjectNoNull<dynamic>("blog");
+                blog.categories = FilterSourceHandler.BuildFilterFile(list, distribution, "categories");
             }
         }
     }
-    public record class MyConfig(string mode);
+    private void sort(List<KeyValuePair<string, List<dynamic>>> all)
+    {
+        PluginHelper.getPluginJsonConfig<MyConfig>(out MyConfig? tar);
+        MyConfig config = tar ?? new MyConfig();
+        Dictionary<string, int> cs = new Dictionary<string, int>();
+        for (int i = 0; i < config.sort.Length; i++)
+        {
+            cs.Add(config.sort[i], i);
+        }
+        all.Sort((category1, category2) =>
+        {
+            if (cs.ContainsKey(category1.Key) && !cs.ContainsKey(category2.Key))
+            {
+                return -1; //improve
+            }
+            else if (!cs.ContainsKey(category1.Key) && cs.ContainsKey(category2.Key))
+            {
+                return 1; //decline
+            }
+            else if (!cs.ContainsKey(category1.Key) && !cs.ContainsKey(category2.Key))
+            {
+                return sortCategoriesDefault(category1, category2);
+            }
+            else if (cs[category1.Key] > cs[category2.Key]) return 1;
+            else if (cs[category1.Key] < cs[category2.Key]) return -1;
+
+            return 0;
+        });
+        PluginHelper.printConsole("Sort the categories.");
+    }
+    private int sortCategoriesDefault(KeyValuePair<string, List<dynamic>> category1, KeyValuePair<string, List<dynamic>> category2)
+    {
+        if (category1.Value.Count > category2.Value.Count) return 1;
+        if (category1.Value.Count < category2.Value.Count) return -1;
+        return 0;
+    }
+    public class MyConfig
+    {
+        public string mode { get; set; } = "default";
+        public string[] sort { get; set; } = Array.Empty<string>();
+    }
 }

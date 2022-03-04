@@ -20,12 +20,10 @@ public class ArchiveProcess : IPlugin
     {
         if (command == Commands.GenerateCommand)
         {
-            PluginHelper.getRegisteredObject<dynamic>("blog", out dynamic? blog);
+            PluginHelper.getRegisteredObject<List<dynamic>>("links", out List<dynamic>? links);
             Dictionary<string, List<dynamic>> archives = new Dictionary<string, List<dynamic>>();
-            if (blog != null)
+            if (links != null)
             {
-                if (blog == null) return;
-                var links = (List<dynamic>)blog.links;
                 foreach (dynamic link in links)
                 {
                     if (Extensions.IsPropertyExists<string>(link, "date", out string dateString))
@@ -44,6 +42,7 @@ public class ArchiveProcess : IPlugin
                     if (int.Parse(v1.Key) < int.Parse(v2.Key)) return 1;
                     return 0;
                 });
+                dynamic blog = PluginHelper.getRegisteredObjectNoNull<dynamic>("blog");
                 blog.archives = FilterSourceHandler.BuildFilterFile(a, distribution, "archives");
             }
         }

@@ -5,11 +5,10 @@ using Bbob.Plugin;
 
 namespace Bbob.Main.BuildInPlugin;
 
-[PluginCondition("SortData", PluginOrder = PluginOrder.AfterMe)]
 public class LinkProcess : IPlugin
 {
-    int resolveCount = 0;
-    readonly string[] ignoreAttributes = 
+    List<dynamic> links = new List<dynamic>();
+    readonly string[] ignoreAttributes =
     {
         "contentParsed",
         "toc"
@@ -18,32 +17,12 @@ public class LinkProcess : IPlugin
     public void GenerateCommand(string filePath, string distribution, GenerationStage stage)
     {
         this.distribution = distribution;
-        if (stage == GenerationStage.Initialize)
-        {
-            PluginHelper.modifyRegisteredObject<dynamic>("blog", (ref dynamic? blog) =>
-            {
-                if (blog == null) return;
-                if (Extensions.IsPropertyExists<List<dynamic>>(blog, "links")) return;
-                blog.links = new List<dynamic>();
-            });
-        }
         if (stage == GenerationStage.Confirm)
         {
-            PluginHelper.getRegisteredObject<dynamic>("blog", out dynamic? blog);
             PluginHelper.getRegisteredObject<dynamic>("article", out dynamic? art);
-            if (blog != null)
+            if (art != null)
             {
-                if (art != null)
-                {
-                    dynamic link = new ExpandoObject();
-                    foreach (var item in (IDictionary<string, object>)art)
-                    {
-                        if (isIgnore(item.Key) || item.Value == null) continue;
-                        ((IDictionary<string, object>)link).Add(item.Key, item.Value);
-                    }
-                    blog.links.Add(link);
-                    resolveCount++;
-                }
+                links.Add(art);
             }
         }
     }
@@ -61,20 +40,64 @@ public class LinkProcess : IPlugin
     {
         if (command == Commands.GenerateCommand)
         {
-            if (PluginHelper.isTargetPluginEnable("SortData") && !PluginHelper.isTargetPluginDone("SortData"))
+            foreach (var link in links)
             {
-                PluginHelper.ExecutingCommandResult = new CommandResult("Wait to sort", CommandOperation.RunMeAgain);
-                return;
+                var tar = (IDictionary<string, object>)link;
+                foreach (var ignore in ignoreAttributes)
+                {
+                    tar.Remove(ignore);
+                }
             }
-            PluginHelper.getRegisteredObject<dynamic>("blog", out dynamic? blog);
-            if (blog != null)
-            {
-                var pack = getLinkInfos(blog.links, distribution);
-                blog.links = pack.Item1;
-                blog.nextFileLinks = pack.Item2;
-                PluginHelper.printConsole($"Resolve {resolveCount} files.");
-            }
+            sort(links);
+            PluginHelper.registerObject("links", links);
+            var pack = getLinkInfos(links, distribution);
+            dynamic blog = PluginHelper.getRegisteredObjectNoNull<dynamic>("blog");
+            blog.links = pack.Item1;
+            blog.nextFileLinks = pack.Item2;
+            PluginHelper.printConsole($"Resolve {links.Count} files.");
         }
+    }
+
+    private void sort(List<dynamic> links)
+    {
+        links.Sort((art1, art2) =>
+        {
+            var a1 = art1 as IDictionary<string, object?>;
+            var a2 = art2 as IDictionary<string, object?>;
+            const string order = "order";
+            if (a1 == null || a2 == null) return 0;
+            if (a1.ContainsKey(order) && !a2.ContainsKey(order))
+            {
+                return -1; //improve
+            }
+            else if (!a1.ContainsKey(order) && a2.ContainsKey(order))
+            {
+                return 1; //decline
+            }
+            else if (!a1.ContainsKey(order) && !a2.ContainsKey(order))
+            {
+                return sortLinksDefault(art1, art2);
+            }
+            else if (!(a1[order] is int) || !(a2[order] is int))
+            {
+                string title = (a1[order] is int) == false ? art1.title : art2.title;
+                PluginHelper.printConsole($"{order} article with title {title} is not numbers");
+            }
+            else if (art1.order > art2.order) return 1;
+            else if (art1.order < art2.order) return -1;
+
+            return 0;
+        });
+        PluginHelper.printConsole("Sort the links.");
+    }
+
+    private int sortLinksDefault(dynamic linkInfo1, dynamic linkInfo2)
+    {
+        var date1 = linkInfo1.date != null ? DateTime.Parse(linkInfo1.date) : DateTime.Now;
+        var date2 = linkInfo2.date != null ? DateTime.Parse(linkInfo2.date) : DateTime.Now;
+        if (date1 < date2) return 1;
+        if (date1 > date2) return -1;
+        return 0;
     }
 
     private static (List<dynamic>, List<string>) getLinkInfos(List<dynamic> LinkInfos, string dist)

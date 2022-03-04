@@ -4,10 +4,14 @@ using Bbob.Plugin;
 namespace Bbob.Main.BuildInPlugin;
 
 [PluginCondition("LinkProcess", PluginOrder = PluginOrder.BeforeMe)]
-[PluginCondition("SortData", ConditionType = ConditionType.StatusCheck, PluginOrder = PluginOrder.AfterMe)]
 public class TagProcess : IPlugin
 {
     string distribution = "";
+
+    public void InitCommand()
+    {
+        PluginHelper.savePluginJsonConfig<MyConfig>(new MyConfig());
+    }
 
     public void GenerateCommand(string filePath, string distribution, GenerationStage stage)
     {
@@ -21,18 +25,11 @@ public class TagProcess : IPlugin
     {
         if (command == Commands.GenerateCommand)
         {
-            PluginHelper.getRegisteredObject<dynamic>("blog", out dynamic? blog);
-            if (blog != null)
+            PluginHelper.getRegisteredObject<List<dynamic>>("links", out List<dynamic>? links);
+            if (links != null)
             {
-                if (PluginHelper.isTargetPluginEnableAndDone("SortData"))
-                {
-                    blog.tags = FilterSourceHandler.BuildFilterFile(blog.tags, distribution, "tags");
-                    return;
-                }
                 Dictionary<string, List<dynamic>> all = new Dictionary<string, List<dynamic>>();
-                if (Extensions.IsPropertyExists<List<dynamic>>(blog, "links", out List<dynamic> links))
-                {
-                    foreach (var link in links)
+                foreach (var link in links)
                     {
                         if (Extensions.IsPropertyExists<List<object>>(link, "tags", out List<object> tags))
                         {
@@ -49,20 +46,54 @@ public class TagProcess : IPlugin
                             }
                         }
                     }
-                }
 
-                blog.tags = all;
-                if (PluginHelper.isTargetPluginEnable("SortData"))
-                {
-                    PluginHelper.ExecutingCommandResult = new CommandResult("Wait to sort", CommandOperation.RunMeAgain);
-                    return;
-                }
-                else
-                {
-                    blog.tags = FilterSourceHandler.BuildFilterFile(blog.tags, distribution, "tags");
-                    return;
-                }
+                var list = all.ToList();
+                sort(list);
+                dynamic blog = PluginHelper.getRegisteredObjectNoNull<dynamic>("blog");
+                blog.tags = FilterSourceHandler.BuildFilterFile(list, distribution, "tags");
             }
         }
+    }
+
+    private void sort(List<KeyValuePair<string, List<dynamic>>> all)
+    {
+        PluginHelper.getPluginJsonConfig<MyConfig>(out var tar);
+        MyConfig config = tar ?? new MyConfig();
+        Dictionary<string, int> cs = new Dictionary<string, int>();
+        for (int i = 0; i < config.sort.Length; i++)
+        {
+            cs.Add(config.sort[i], i);
+        }
+        all.Sort((tag1, tag2) =>
+        {
+            if (cs.ContainsKey(tag1.Key) && !cs.ContainsKey(tag2.Key))
+            {
+                return -1; //improve
+                }
+            else if (!cs.ContainsKey(tag1.Key) && cs.ContainsKey(tag2.Key))
+            {
+                return 1; //decline
+                }
+            else if (!cs.ContainsKey(tag1.Key) && !cs.ContainsKey(tag2.Key))
+            {
+                return sortTagsDefault(tag1, tag2);
+            }
+            else if (cs[tag1.Key] > cs[tag2.Key]) return 1;
+            else if (cs[tag1.Key] < cs[tag2.Key]) return -1;
+
+            return 0;
+        });
+        PluginHelper.printConsole("Sort the tags.");
+    }
+    private int sortTagsDefault(KeyValuePair<string, List<dynamic>> tag1, KeyValuePair<string, List<dynamic>> tag2)
+    {
+        if (tag1.Value.Count > tag2.Value.Count) return 1;
+        if (tag1.Value.Count < tag2.Value.Count) return -1;
+        return 0;
+    }
+
+    public record class MyConfig
+    {
+        public string[] sort {get;set;} = Array.Empty<string>();
     }
 }
