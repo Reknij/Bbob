@@ -1,3 +1,8 @@
+# 2022-3-4 11:29:00
+## Bbob
+- `LinkProcess` add condition.
+- generate command message optimize.
+
 # 2022-3-3 16:01:00
 ## Bbob
 - `CategoryProcess` support use folder name.
