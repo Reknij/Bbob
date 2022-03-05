@@ -8,6 +8,8 @@ public class SitemapGenerator : IPlugin
 {
     string? distribution { get; set; }
     List<string> articlesUrl = new List<string>();
+    string fullUrl = Shared.SharedLib.UrlHelper.UrlCombine(PluginHelper.ConfigBbob.domain, PluginHelper.ConfigBbob.baseUrl);
+
     MyConfig config;
     string? articleBaseUrl;
     public SitemapGenerator()
@@ -59,7 +61,6 @@ public class SitemapGenerator : IPlugin
                     if (articleBaseUrl != null)
                     {
                         string address = value.address;
-                        string fullUrl = Shared.SharedLib.UrlHelper.UrlCombine(PluginHelper.ConfigBbob.domain, PluginHelper.ConfigBbob.baseUrl);
                         string remake = articleBaseUrl.Replace("&", "~and~").Replace('?', '&');
                         string redirectUrl = $"{fullUrl}?{remake}{address}";
                         string normalUrl = $"{fullUrl}{articleBaseUrl}{address}";
@@ -102,7 +103,7 @@ public class SitemapGenerator : IPlugin
     private void generateRobotTxt(string distribution)
     {
         string robot = Path.Combine(distribution, "robots.txt");
-        string sitemapPath = $"Sitemap: {PluginHelper.ConfigBbob.baseUrl}sitemap.xml";
+        string sitemapPath = $"Sitemap: {fullUrl}sitemap.xml";
         File.WriteAllText(robot, sitemapPath);
     }
 
