@@ -202,6 +202,63 @@ class ConsoleParser
                     list.Process();
                 }
                 break;
+            case Commands.Add.Current:
+                {
+                    Add.Options option = Add.Options.Address;
+                    if (++i < length)
+                    {
+                        switch (arguments[i])
+                        {
+                            case Commands.Add.Address:
+                            case Commands.Add.AddressAka:
+                                option = Add.Options.Address;
+                                break;
+                            case Commands.Add.File:
+                            case Commands.Add.FileAka:
+                                option = Add.Options.File;
+                                break;
+                            default:
+                                System.Console.WriteLine($"Unknown option '{arguments[i]}'!");
+                                return;
+                        }
+                    }
+                    if (++i < length)
+                    {
+                        string content = arguments[i];
+                        bool global = false;
+                        if (++i < length)
+                        {
+                            if (arguments[i] == "-g") global = true;
+                            else System.Console.WriteLine($"Unknown option '{arguments[i]}'");
+                        }
+                        Add install = new Add(content, option, global);
+                        install.Process();
+                    }
+                    else
+                    {
+                        System.Console.WriteLine("Please enter content!");
+                    }
+                }
+                break;
+            case Commands.Remove.Current:
+                if (++i < length)
+                {
+                    string name = arguments[i];
+                    bool global = false;
+                    if (++i < length)
+                    {
+                        if (arguments[i] == "-g") global = true;
+                        else System.Console.WriteLine($"Unknown option '{arguments[i]}'");
+                    }
+                    Remove remove = new Remove(name, global);
+                    remove.Process();
+                }
+                else
+                {
+                    System.Console.WriteLine("Please enter content!");
+                }
+
+                break;
             default:
                 System.Console.WriteLine($"Unknown command: {arguments[i]}!");
                 break;
@@ -291,6 +348,20 @@ class ConsoleParser
             public const string CurrentAka = "l";
             public const string Plugins = "--plugins";
             public const string PluginsAka = "-p";
+        }
+
+        public static class Add
+        {
+            public const string Current = "add";
+            public const string Address = "--address";
+            public const string AddressAka = "-a";
+            public const string File = "--file";
+            public const string FileAka = "-f";
+        }
+
+        public static class Remove
+        {
+            public const string Current = "remove";
         }
     }
 }

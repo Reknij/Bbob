@@ -6,7 +6,8 @@ namespace Bbob.Main.PluginManager;
 
 public static class PluginSystem
 {
-    public static readonly string pluginDirectory = Path.Combine(Environment.CurrentDirectory, "plugins"); //plugins in base of Bbob directory.
+    public static readonly string pluginCurrentDirectory = Path.Combine(Environment.CurrentDirectory, "plugins");
+    public static readonly string pluginBaseDirectory = Path.Combine(Environment.CurrentDirectory, "plugins");
     public static readonly string configsFolder = Path.Combine(Environment.CurrentDirectory, "configs");
     static List<PluginAssemblyLoadContext> thirdPlugins = new List<PluginAssemblyLoadContext>();
     static List<IPlugin> buildInPlugins = new List<IPlugin>();
@@ -64,8 +65,8 @@ public static class PluginSystem
     }
     private static List<KeyValuePair<string, PluginJson>> GetThirdPluginsInfo()
     {
+        HashSet<string> addedPlugins = new();
         List<KeyValuePair<string, PluginJson>> infos = new();
-        Directory.CreateDirectory(pluginDirectory);
         thirdPlugins.Clear();
         Action<string> addInfo = (folder) =>
         {
@@ -88,15 +89,17 @@ public static class PluginSystem
                     {
                         pluginInfo.name = Path.GetDirectoryName(folder) ?? $"UnknownPluginName.{Path.GetRandomFileName()}";
                     }
-                    infos.Add(new KeyValuePair<string, PluginJson>(folder, pluginInfo));
+                    if (!addedPlugins.Contains(pluginInfo.name))
+                    {
+                        infos.Add(new KeyValuePair<string, PluginJson>(folder, pluginInfo));
+                        addedPlugins.Add(pluginInfo.name);
+                    }
                 }
             }
         };
-        string[] folders = Directory.GetDirectories(pluginDirectory);
-        foreach (string folder in folders)
-        {
-            addInfo(folder);
-        }
+        List<string> folders = new List<string>();
+        if (Directory.Exists(pluginCurrentDirectory)) folders.AddRange(Directory.GetDirectories(pluginCurrentDirectory));
+
         string nugetPackages = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
         string[] packages = Directory.GetDirectories(nugetPackages);
         Func<string, string> getVersion = (package) =>
@@ -138,9 +141,17 @@ public static class PluginSystem
             {
                 fs.Sort();
                 fs.Reverse();
-                addInfo(fs[0]);
+                folders.Add(fs[0]);
             }
         }
+
+        if (Directory.Exists(pluginBaseDirectory)) folders.AddRange(Directory.GetDirectories(pluginBaseDirectory));
+
+        foreach (string folder in folders)
+        {
+            addInfo(folder);
+        }
+
         return infos;
     }
 
