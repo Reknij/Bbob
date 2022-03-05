@@ -59,9 +59,10 @@ public class SitemapGenerator : IPlugin
                     if (articleBaseUrl != null)
                     {
                         string address = value.address;
+                        string fullUrl = Shared.SharedLib.UrlHelper.UrlCombine(PluginHelper.ConfigBbob.domain, PluginHelper.ConfigBbob.baseUrl);
                         string remake = articleBaseUrl.Replace("&", "~and~").Replace('?', '&');
-                        string redirectUrl = $"{PluginHelper.ConfigBbob.baseUrl}?{remake}{address}";
-                        string normalUrl = $"{PluginHelper.ConfigBbob.baseUrl}{articleBaseUrl}{address}".Replace("//", "/");
+                        string redirectUrl = $"{fullUrl}?{remake}{address}";
+                        string normalUrl = $"{fullUrl}{articleBaseUrl}{address}";
                         articlesUrl.Add(config.redirectUrl ? redirectUrl : normalUrl);
                     }
                 }
