@@ -7,12 +7,11 @@ public class Add : Command
 {
     public new static string Name => "add";
     public new static string Help => "Add the theme or plugin. Auto detect.\n" +
-    "[option]:\n" +
+    "<option>:\n" +
     "--address | -a : Add from address. <content> is address.\n" +
     "--file | -f : Add from local path. <content> is local file path.\n\n" +
     "Use:\n" +
-    "// add -a <content>\n" +
-    "// add -f <content>";
+    "// add <option> <content>";
 
     public string Content { get; set; } = "";
     private bool isGlobal = false;
