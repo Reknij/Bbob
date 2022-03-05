@@ -58,7 +58,7 @@ public class Remove: Command
             return false;
         }
         Shared.SharedLib.DirectoryHelper.DeleteDirectory(directory);
-        System.Console.WriteLine($"{SUCCESS}Remove done...");
+        System.Console.WriteLine($"{SUCCESS}Remove {PluginOrTheme}!");
         return true;
     }
 }
