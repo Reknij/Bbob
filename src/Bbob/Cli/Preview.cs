@@ -53,12 +53,13 @@ public class Preview : Command
                 await next();
             }
         });
+        app.UsePathBase(config.baseUrl);
         app.UseFileServer(new FileServerOptions()
         {
             FileProvider = new PhysicalFileProvider(distribution),
 
         });
-        System.Console.WriteLine($"Preview running at {url}");
+        System.Console.WriteLine($"Preview running at {url}{config.baseUrl}");
         System.Console.WriteLine("Ctrl + C to stop preview.");
         app.Run(url);
     }
