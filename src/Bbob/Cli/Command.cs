@@ -6,10 +6,13 @@ public class Command
 {
     public static string Name => "Base command";
     public static string Help => "Here is base command.";
-    public Command()
+    public Command(bool initialize = true)
     {
-        PluginHelper.clearAllObject();
-        InitializeBbob.registerDataAgain();
+        if (initialize)
+        {
+            PluginHelper.clearAllObject();
+            InitializeBbob.registerDataAgain();
+        }
     }
     public virtual bool Process()
     {
