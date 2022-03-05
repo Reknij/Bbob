@@ -58,42 +58,46 @@ public class Add : Command
         const string FAILED = "Failed: ";
         if (Directory.Exists(DownloadPath.Temp)) Shared.SharedLib.DirectoryHelper.DeleteDirectory(DownloadPath.Temp);
         Directory.CreateDirectory(DownloadPath.Temp);
+        string fileNameWithoutExtension = "";
         if (Option == Options.Address)
         {
             Uri address = new Uri(Content);
-            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(address.LocalPath);
+            fileNameWithoutExtension = Path.GetFileNameWithoutExtension(address.LocalPath);
             if (!isValidFilePath(fileNameWithoutExtension))
             {
                 System.Console.WriteLine($"{FAILED}It is invalid: {fileNameWithoutExtension}");
                 return false;
             }
+            bool isTheme = Path.GetFileNameWithoutExtension(address.LocalPath).StartsWith("bbob-theme-");
+            bool isPlugin = Path.GetFileNameWithoutExtension(address.LocalPath).StartsWith("bbob-plugin-");
+            if (!isTheme && !isPlugin)
+            {
+                System.Console.WriteLine($"{FAILED}Can't add because it no theme or plugin.");
+                return false;
+            }
             string tempFilePath = Path.Combine(DownloadPath.Temp, Path.GetRandomFileName());
             HttpClient client = new HttpClient();
-            using (var s = client.GetStreamAsync(address).Result)
+            var t = client.GetStreamAsync(address);
+            System.Console.WriteLine("Downloading...");
+            using (var s = t.Result)
             {
+                System.Console.WriteLine("Downloaded, installing...");
                 using (var f = File.OpenWrite(tempFilePath))
                 {
                     s.CopyTo(f);
                 }
             }
-            bool isTheme = Path.GetFileNameWithoutExtension(address.LocalPath).StartsWith("bbob-theme-");
-            bool isPlugin = Path.GetFileNameWithoutExtension(address.LocalPath).StartsWith("bbob-plugin-");
-            if (!isTheme && !isPlugin)
-            {
-                System.Console.WriteLine($"{FAILED}Can't install because it no theme or plugin.");
-                return false;
-            }
+
             string downloadPath = Path.Combine(DownloadPath.Plugins, fileNameWithoutExtension);
             if (Directory.Exists(downloadPath))
             {
                 System.Console.WriteLine($"Already exists {fileNameWithoutExtension}, will override!");
             }
             getContentFromFile(tempFilePath, downloadPath, true);
-            System.Console.WriteLine($"{SUCCESS}Install done...");
         }
         else if (Option == Options.File)
         {
-            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(Content);
+            fileNameWithoutExtension = Path.GetFileNameWithoutExtension(Content);
             if (!isValidFilePath(fileNameWithoutExtension))
             {
                 System.Console.WriteLine($"{FAILED}It is invalid: {fileNameWithoutExtension}");
@@ -103,15 +107,15 @@ public class Add : Command
             bool isPlugin = Path.GetFileNameWithoutExtension(Content).StartsWith("bbob-plugin-");
             if (!isTheme && !isPlugin)
             {
-                System.Console.WriteLine($"{FAILED}Can't install because it no theme or plugin.");
+                System.Console.WriteLine($"{FAILED}Can't add because it no theme or plugin.");
                 return false;
             }
             string downloadPath = Path.Combine(isTheme ? DownloadPath.Themes : DownloadPath.Plugins, fileNameWithoutExtension);
             getContentFromFile(Content, downloadPath, false);
-            string p = Global ? "global" : "current";
-            System.Console.WriteLine($"{SUCCESS}Install {p} done...");
         }
         Shared.SharedLib.DirectoryHelper.DeleteDirectory(DownloadPath.Temp);
+        string p = Global ? "global" : "current";
+        System.Console.WriteLine($"{SUCCESS}Added {fileNameWithoutExtension} in {p} directory path.!");
         return true;
     }
 
