@@ -1,3 +1,7 @@
+# 2022-3-5 15:57:00
+## Bbob
+- new command `add` and `remove`. To add the theme or plugin.
+
 # 2022-3-4 20:10:00
 ## Bbob
 - Refactoring congiguration.
