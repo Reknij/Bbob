@@ -10,6 +10,7 @@ public class ConfigJson
     public int blogCountOneTime { get; set; }
     public string allLink { get; set; } = "";
     public bool recursion { get; set; }
+    public string domain {get;set;} = "";
     public string baseUrl { get; set; } = "";
     public int previewPort { get; set; }
 

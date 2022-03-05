@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Bbob.Plugin;
 
 namespace Bbob.Main.Configuration;
@@ -128,9 +129,17 @@ public static class ConfigManager
                 System.Console.WriteLine("Auto set to `false` now.");
                 allLink = "false";
             }
+            var domainMatch = Regex.Match(domain, @"^(?:\w+://)?([^/?]*)");
+            if (!domainMatch.Success) System.Console.WriteLine("Warning: config.domain is invalid!");
+            else if(domainMatch.Value != domain)
+            {
+                System.Console.WriteLine("Warning: domain is have invalid sub url.");
+                domain = domainMatch.Value;
+                System.Console.WriteLine($"Auto repair it to '{domain}'");
+            }
             if (baseUrl == "")
             {
-                System.Console.WriteLine("Warning: config.publicPath value is null.");
+                System.Console.WriteLine("Warning: config.baseUrl value is null.");
                 System.Console.WriteLine("Auto set to '/'");
                 baseUrl = "/";
             }
