@@ -47,7 +47,7 @@ public class Remove: Command
         bool isPlugin = PluginOrTheme.StartsWith("bbob-plugin-");
         bool isTheme = PluginOrTheme.StartsWith("bbob-theme-");
         string directory = Path.Combine(isPlugin?DownloadPath.Plugins: DownloadPath.Themes, PluginOrTheme);
-        if (!isPlugin && isTheme)
+        if (!isPlugin && !isTheme)
         {
             System.Console.WriteLine($"{FAILED}Can't remove because it not plugin or theme.");
             return false;
