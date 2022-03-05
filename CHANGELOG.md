@@ -1,3 +1,7 @@
+# 2022-3-5 19:54:00
+## Bbob
+- optimize preview.
+
 # 2022-3-5 15:57:00
 ## Bbob
 - new command `add` and `remove`. To add the theme or plugin.
