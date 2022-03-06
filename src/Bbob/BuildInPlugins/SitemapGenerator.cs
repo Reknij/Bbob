@@ -79,6 +79,7 @@ public class SitemapGenerator : IPlugin
         if (commands == Commands.GenerateCommand && distribution != null && articlesUrl.Count > 0)
         {
             if (config.redirectUrl) InsertFuncToIndex(distribution);
+            articlesUrl.Add(fullUrl);
             generateSitemap(distribution);
             generateRobotTxt(distribution);
             PluginHelper.printConsole("Success generate sitemap.");
