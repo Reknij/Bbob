@@ -20,7 +20,22 @@ const api = {
     },
     getLinkInfosWithAddress(address, callback) {
         ajaxRequest('get', address, callback)
-    }
+    },
+    executeScriptElements(containerElement) {
+        const scriptElements = containerElement.querySelectorAll("script");
+      
+        Array.from(scriptElements).forEach((scriptElement) => {
+          const clonedElement = document.createElement("script");
+      
+          Array.from(scriptElement.attributes).forEach((attribute) => {
+            clonedElement.setAttribute(attribute.name, attribute.value);
+          });
+          
+          clonedElement.text = scriptElement.text;
+      
+          scriptElement.parentNode.replaceChild(clonedElement, scriptElement);
+        });
+      }
 }
 
 let ajaxRequest = function(type, url, callback) {

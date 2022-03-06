@@ -20,6 +20,7 @@ Bbob.api.getArticleFromAddress(address, (art) => {
     article.value = art;
     if (htmlContent && art.contentParsed) {
         htmlContent.innerHTML = art.contentParsed;
+        Bbob.api.executeScriptElements(htmlContent);
         hljs.highlightAll();
     }
     document.title = art.title;

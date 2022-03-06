@@ -50,6 +50,7 @@ export interface BbobJSApi {
         nextLinkInfos(callback: LinkInfoArrayProcessCallBack): void,
         getArticleFromAddress(address: string, callback: ArticleProcessCallBack): void,
         getLinkInfosWithAddress(address: string, callback: LinkInfoArrayProcessCallBack): void,
+        executeScriptElements(containerElement: Element): void
     }
 }
 
