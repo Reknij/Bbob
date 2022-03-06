@@ -115,45 +115,69 @@ public class Add : Command
         }
         else if (Option == Options.File)
         {
-            fileNameWithoutExtension = Path.GetFileNameWithoutExtension(Content);
-            if (!isValidFilePath(fileNameWithoutExtension))
+            if (!File.Exists(Content))
             {
-                System.Console.WriteLine($"{FAILED}It is invalid: {fileNameWithoutExtension}");
+                System.Console.WriteLine($"{FAILED}File is not exists!");
                 return false;
             }
-            bool isTheme = Path.GetFileNameWithoutExtension(Content).StartsWith("bbob-theme-");
-            bool isPlugin = Path.GetFileNameWithoutExtension(Content).StartsWith("bbob-plugin-");
-            if (!isTheme && !isPlugin)
+            try
             {
-                System.Console.WriteLine($"{FAILED}Can't add because it no theme or plugin.");
+                fileNameWithoutExtension = Path.GetFileNameWithoutExtension(Content);
+                if (!isValidFilePath(fileNameWithoutExtension))
+                {
+                    System.Console.WriteLine($"{FAILED}It is invalid: {fileNameWithoutExtension}");
+                    return false;
+                }
+                bool isTheme = Path.GetFileNameWithoutExtension(Content).StartsWith("bbob-theme-");
+                bool isPlugin = Path.GetFileNameWithoutExtension(Content).StartsWith("bbob-plugin-");
+                if (!isTheme && !isPlugin)
+                {
+                    System.Console.WriteLine($"{FAILED}Can't add because it no theme or plugin.");
+                    return false;
+                }
+                string downloadPath = Path.Combine(isTheme ? DownloadPath.Themes : DownloadPath.Plugins, fileNameWithoutExtension);
+                if (Directory.Exists(downloadPath))
+                {
+                    System.Console.WriteLine($"Already exists {fileNameWithoutExtension}, will override!");
+                }
+                getContentFromFile(Content, downloadPath, false);
+            }
+            catch (System.Exception)
+            {
+                System.Console.WriteLine($"{FAILED}Please make sure your enter the valid path!");
                 return false;
             }
-            string downloadPath = Path.Combine(isTheme ? DownloadPath.Themes : DownloadPath.Plugins, fileNameWithoutExtension);
-            getContentFromFile(Content, downloadPath, false);
         }
         Shared.SharedLib.DirectoryHelper.DeleteDirectory(DownloadPath.Temp);
         string p = Global ? "global" : "current";
-        System.Console.WriteLine($"{SUCCESS}Added {fileNameWithoutExtension} in {p} directory path.!");
+        System.Console.WriteLine($"{SUCCESS}Added {fileNameWithoutExtension} to {p} directory path.!");
         return true;
     }
 
     private void getContentFromFile(string tempFilePath, string downloadPath, bool overrideIt)
     {
-        Directory.CreateDirectory(downloadPath);
-        using (Stream stream = File.OpenRead(tempFilePath))
-        using (var reader = ReaderFactory.Open(stream))
+        try
         {
-            while (reader.MoveToNextEntry())
+            Directory.CreateDirectory(downloadPath);
+            using (Stream stream = File.OpenRead(tempFilePath))
+            using (var reader = ReaderFactory.Open(stream))
             {
-                if (!reader.Entry.IsDirectory)
+                while (reader.MoveToNextEntry())
                 {
-                    reader.WriteEntryToDirectory(downloadPath, new ExtractionOptions()
+                    if (!reader.Entry.IsDirectory)
                     {
-                        ExtractFullPath = true,
-                        Overwrite = true
-                    });
+                        reader.WriteEntryToDirectory(downloadPath, new ExtractionOptions()
+                        {
+                            ExtractFullPath = true,
+                            Overwrite = true
+                        });
+                    }
                 }
             }
+        }
+        catch (System.Exception ex)
+        {
+            System.Console.WriteLine("Uncompress target file error:\n" + ex.Message);
         }
     }
 
