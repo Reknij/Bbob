@@ -267,6 +267,7 @@ class ConsoleParser
 
     private void eodPlugin(EnableAndDisable.Options option, string pluginName, bool direct)
     {
+        InitializeBbob.Initialize(InitializeBbob.InitializeOptions.Config);
         EnableAndDisable eod = new EnableAndDisable(option, pluginName, direct);
         eod.Process();
     }
