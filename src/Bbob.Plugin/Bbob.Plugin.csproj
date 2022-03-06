@@ -1,9 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Description>Bbob plugin classlib.</Description>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Version>1.0.0</Version>
+    <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/Reknij/Bbob</RepositoryUrl> 
   </PropertyGroup>
 
 </Project>
