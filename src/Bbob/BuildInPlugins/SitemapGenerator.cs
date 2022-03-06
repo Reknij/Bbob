@@ -54,7 +54,7 @@ public class SitemapGenerator : IPlugin
             case GenerationStage.Initialize:
                 this.distribution = distribution;
                 break;
-            case GenerationStage.FinalProcess:
+            case GenerationStage.Confirm:
                 if (PluginHelper.getRegisteredObject<dynamic>("article", out dynamic? value))
                 {
                     if (value == null) return;

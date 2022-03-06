@@ -20,7 +20,7 @@ public class BuildWebArticleJson : IPlugin
     }
     public void GenerateCommand(string filePath, string distribution, GenerationStage stage)
     {
-        if (stage != GenerationStage.FinalProcess) return;
+        if (stage != GenerationStage.Confirm) return;
 
         PluginHelper.getRegisteredObject<dynamic>("article", out var article);
         if (article == null) return;
