@@ -17,7 +17,6 @@ if (!rpa || rpa == '') rpa = 'default';
 getArticle(rpa);
 
 let clickDoc = (link: LinkInfo) => {
-    console.log(link.address)
     router.replace({ params: { address: link.address } });
     getArticle(link.address);
 }

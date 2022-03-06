@@ -4,11 +4,13 @@ import DocumentCategories from './DocumentCategories.vue'
 import { rawHtml } from '../composition/documentData';
 import { ref, watch } from 'vue';
 import hljs from '../composition/gethljs';
+import Bbob from '../../../Bbob/JSApi/Bbob';
 
 watch(()=>rawHtml.value, (value)=>{
 let htmlContent = document.getElementById('htmlContent')
     if (htmlContent){
         htmlContent.innerHTML = value;
+        Bbob.api.executeScriptElements(htmlContent);
         hljs.highlightAll();
     }
 });
