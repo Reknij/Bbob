@@ -61,7 +61,16 @@ public class Add : Command
         string fileNameWithoutExtension = "";
         if (Option == Options.Address)
         {
-            Uri address = new Uri(Content);
+            Uri address;
+            try
+            {
+                address = new Uri(Content);
+            }
+            catch (System.Exception)
+            {
+                System.Console.WriteLine($"{FAILED}Please make sure content is url!");
+                return false;
+            }
             fileNameWithoutExtension = Path.GetFileNameWithoutExtension(address.LocalPath);
             if (!isValidFilePath(fileNameWithoutExtension))
             {
@@ -77,15 +86,24 @@ public class Add : Command
             }
             string tempFilePath = Path.Combine(DownloadPath.Temp, Path.GetRandomFileName());
             HttpClient client = new HttpClient();
-            var t = client.GetStreamAsync(address);
-            System.Console.WriteLine("Downloading...");
-            using (var s = t.Result)
+            try
             {
-                System.Console.WriteLine("Downloaded, installing...");
-                using (var f = File.OpenWrite(tempFilePath))
+                var t = client.GetStreamAsync(address);
+                System.Console.WriteLine("Downloading...");
+                using (var s = t.Result)
                 {
-                    s.CopyTo(f);
+                    System.Console.WriteLine("Downloaded, installing...");
+                    using (var f = File.OpenWrite(tempFilePath))
+                    {
+                        s.CopyTo(f);
+                    }
                 }
+            }
+            catch (System.Exception)
+            {
+                System.Console.WriteLine("Error downloading plugin!");
+                System.Console.WriteLine($"{FAILED}Please make sure it is valid address!");
+                return false;
             }
 
             string downloadPath = Path.Combine(DownloadPath.Plugins, fileNameWithoutExtension);
