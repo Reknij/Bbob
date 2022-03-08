@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import Bbob from '../../../Bbob/JSApi/Bbob';
-import { paths } from '../composition/routePaths'
+import { routes } from '../router'
 let router = useRouter();
 
 let props = defineProps({
@@ -14,24 +15,36 @@ let props = defineProps({
     default: undefined
   }
 })
+let defaultActive = ref(routes[0].defaultPath);
+function getDefaultActive(){
+  for (const route of routes) {
+    if (route.name == router.currentRoute.value.name){
+      defaultActive.value = route.defaultPath;
+    }
+  }
+}
+getDefaultActive();
+watch(()=>router.currentRoute.value, ()=>{
+  getDefaultActive();
+})
 </script>
 
 <template>
   <div v-if="props.mode == 'horizontal'" class="nav-wrapper">
     <h1 class="title" @click="router.push('/')">{{ Bbob.meta.blogName }}</h1>
     <div class="nav-container">
-      <div :id="`nav-item-${p.path}`" :class="router.currentRoute.value.path == p.path?'nav-item-selected':''" class="nav-item" v-for="(p, i) in paths">
-        <router-link class="nav-item-a" :to="p.path">{{ p.name }}</router-link>
+      <div :id="`nav-item-${p.name}`" :class="router.currentRoute.value.name == p.name?'nav-item-selected':''" class="nav-item" v-for="(p, i) in routes">
+        <router-link class="nav-item-a" :to="p.defaultPath">{{ p.name }}</router-link>
       </div>
     </div>
   </div>
   <el-menu
     v-else-if="props.mode == 'vertical'"
     router
-    :default-active="router.currentRoute.value.path"
+    :default-active="defaultActive"
     @select="props.readyClick && props.readyClick()"
   >
-    <el-menu-item v-for="(p, i) in paths" :key="i" :index="p.path">{{ p.name }}</el-menu-item>
+    <el-menu-item v-for="(p, i) in routes" :key="i" :index="p.defaultPath">{{ p.name }}</el-menu-item>
   </el-menu>
 </template>
 

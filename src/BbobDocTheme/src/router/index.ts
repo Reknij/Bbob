@@ -6,15 +6,21 @@ import Bbob from '../../../Bbob/JSApi/Bbob';
 
 const routes = [
     {
+        name: "Home",
         path: '/',
+        defaultPath: "/",
         component: Home
     },
     {
+        name: "Documents",
         path: '/documents/:address',
+        defaultPath: "/documents/default",
         component: Documents
     },
     {
+        name: "About",
         path: '/about',
+        defaultPath: "/about",
         component: About,
     }
 ]
@@ -24,4 +30,7 @@ const router = createRouter({
     routes
 })
 
-export default router;
+export {
+    routes,
+    router
+}

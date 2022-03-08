@@ -2,9 +2,8 @@
 import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import Bbob, { LinkInfo } from '../../../Bbob/JSApi/Bbob';
-import { rawHtml, toc } from '../composition/documentData';
+import { activeName, getArticle, toc } from '../composition/documentData';
 
-let activeName = ref('0');
 const router = useRouter();
 let props = defineProps({
     readyClick: {
@@ -12,34 +11,13 @@ let props = defineProps({
         default: undefined
     }
 })
-let rpa = router.currentRoute.value.params.address as string;
-if (!rpa || rpa == '') rpa = 'default';
-getArticle(rpa);
 
 let clickDoc = (link: LinkInfo) => {
     router.replace({ params: { address: link.address } });
     getArticle(link.address);
+    if (props.readyClick) props.readyClick();
 }
-function getArticle(address: string) {
-    if (address == 'default')return;
-    let a =address;
-    const sa = Bbob.meta.extra.shortAddress;
-    if (sa) {
-        a = `${sa.startOfAddress}${address}${sa.endOfAddress}`;
-    }
-    Bbob.api.getArticleFromAddress(a, (article) => {
-        if (article.contentParsed) {
-            rawHtml.value = article.contentParsed;
-        }
-        if (article.toc) {
-            toc.value = article.toc;
-        }
-        activeName.value = address;
-    })
-    if (props.readyClick) {
-        props.readyClick();
-    }
-}
+
 
 let blogs: any = {}
 for (let index = 0; index < Bbob.blog.categories.length; index++) {
