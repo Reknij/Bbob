@@ -29,7 +29,7 @@ public class MarkdownStyle : IPlugin
 
         PluginHelper.getRegisteredObject<dynamic>("article", out dynamic? article);
         if (article == null) return;
-        string script = "<script>let c = document.getElementsByClassName('bbob-code');for(let i of c){hljs.highlightElement(i)}</script>";
+        string script = "<script>hljs.highlightAll()</script>";
         article.contentParsed = $"<article class=\"markdown-body\">{article.contentParsed}</article>{script}";
     }
 
