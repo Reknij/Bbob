@@ -55,12 +55,17 @@ public class Generator : Command
         string[] files = Directory.GetFiles(articlesFolderPath, "*.*", config.recursion ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
         ThemeProcessor.Theme? theme = ThemeProcessor.BuildThemeToDist(config.theme, distribution);
+        if (theme == null)
+        {
+            System.Console.WriteLine($"{FAILED}Not found theme.");
+            return false;
+        }
         InitializeConventionObjects();
         if (files.Length > 0) System.Console.WriteLine($"Run generate all stage for article files in '{articlesFolderPath.Replace(Environment.CurrentDirectory, ".")}':");
         else System.Console.WriteLine("Nothing files to generate.");
         foreach (string file in files)
         {
-            string shortFilePath = file.Replace(articlesFolderPath, "").Remove(0,1);
+            string shortFilePath = file.Replace(articlesFolderPath, "").Remove(0, 1);
             System.Console.WriteLine($"- {shortFilePath}");
             foreach (GenerationStage stage in Enum.GetValues<GenerationStage>())
             {
@@ -92,36 +97,31 @@ public class Generator : Command
             }
             if (isSkip()) continue;
         }
-
-        if (theme != null)
+        try
         {
-            try
+            PluginSystem.cyclePlugins((plugin) =>
             {
-                PluginSystem.cyclePlugins((plugin) =>
-           {
-               plugin.CommandComplete(Commands.GenerateCommand);
-           });
-            }
-            catch (System.Exception ex)
-            {
-                string msg = ex.Message;
-#if DEBUG
-                msg = ex.ToString();
-#endif
-                System.Console.WriteLine($"{FAILED}Error run generate command complete in plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
-                return false;
-            }
-            string mainName = "bbob.js";
-            System.Console.WriteLine($"Building {mainName}");
-            string newName = JSAPiHelper.BuildBbobJS(distribution, GetBuildData(), theme.Info);
-            System.Console.WriteLine($"Hook in {mainName} to index file...");
-            JSAPiHelper.Hook(distribution, theme.Info.index, newName);
-
+                plugin.CommandComplete(Commands.GenerateCommand);
+            });
         }
-        else
+        catch (System.Exception ex)
         {
-            System.Console.WriteLine($"{FAILED}Not found theme.");
+            string msg = ex.Message;
+#if DEBUG
+            msg = ex.ToString();
+#endif
+            System.Console.WriteLine($"{FAILED}Error run generate command complete in plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
             return false;
+        }
+        string mainName = "bbob.js";
+        System.Console.WriteLine($"Building {mainName}");
+        string newName = JSAPiHelper.BuildBbobJS(distribution, GetBuildData(), theme.Info);
+        System.Console.WriteLine($"Hook in {mainName} to index file...");
+        JSAPiHelper.Hook(distribution, theme.Info.index, newName);
+        if (config.compress)
+        {
+            if (ThemeProcessor.CompressHtml(distribution)) System.Console.WriteLine("Compress html success.");
+            else System.Console.WriteLine("Compress html failed.");
         }
         System.Console.WriteLine($"{SUCCESS} Generation has been run.");
         return true;

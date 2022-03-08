@@ -7,6 +7,7 @@ using static Bbob.Main.JSApi.JSApiType;
 using Bbob.Plugin;
 using System.Security.Cryptography;
 using System.Dynamic;
+using NUglify;
 
 namespace Bbob.Main.JSApi;
 
@@ -60,6 +61,14 @@ public static class JSAPiHelper
         string metaPlain = $"\nconst meta =  {JsonSerializer.Serialize(meta)}";
         string globalVariable = "\nvar Bbob = { blog, meta, api }";
         string content = mjs + blogPlain + metaPlain + globalVariable;
+        try
+        {
+            content = Uglify.Js(content).Code;
+        }
+        catch (System.Exception ex)
+        {
+            System.Console.WriteLine("Compress bbob.js error:\n" + ex.Message);
+        }
         SHA256 sha256 = SHA256.Create();
         string hash = "";
         using (FileStream fs = new FileStream(mainjsDist, FileMode.Create, FileAccess.ReadWrite))
@@ -135,7 +144,7 @@ public static class JSAPiHelper
     {
         if (obj is IDictionary<string, object>) return (IDictionary<string, object>)obj;
         var properties = obj.GetType().GetProperties();
-        Dictionary<string, object> objDict = new ();
+        Dictionary<string, object> objDict = new();
         foreach (var property in properties)
         {
             var value = property.GetValue(obj);
@@ -145,5 +154,5 @@ public static class JSAPiHelper
         return objDict;
     }
 
-    
+
 }

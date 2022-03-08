@@ -42,6 +42,26 @@ public static class ThemeProcessor
         }
         return null;
     }
+    public static bool CompressHtml(string dist) => CompressHtml(Configuration.ConfigManager.MainConfig.theme, dist);
+    public static bool CompressHtml(string themeName, string dist)
+    {
+        getTheme(themeName, out Theme? t);
+        if (t == null) return false;
+
+        string index = Path.Combine(dist, t.Info.index);
+        string content = File.ReadAllText(index);
+        try
+        {
+            content = NUglify.Uglify.Html(content).Code;
+            File.WriteAllText(index, content);
+        }
+        catch (System.Exception ex)
+        {
+            System.Console.WriteLine($"Compress {t.Info.index} error:\n{ex.Message}");
+            return false;
+        }
+        return true;
+    }
 
     public static bool getTheme(out Theme? info) => getTheme(Configuration.ConfigManager.MainConfig.theme, out info);
     public static bool getTheme(string themeName, out Theme? info)
