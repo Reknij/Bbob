@@ -10,8 +10,8 @@ public enum PluginOrder
 public enum ConditionType
 {
     Require = 2,
-    StatusCheck = 4,
-    All = Require | StatusCheck
+    OrderCheck = 4,
+    All = Require | OrderCheck
 }
 
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]

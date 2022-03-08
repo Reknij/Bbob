@@ -80,7 +80,7 @@ public class PluginRelation
         pcrs.Add(c);
         foreach (var attr in Attribute.GetCustomAttributes(context.main.GetType()))
         {
-            if (attr is PluginCondition condition && (condition.ConditionType & ConditionType.StatusCheck) != 0)
+            if (attr is PluginCondition condition && (condition.ConditionType & ConditionType.OrderCheck) != 0)
             {
                 PluginContext? other = plugins.Find((item) => item.info.name == condition.PluginName);
                 if (other == null) continue;

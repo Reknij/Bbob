@@ -13,6 +13,7 @@ public class ConfigJson
     public string domain {get;set;} = "";
     public string baseUrl { get; set; } = "";
     public int previewPort { get; set; }
+    public bool compress {get;set;} = true;
 
     public List<string> pluginsDisable { get; set; } = new List<string>();
     public bool isPluginEnable(string pluginName) => isPluginEnable(pluginName, out int i);
