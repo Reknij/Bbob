@@ -7,7 +7,7 @@ namespace Bbob.Main.BuildInPlugin;
 public class SitemapGenerator : IPlugin
 {
     string? distribution { get; set; }
-    List<string> articlesUrl = new List<string>();
+    List<KeyValuePair<string, string>> articlesUrl = new ();
     string fullUrl = Shared.SharedLib.UrlHelper.UrlCombine(PluginHelper.ConfigBbob.domain, PluginHelper.ConfigBbob.baseUrl);
 
     MyConfig config;
@@ -64,7 +64,7 @@ public class SitemapGenerator : IPlugin
                         string remake = articleBaseUrl.Replace("&", "~and~").Replace('?', '&');
                         string redirectUrl = $"{fullUrl}?{remake}{address}";
                         string normalUrl = $"{fullUrl}{articleBaseUrl}{address}";
-                        articlesUrl.Add(config.redirectUrl ? redirectUrl : normalUrl);
+                        articlesUrl.Add(new KeyValuePair<string, string>(value.title, config.redirectUrl ? redirectUrl : normalUrl));
                     }
                 }
                 else PluginHelper.ExecutingCommandResult = new CommandResult("Can't get article object.", CommandOperation.RunMeAgain);
@@ -79,7 +79,7 @@ public class SitemapGenerator : IPlugin
         if (commands == Commands.GenerateCommand && distribution != null && articlesUrl.Count > 0)
         {
             if (config.redirectUrl) InsertFuncToIndex(distribution);
-            articlesUrl.Add(fullUrl);
+            articlesUrl.Add(new KeyValuePair<string, string>("Home", fullUrl));
             generateSitemap(distribution);
             generateRobotTxt(distribution);
             PluginHelper.printConsole("Success generate sitemap.");
@@ -90,14 +90,10 @@ public class SitemapGenerator : IPlugin
     {
         string indexFile = Path.Combine(distribution, "index.html");
         string script = "<script>!function(n){var a;'/'===n.search[1]&&(a=n.search.slice(1).split('&').map(function(n){return n.replace(/~and~/g,'&')}).join('?'),window.history.replaceState(null,null,n.pathname.slice(0,-1)+a+n.hash))}(window.location);</script>";
-        string add = "<a href=\"/itissm.html\" hidden>Sitemap html</a>";
         string indexPlain = File.ReadAllText(indexFile);
         string patternHead = @"<head>(.*)</head>";
-        string patternBody = @"<body>(.*)</body>";
         string replacement1 = $"<head>{script}$1</head>";
-        string replacement2 = $"<body>{add}$1</body>";
         indexPlain = Regex.Replace(indexPlain, patternHead, replacement1, RegexOptions.Singleline);
-        indexPlain = Regex.Replace(indexPlain, patternBody, replacement2, RegexOptions.Singleline);
         File.WriteAllText(indexFile, indexPlain);
     }
 
@@ -111,19 +107,15 @@ public class SitemapGenerator : IPlugin
     private void generateSitemap(string distribution)
     {
         string sitemapFile = Path.Combine(distribution, "sitemap.xml");
-        List<string> aurl = new List<string>();
-        if (File.Exists(sitemapFile))
-        {
-            aurl.AddRange(File.ReadAllLines(sitemapFile));
-        }
-        aurl.AddRange(articlesUrl);
         SitemapXml sitemapXml = new SitemapXml() { Format = true };
+        articlesUrl.Add(new KeyValuePair<string, string>("It is sitemap html.", $"{fullUrl}itissm.html"));
+        var aurl = articlesUrl.Select(i => i.Value);
         sitemapXml.AddRange(aurl);
         sitemapXml.WriteToFile(sitemapFile);
-        generateSitemapHtml(distribution, aurl);
+        generateSitemapHtml(distribution);
     }
 
-    private void generateSitemapHtml(string distribution, List<string> addressList)
+    private void generateSitemapHtml(string distribution)
     {
         string sitemap = Path.Combine(distribution, "itissm.html");
         string metas = "<meta charset=\"UTF-8\"/>" +
@@ -131,9 +123,9 @@ public class SitemapGenerator : IPlugin
                         "<meta name=\"robots\" content=\"noindex\">";
         string style = "<style>li{margin: 15px auto}</style>";
         UnsortedList unsortedList = new UnsortedList();
-        foreach (string address in addressList)
+        foreach (var article in articlesUrl)
         {
-            unsortedList.Add($"<a href=\"{address}\">address</a>");
+            unsortedList.Add($"<a href=\"{article.Value}\">{article.Key}</a>");
         }
         string html = $"<!DOCTYPE html><html lang=\"en\"><head>{metas}<title>Sitemap Html</title>{style}</head><body>{unsortedList}</body></html>";
         File.WriteAllText(sitemap, html);
