@@ -3,7 +3,6 @@ import { ref, watch } from 'vue';
 import { onBeforeRouteLeave, useRoute } from 'vue-router';
 import Bbob, { Article } from '../../../Bbob/JSApi/Bbob'
 import { normal } from '../composition/changeSize';
-import hljs from '../composition/gethljs';
 
 const noArticle = 'No exists article!';
 const route = useRoute();
@@ -21,7 +20,6 @@ Bbob.api.getArticleFromAddress(address, (art) => {
     if (htmlContent && art.contentParsed) {
         htmlContent.innerHTML = art.contentParsed;
         Bbob.api.executeScriptElements(htmlContent);
-        hljs.highlightAll();
     }
     document.title = art.title;
 })
