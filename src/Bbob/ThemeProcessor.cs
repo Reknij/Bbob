@@ -36,7 +36,7 @@ public static class ThemeProcessor
             if (theme != null)
             {
                 string themeJson = Path.Combine(theme.Path, "theme.json");
-                SharedLib.DirectoryHelper.CopyDirectory(theme.Path, dist, themeJson);
+                SharedLib.DirectoryHelper.CopyDirectory(theme.Path, dist, themeJson, true, true);
                 return theme;
             }
         }
