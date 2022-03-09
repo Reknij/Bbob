@@ -16,7 +16,7 @@ public class InitializeBbob: IPlugin
         else if (config.IsAllDisable()) PluginHelper.printConsole("Nothing initialized, all disabled...");
     }
 
-    public void GenerateCommand(string filePath, string dist, GenerationStage stage)
+    public void GenerateCommand(string filePath, GenerationStage stage)
     {
         if (!IsInitDone) this.InitCommand();
     }

@@ -34,7 +34,7 @@ public class Deploy : Command
         {
             PluginSystem.cyclePlugins((plugin) =>
             {
-                plugin.DeployCommand(distribution);
+                plugin.DeployCommand();
             });
         }
         catch (System.Exception ex)

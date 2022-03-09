@@ -69,14 +69,13 @@ public static class JSAPiHelper
         {
             System.Console.WriteLine("Compress bbob.js error:\n" + ex.Message);
         }
-        SHA256 sha256 = SHA256.Create();
         string hash = "";
         using (FileStream fs = new FileStream(mainjsDist, FileMode.Create, FileAccess.ReadWrite))
         {
             fs.Write(Encoding.UTF8.GetBytes(content));
             fs.Flush(); //If not flush now, hash can't compute
             fs.Position = 0; //set to 0 to read.
-            hash = Shared.SharedLib.BytesToString(sha256.ComputeHash(fs));
+            hash = Shared.SharedLib.HashHelper.GetContentHash(fs);
         }
         string newName = config.useHashName?$"bbob-{hash.Substring(0, 9)}.js": "bbob.js";
         string newPath = Path.Combine(dist, newName);

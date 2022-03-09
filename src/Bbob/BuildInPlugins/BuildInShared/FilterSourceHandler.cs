@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using System.Text.Json;
 using Bbob.Plugin;
 
@@ -15,7 +14,6 @@ public static class FilterSourceHandler
         var config = PluginHelper.ConfigBbob;
         string localPath = Path.Combine(dist, Variables.bbobAssets, name);
         Directory.CreateDirectory(localPath);
-        SHA256 sha256 = SHA256.Create();
         foreach (var item in list)
         {
             string vFile = Path.Combine(localPath, $"{item.Key}.json");
@@ -25,7 +23,7 @@ public static class FilterSourceHandler
                 JsonSerializer.Serialize(fs, item.Value);
                 fs.Flush(); //If not flush now, hash can't compute
                 fs.Position = 0; //set to 0 to read.
-                hash = Shared.SharedLib.BytesToString(sha256.ComputeHash(fs));
+                hash = Shared.SharedLib.HashHelper.GetContentHash(fs);
             }
             string newName = config.useHashName ? $"{item.Key}-{hash.Substring(0, 9)}.json" : $"{item.Key}.json";
             string newPath = Path.Combine(localPath, newName);

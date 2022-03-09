@@ -15,6 +15,7 @@ public class ConfigJson
     public int previewPort { get; set; }
     public bool compress {get;set;} = true;
     public bool useHashName {get;set;} = true;
+    public string distributionPath {get;set;} = "";
 
     public List<string> pluginsDisable { get; set; } = new List<string>();
     public bool isPluginEnable(string pluginName) => isPluginEnable(pluginName, out int i);

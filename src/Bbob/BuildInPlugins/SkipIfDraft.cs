@@ -4,7 +4,7 @@ namespace Bbob.Main.BuildInPlugin;
 
 public class SkipIfDraft : IPlugin
 {
-    public void GenerateCommand(string filePath, string distribution, GenerationStage stage)
+    public void GenerateCommand(string filePath, GenerationStage stage)
     {
         if (stage == GenerationStage.Process)
         {

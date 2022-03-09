@@ -1,5 +1,3 @@
-using System.Dynamic;
-using System.Security.Cryptography;
 using System.Text.Json;
 using Bbob.Plugin;
 
@@ -13,10 +11,8 @@ public class LinkProcess : IPlugin
         "contentParsed",
         "toc"
     };
-    string distribution = "";
-    public void GenerateCommand(string filePath, string distribution, GenerationStage stage)
+    public void GenerateCommand(string filePath, GenerationStage stage)
     {
-        this.distribution = distribution;
         if (stage == GenerationStage.Confirm)
         {
             PluginHelper.getRegisteredObject<dynamic>("article", out dynamic? art);
@@ -50,7 +46,7 @@ public class LinkProcess : IPlugin
             }
             sort(links);
             PluginHelper.registerObject("links", links);
-            var pack = getLinkInfos(links, distribution);
+            var pack = getLinkInfos(links, PluginHelper.DistributionDirectory);
             dynamic blog = PluginHelper.getRegisteredObjectNoNull<dynamic>("blog");
             blog.links = pack.Item1;
             blog.nextFileLinks = pack.Item2;
@@ -139,18 +135,17 @@ public class LinkProcess : IPlugin
             {
                 nextLinkInfos.Add(LinkInfos[i]);
             }
-            SHA256 sha256 = SHA256.Create();
             string hash = "";
             using (FileStream fs = new FileStream(nextLinkInfosFile, FileMode.Create, FileAccess.ReadWrite))
             {
                 JsonSerializer.Serialize(fs, nextLinkInfos);
                 fs.Flush(); //If not flush now, hash can't compute
                 fs.Position = 0; //set to 0 to read.
-                hash = Shared.SharedLib.BytesToString(sha256.ComputeHash(fs));
+                hash = Shared.SharedLib.HashHelper.GetContentHash(fs);
             }
             string newName = $"next-{hash.Substring(0, 9)}.js";
             string newPath = Path.Combine(nextLinkInfoFilesFolderLocal, newName);
-            File.Move(nextLinkInfosFile, newPath);
+            File.Move(nextLinkInfosFile, newPath, true);
             nextFileLinkInfos.Add($"{config.baseUrl}{BuildInShared.Variables.bbobAssets}/{nextLinkInfoFilesFolder}/{newName}");
         }
 

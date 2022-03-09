@@ -6,19 +6,9 @@ namespace Bbob.Main.BuildInPlugin;
 [PluginCondition("LinkProcess", PluginOrder = PluginOrder.BeforeMe)]
 public class TagProcess : IPlugin
 {
-    string distribution = "";
-
     public void InitCommand()
     {
         PluginHelper.savePluginJsonConfig<MyConfig>(new MyConfig());
-    }
-
-    public void GenerateCommand(string filePath, string distribution, GenerationStage stage)
-    {
-        if (stage == GenerationStage.Confirm)
-        {
-            this.distribution = distribution;
-        }
     }
 
     public void CommandComplete(Commands command)
@@ -50,7 +40,7 @@ public class TagProcess : IPlugin
                 var list = all.ToList();
                 sort(list);
                 dynamic blog = PluginHelper.getRegisteredObjectNoNull<dynamic>("blog");
-                blog.tags = FilterSourceHandler.BuildFilterFile(list, distribution, "tags");
+                blog.tags = FilterSourceHandler.BuildFilterFile(list, PluginHelper.DistributionDirectory, "tags");
             }
         }
     }

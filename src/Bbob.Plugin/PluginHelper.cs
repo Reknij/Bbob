@@ -24,6 +24,7 @@ public static class PluginHelper
         get => _baseDirectory ?? throw new NullReferenceException("base directory is null.");
         set => _baseDirectory = value;
     }
+    public static string DistributionDirectory => Path.Combine(CurrentDirectory, ConfigBbob.distributionPath);
     public static class HelperDelegates
     {
         public delegate void ModifyObjectDelegate<T>(ref T? obj);

@@ -6,8 +6,6 @@ namespace Bbob.Main.BuildInPlugin;
 [PluginCondition("LinkProcess", PluginOrder = PluginOrder.BeforeMe)]
 public class CategoryProcess : IPlugin
 {
-    string distribution = "";
-
     public void InitCommand()
     {
         if (!PluginHelper.isPluginJsonConfigExists())
@@ -21,12 +19,10 @@ public class CategoryProcess : IPlugin
         }
     }
 
-    public void GenerateCommand(string filePath, string distribution, GenerationStage stage)
+    public void GenerateCommand(string filePath, GenerationStage stage)
     {
         if (stage == GenerationStage.Confirm)
         {
-            this.distribution = distribution;
-
             PluginHelper.getRegisteredObject<dynamic>("article", out dynamic? article);
             if (article == null) return;
 
@@ -80,7 +76,7 @@ public class CategoryProcess : IPlugin
                 var list = all.ToList();
                 sort(list);
                 dynamic blog = PluginHelper.getRegisteredObjectNoNull<dynamic>("blog");
-                blog.categories = FilterSourceHandler.BuildFilterFile(list, distribution, "categories");
+                blog.categories = FilterSourceHandler.BuildFilterFile(list, PluginHelper.DistributionDirectory, "categories");
             }
         }
     }

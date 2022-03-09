@@ -6,16 +6,6 @@ namespace Bbob.Main.BuildInPlugin;
 [PluginCondition("LinkProcess", PluginOrder = PluginOrder.BeforeMe)]
 public class ArchiveProcess : IPlugin
 {
-    string distribution = "";
-
-    public void GenerateCommand(string filePath, string distribution, GenerationStage stage)
-    {
-        if (stage == GenerationStage.Confirm)
-        {
-            this.distribution = distribution;
-        }
-    }
-
     public void CommandComplete(Commands command)
     {
         if (command == Commands.GenerateCommand)
@@ -43,7 +33,7 @@ public class ArchiveProcess : IPlugin
                     return 0;
                 });
                 dynamic blog = PluginHelper.getRegisteredObjectNoNull<dynamic>("blog");
-                blog.archives = FilterSourceHandler.BuildFilterFile(a, distribution, "archives");
+                blog.archives = FilterSourceHandler.BuildFilterFile(a, PluginHelper.DistributionDirectory, "archives");
             }
         }
     }

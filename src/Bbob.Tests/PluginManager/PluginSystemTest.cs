@@ -56,7 +56,7 @@ public class PluginSystemTest
     {
         PluginSystem.cyclePlugins((IPlugin plugin) =>
         {
-            plugin.GenerateCommand(testMDPath, dist, GenerationStage.Initialize);
+            plugin.GenerateCommand(testMDPath, GenerationStage.Initialize);
         });
         Assert.IsTrue(PluginHelper.getRegisteredObject<string>("markdown", out string? markdown));
         Assert.IsNotNull(markdown);
@@ -68,7 +68,7 @@ public class PluginSystemTest
         PluginSystem.cyclePlugins((IPlugin plugin) =>
         {
 
-            plugin.GenerateCommand(testMDPath, dist, GenerationStage.Process);
+            plugin.GenerateCommand(testMDPath, GenerationStage.Process);
         });
         PluginHelper.getRegisteredObject<string>("markdown", out string? markdown);
         using (StreamReader sr = new StreamReader(testMDPath))
@@ -87,7 +87,7 @@ public class PluginSystemTest
         PluginSystem.cyclePlugins((IPlugin plugin) =>
         {
 
-            plugin.GenerateCommand(testMDPath, dist, GenerationStage.Parse);
+            plugin.GenerateCommand(testMDPath, GenerationStage.Parse);
         });
         Assert.IsTrue(PluginHelper.getRegisteredObject<dynamic>("article", out var article));
         Assert.IsNotNull(article);
@@ -99,7 +99,7 @@ public class PluginSystemTest
         PluginSystem.cyclePlugins((IPlugin plugin) =>
         {
 
-            plugin.GenerateCommand(testMDPath, dist, GenerationStage.FinalProcess);
+            plugin.GenerateCommand(testMDPath, GenerationStage.FinalProcess);
         });
         PluginHelper.getRegisteredObject<dynamic>("article", out var article);
         Assert.IsNotNull(article);

@@ -100,6 +100,7 @@ public static class ConfigManager
             var main = Assembly.GetExecutingAssembly();
             var types = main?.GetTypes();
             pluginsDisable = new List<string>();
+            distributionPath = "./dist";
         }
 
         public override string ToString()

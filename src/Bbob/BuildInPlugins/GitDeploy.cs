@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using Bbob.Plugin;
 
@@ -22,8 +21,9 @@ public class GitDeploy : IPlugin
             PluginHelper.printConsole("Already exists config.");
         }
     }
-    public void DeployCommand(string distribution)
+    public void DeployCommand()
     {
+        string distribution = PluginHelper.DistributionDirectory;
         if (PluginHelper.getPluginJsonConfig<GitConfig>("GitDeploy", out var config) && config != null)
         {
             if (config.repos == null)

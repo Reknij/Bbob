@@ -6,7 +6,6 @@ namespace Bbob.Main.BuildInPlugin;
 [PluginCondition("BuildWebArticleJson", PluginOrder = PluginOrder.BeforeMe)]
 public class SitemapGenerator : IPlugin
 {
-    string? distribution { get; set; }
     List<KeyValuePair<string, string>> articlesUrl = new ();
     string fullUrl = Shared.SharedLib.UrlHelper.UrlCombine(PluginHelper.ConfigBbob.domain, PluginHelper.ConfigBbob.baseUrl);
 
@@ -47,13 +46,10 @@ public class SitemapGenerator : IPlugin
         }
 
     }
-    public void GenerateCommand(string filePath, string distribution, GenerationStage stage)
+    public void GenerateCommand(string filePath, GenerationStage stage)
     {
         switch (stage)
         {
-            case GenerationStage.Initialize:
-                this.distribution = distribution;
-                break;
             case GenerationStage.Confirm:
                 if (PluginHelper.getRegisteredObject<dynamic>("article", out dynamic? value))
                 {
@@ -76,8 +72,9 @@ public class SitemapGenerator : IPlugin
     }
     public void CommandComplete(Commands commands)
     {
-        if (commands == Commands.GenerateCommand && distribution != null && articlesUrl.Count > 0)
+        if (commands == Commands.GenerateCommand && articlesUrl.Count > 0)
         {
+            string distribution = PluginHelper.DistributionDirectory;
             if (config.redirectUrl) InsertFuncToIndex(distribution);
             articlesUrl.Add(new KeyValuePair<string, string>("Home", fullUrl));
             generateSitemap(distribution);

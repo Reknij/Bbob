@@ -6,7 +6,6 @@ namespace Bbob.Main.BuildInPlugin;
 [PluginCondition("MarkdownParser", PluginOrder = PluginOrder.BeforeMe, ConditionType = ConditionType.OrderCheck)]
 public class MarkdownStyle : IPlugin
 {
-    string distribution = "";
     readonly string InitDoneFile = Path.Combine(PluginHelper.CurrentDirectory, "BbobInitDone");
     public bool IsInitDone => File.Exists(InitDoneFile);
     public void InitCommand()
@@ -22,10 +21,9 @@ public class MarkdownStyle : IPlugin
         }
     }
 
-    public void GenerateCommand(string filePath, string dist, GenerationStage stage)
+    public void GenerateCommand(string filePath, GenerationStage stage)
     {
         if (stage != GenerationStage.FinalProcess) return;
-        this.distribution = dist;
 
         PluginHelper.getRegisteredObject<dynamic>("article", out dynamic? article);
         if (article == null) return;
@@ -36,7 +34,7 @@ public class MarkdownStyle : IPlugin
     public void CommandComplete(Commands cmd)
     {
         if (cmd != Commands.GenerateCommand) return;
-        string indexFile = Path.Combine(distribution, "index.html");
+        string indexFile = Path.Combine(PluginHelper.DistributionDirectory, "index.html");
         string indexPlain = File.ReadAllText(indexFile);
         PluginHelper.getPluginJsonConfig<MyConfig>(out MyConfig? tar);
         MyConfig config = tar ?? new MyConfig();

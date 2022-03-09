@@ -1,4 +1,6 @@
 ﻿using System.Globalization;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Bbob.Shared;
 public static class SharedLib
@@ -22,6 +24,25 @@ public static class SharedLib
         public static bool FileNameEndWith(string name, string ext)
         {
             return name.IndexOf(ext) == (name.Length - ext.Length);
+        }
+    }
+
+    public static class HashHelper
+    {
+        static SHA256 sha256 = SHA256.Create();
+        public static string GetFileContentHash(string filePath)
+        {
+            return BytesToString(sha256.ComputeHash(File.ReadAllBytes(filePath)));
+        }
+
+        public static string GetContentHash(string content)
+        {
+            return BytesToString(sha256.ComputeHash(Encoding.UTF8.GetBytes(content)));
+        }
+
+        public static string GetContentHash(Stream stream)
+        {
+            return BytesToString(sha256.ComputeHash(stream));
         }
     }
 
@@ -56,7 +77,7 @@ public static class SharedLib
 
     public static class DirectoryHelper
     {
-        public static void CopyDirectory(string sourceDir, string destinationDir, string ignores = "", bool recursive = true)
+        public static void CopyDirectory(string sourceDir, string destinationDir, string ignores = "", bool recursive = true, bool overwrite = false)
         {
             // Get information about the source directory
             var dir = new DirectoryInfo(sourceDir);
@@ -77,7 +98,7 @@ public static class SharedLib
                 if (ignores.Contains(file.FullName)) continue;
 
                 string targetFilePath = Path.Combine(destinationDir, file.Name);
-                file.CopyTo(targetFilePath);
+                file.CopyTo(targetFilePath, overwrite);
             }
 
             // If recursive and copying subdirectories, recursively call this method
@@ -86,7 +107,7 @@ public static class SharedLib
                 foreach (DirectoryInfo subDir in dirs)
                 {
                     string newDestinationDir = Path.Combine(destinationDir, subDir.Name);
-                    CopyDirectory(subDir.FullName, newDestinationDir, ignores, recursive);
+                    CopyDirectory(subDir.FullName, newDestinationDir, ignores, recursive, overwrite);
                 }
             }
         }

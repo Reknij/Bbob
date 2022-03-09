@@ -1,5 +1,3 @@
-using System.Dynamic;
-using System.Security.Cryptography;
 using System.Text.Json;
 using Bbob.Plugin;
 
@@ -18,7 +16,7 @@ public class BuildWebArticleJson : IPlugin
             PluginHelper.printConsole("Already exists config.");
         }
     }
-    public void GenerateCommand(string filePath, string distribution, GenerationStage stage)
+    public void GenerateCommand(string filePath, GenerationStage stage)
     {
         if (stage != GenerationStage.Confirm) return;
 
@@ -31,10 +29,9 @@ public class BuildWebArticleJson : IPlugin
         string targetFile = $"{Path.GetFileNameWithoutExtension(filePath)}.json";
         string folder = "articles";
         //string FileLocalFolder = Path.Combine(distribution, JSApi.JSAPiHelper.bbobAssets, folder, year, month, day);
-        string FileLocalFolder = Path.Combine(distribution, JSApi.JSAPiHelper.bbobAssets, folder);
+        string FileLocalFolder = Path.Combine(PluginHelper.DistributionDirectory, JSApi.JSAPiHelper.bbobAssets, folder);
         string FileLocal = Path.Combine(FileLocalFolder, targetFile);
         Directory.CreateDirectory(FileLocalFolder);
-        SHA256 sha256 = SHA256.Create();
         string hash = "";
         using (FileStream fs = new FileStream(FileLocal, FileMode.Create, FileAccess.ReadWrite))
         {
@@ -44,7 +41,7 @@ public class BuildWebArticleJson : IPlugin
             });
             fs.Flush(); //If not flush now, hash can't compute
             fs.Position = 0; //set to 0 to read.
-            hash = Shared.SharedLib.BytesToString(sha256.ComputeHash(fs));
+            hash = Shared.SharedLib.HashHelper.GetContentHash(fs);
         }
         string newName = PluginHelper.ConfigBbob.useHashName?$"{Path.GetFileNameWithoutExtension(filePath)}-{hash.Substring(0, 9)}.json": $"{Path.GetFileNameWithoutExtension(filePath)}.json";
         string newLocal = Path.Combine(FileLocalFolder, newName);

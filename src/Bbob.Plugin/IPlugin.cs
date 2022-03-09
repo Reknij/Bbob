@@ -5,7 +5,7 @@ public interface IPlugin
 {
     void InitCommand(){}
     void NewCommand(string filePath, ref string content, NewTypes types = NewTypes.blog){}
-    void GenerateCommand(string filePath, string distribution, GenerationStage stage){}
-    void DeployCommand(string distribution){}
+    void GenerateCommand(string filePath, GenerationStage stage){}
+    void DeployCommand(){}
     void CommandComplete(Commands commands){}
 }

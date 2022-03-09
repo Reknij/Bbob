@@ -37,7 +37,7 @@ public class MarkdownParser : IPlugin
                 break;
         }
     }
-    public void GenerateCommand(string filePath, string distribution, GenerationStage stage)
+    public void GenerateCommand(string filePath, GenerationStage stage)
     {
         switch (stage)
         {
