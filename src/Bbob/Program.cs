@@ -27,6 +27,7 @@ public class Program
             }
         }
         Console.WriteLine($"【Bbob v{Version}】");
+        Configuration.ConfigManager.LoadConfigs();
         ConsoleParser parser = new ConsoleParser(args);
         parser.Parse();
         Console.WriteLine("-----End-----");
@@ -44,7 +45,7 @@ public class Program
             {
                 string Name = (string?)type.GetProperty("Name", BindingFlags.Public | BindingFlags.Static)?.GetValue(null) ?? "";
                 string Help = (string?)type.GetProperty("Help", BindingFlags.Public | BindingFlags.Static)?.GetValue(null) ?? "";
-                
+
                 System.Console.WriteLine($"Command '{Name}': {Help}");
                 System.Console.WriteLine();
                 Shared.SharedLib.ConsoleHelper.printDividingLine();

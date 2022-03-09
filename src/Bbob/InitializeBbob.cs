@@ -17,7 +17,6 @@ public static class InitializeBbob
     {
         if ((options & InitializeOptions.Config) != 0)
         {
-            Configuration.ConfigManager.LoadConfigs();
             Configuration.ConfigManager.registerConfigToPluginSystem();
         }
         if ((options & InitializeOptions.Theme) != 0)
