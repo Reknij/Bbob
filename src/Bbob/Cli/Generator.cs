@@ -6,6 +6,8 @@ using Bbob.Main.JSApi;
 using static Bbob.Main.JSApi.JSApiType;
 using System.Text.RegularExpressions;
 using System.Dynamic;
+using System.Text.Json;
+using System.Security.Cryptography;
 
 namespace Bbob.Main.Cli;
 
@@ -47,6 +49,7 @@ public class Generator : Command
     {
         const string SUCCESS = "Success generate: ";
         const string FAILED = "Failed generate: ";
+        DateTime beforeGenerateDateTime = DateTime.Now;
         if (Directory.Exists(distribution)) Shared.SharedLib.DirectoryHelper.DeleteDirectory(distribution);
         Directory.CreateDirectory(distribution);
         Directory.CreateDirectory(articlesFolderPath);
@@ -61,7 +64,7 @@ public class Generator : Command
             return false;
         }
         InitializeConventionObjects();
-        if (files.Length > 0) System.Console.WriteLine($"Run generate all stage for article files in '{articlesFolderPath.Replace(Environment.CurrentDirectory, ".")}':");
+        if (files.Length > 0) System.Console.WriteLine($"Run generate all stage for article files in '{articlesFolderPath.Replace(Environment.CurrentDirectory, ".")}'.");
         else System.Console.WriteLine("Nothing files to generate.");
         foreach (string file in files)
         {
@@ -73,7 +76,7 @@ public class Generator : Command
                 {
                     PluginSystem.cyclePlugins((plugin) =>
                     {
-                        plugin.GenerateCommand(file, distribution, stage);
+                        plugin.GenerateCommand(file, stage);
                     });
                     if (isSkip(false)) break;
                     if (PluginHelper.ExecutingCommandResult.Operation == CommandOperation.Stop)
@@ -123,7 +126,9 @@ public class Generator : Command
             if (ThemeProcessor.CompressHtml(distribution)) System.Console.WriteLine("Compress html success.");
             else System.Console.WriteLine("Compress html failed.");
         }
-        System.Console.WriteLine($"{SUCCESS} Generation has been run.");
+        DateTime afterGenerateDateTime = DateTime.Now;
+        double diff = (afterGenerateDateTime - beforeGenerateDateTime).TotalSeconds;
+        System.Console.WriteLine($"{SUCCESS} Generation has been run. ({string.Format("{0:0.00}", diff)} seconds)");
         return true;
     }
 

@@ -17,7 +17,7 @@ class ConsoleParser
 
     public void Parse()
     {
-        string dist = Path.Combine(Environment.CurrentDirectory, "dist");
+        string dist = Path.Combine(Environment.CurrentDirectory, Configuration.ConfigManager.MainConfig.distributionPath);
         int length = arguments.Length;
         if (length >= 3 && arguments[length - 2] == "--config-file")
         {
@@ -257,7 +257,6 @@ class ConsoleParser
                 {
                     System.Console.WriteLine("Please enter content!");
                 }
-
                 break;
             default:
                 System.Console.WriteLine($"Unknown command: {arguments[i]}!");
