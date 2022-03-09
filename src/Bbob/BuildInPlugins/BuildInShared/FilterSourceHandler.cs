@@ -27,10 +27,10 @@ public static class FilterSourceHandler
                 fs.Position = 0; //set to 0 to read.
                 hash = Shared.SharedLib.BytesToString(sha256.ComputeHash(fs));
             }
-            string newName = $"{item.Key}-{hash.Substring(0,9)}.json";
+            string newName = config.useHashName ? $"{item.Key}-{hash.Substring(0, 9)}.json" : $"{item.Key}.json";
             string newPath = Path.Combine(localPath, newName);
             string webPath = Path.Combine($"{config.baseUrl}{BuildInShared.Variables.bbobAssets}/{name}/{newName}");
-            File.Move(vFile, newPath);
+            if (vFile != newPath) File.Move(vFile, newPath);
             filterSources.Add(new FilterSource(item.Key, webPath));
         }
         PluginHelper.printConsole($"Resolve {filterSources.Count} {name}.");

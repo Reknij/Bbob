@@ -46,9 +46,9 @@ public class BuildWebArticleJson : IPlugin
             fs.Position = 0; //set to 0 to read.
             hash = Shared.SharedLib.BytesToString(sha256.ComputeHash(fs));
         }
-        string newName = $"{Path.GetFileNameWithoutExtension(filePath)}-{hash.Substring(0, 9)}.json";
+        string newName = PluginHelper.ConfigBbob.useHashName?$"{Path.GetFileNameWithoutExtension(filePath)}-{hash.Substring(0, 9)}.json": $"{Path.GetFileNameWithoutExtension(filePath)}.json";
         string newLocal = Path.Combine(FileLocalFolder, newName);
-        File.Move(FileLocal, newLocal, true);
+        if (FileLocal != newLocal) File.Move(FileLocal, newLocal, true);
         string baseUrl = PluginHelper.ConfigBbob.baseUrl;
         PluginHelper.getPluginJsonConfig<MyConfig>(out MyConfig? configPlugin);
         bool isShortAddress = configPlugin != null ? configPlugin.shortAddress : false;

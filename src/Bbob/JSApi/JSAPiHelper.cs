@@ -78,9 +78,9 @@ public static class JSAPiHelper
             fs.Position = 0; //set to 0 to read.
             hash = Shared.SharedLib.BytesToString(sha256.ComputeHash(fs));
         }
-        string newName = $"bbob-{hash.Substring(0, 9)}.js";
+        string newName = config.useHashName?$"bbob-{hash.Substring(0, 9)}.js": "bbob.js";
         string newPath = Path.Combine(dist, newName);
-        File.Move(mainjsDist, newPath);
+        if (mainjsDist != newPath) File.Move(mainjsDist, newPath);
         ProcessPublicPath(dist, themeInfo.index);
         return newName;
     }
