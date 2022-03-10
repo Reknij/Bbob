@@ -17,18 +17,31 @@ public class SitemapGenerator : IPlugin
         PluginHelper.getPluginJsonConfig<MyConfig>(out MyConfig? tar);
         config = tar ?? new MyConfig();
         var theme = PluginHelper.getThemeInfo<Theme>();
+        PluginHelper.getPluginJsonConfig<BWAJ>("BuildWebArticleJson", out var bwajConfig);
+        bool isShortAddress = bwajConfig?.shortAddress ?? false;
         if (theme != null)
         {
-            articleBaseUrl = theme.articleBaseUrl;
+            if (isShortAddress)
+            {
+                if (theme.articleBaseUrlShort != null) articleBaseUrl = theme.articleBaseUrlShort;
+                else PluginHelper.printConsole("BuildWebArticleJson plugin is enable 'shortAddress' but theme does support.");
+            }
+            else
+            {
+                if (theme.articleBaseUrl != null) articleBaseUrl = theme.articleBaseUrl;
+                else if (theme.articleBaseUrlShort != null) PluginHelper.printConsole("Theme is not support full address! Please enable 'shortAddress' in BuildWebArticleJson.config.json.");
+                else PluginHelper.printConsole("theme.articleBaseUrl and theme is null, target theme is not support.");
+            }
         }
-        if (articleBaseUrl == null)
-        {
-            PluginHelper.printConsole("theme.articleBaseUrl is null, target theme is not support.");
-        }
+    }
+    class BWAJ
+    {
+        public bool shortAddress{get;set;}
     }
     class Theme
     {
         public string? articleBaseUrl { get; set; }
+        public string? articleBaseUrlShort { get; set; }
     }
     class MyConfig
     {

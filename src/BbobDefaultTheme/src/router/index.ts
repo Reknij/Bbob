@@ -16,7 +16,7 @@ const routes = [
         props: true 
     },
     {
-        path: '/article/:address',
+        path: '/article/:address*',
         component: ArticleResult
     },
     {

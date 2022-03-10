@@ -2,5 +2,6 @@
     "name": "default",
     "description": "Bbob default theme.",
     "author": "Jinker",
-    "articleBaseUrl": "/article/"
+    "articleBaseUrl": "/article?address=",
+    "articleBaseUrlShort": "/article/"
 }

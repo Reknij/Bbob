@@ -2,5 +2,5 @@
     "name": "documents",
     "description": "Bbob theme for documents",
     "author": "Jinker",
-    "articleBaseUrl": "/documents/"
+    "articleBaseUrlShort": "/documents/"
 }
