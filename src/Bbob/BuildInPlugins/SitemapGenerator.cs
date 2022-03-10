@@ -4,9 +4,10 @@ using Bbob.Plugin;
 namespace Bbob.Main.BuildInPlugin;
 
 [PluginCondition("BuildWebArticleJson", PluginOrder = PluginOrder.BeforeMe)]
+[PluginCondition("ExtraLinks", PluginOrder = PluginOrder.AfterMe)]
 public class SitemapGenerator : IPlugin
 {
-    List<KeyValuePair<string, string>> articlesUrl = new ();
+    List<KeyValuePair<string, string>> articlesUrl = new();
     string fullUrl = Shared.SharedLib.UrlHelper.UrlCombine(PluginHelper.ConfigBbob.domain, PluginHelper.ConfigBbob.baseUrl);
 
     MyConfig config;
@@ -105,7 +106,7 @@ public class SitemapGenerator : IPlugin
     {
         string sitemapFile = Path.Combine(distribution, "sitemap.xml");
         SitemapXml sitemapXml = new SitemapXml() { Format = true };
-        articlesUrl.Add(new KeyValuePair<string, string>("It is sitemap html.", $"{fullUrl}itissm.html"));
+        articlesUrl.Add(new KeyValuePair<string, string>("It is sitemap html.", $"{fullUrl}sitemap-html.html"));
         var aurl = articlesUrl.Select(i => i.Value);
         sitemapXml.AddRange(aurl);
         sitemapXml.WriteToFile(sitemapFile);
@@ -114,7 +115,7 @@ public class SitemapGenerator : IPlugin
 
     private void generateSitemapHtml(string distribution)
     {
-        string sitemap = Path.Combine(distribution, "itissm.html");
+        string sitemap = Path.Combine(distribution, "sitemap-html.html");
         string metas = "<meta charset=\"UTF-8\"/>" +
                         "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />" +
                         "<meta name=\"robots\" content=\"noindex\">";
@@ -126,6 +127,7 @@ public class SitemapGenerator : IPlugin
         }
         string html = $"<!DOCTYPE html><html lang=\"en\"><head>{metas}<title>Sitemap Html</title>{style}</head><body>{unsortedList}</body></html>";
         File.WriteAllText(sitemap, html);
+        PluginHelper.getRegisteredObjectNoNull<Dictionary<string, string>>("extraLinks").Add("Sitemap", "/sitemap-html.html");
     }
 
     class SitemapXml
