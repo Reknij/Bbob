@@ -54,7 +54,7 @@ public static class JSAPiHelper
         string mjs = File.ReadAllText(mainjsOriginal);
         ConfigJson config = ConfigManager.MainConfig;
         JSApiType.BbobMeta meta = new JSApiType.BbobMeta(config);
-        meta.copyright = meta.copyright.Replace("year", DateTime.Now.Year.ToString()).Replace("author", config.author).Replace("themeName", themeInfo.name);
+        meta.copyright = meta.copyright.Replace("*year", DateTime.Now.Year.ToString()).Replace("*author", config.author).Replace("*themeName", themeInfo.name);
         LoadThirdMetas(meta, buildData.Metas);
         JsonSerializerOptions a = new JsonSerializerOptions();
         string blogPlain = $"\nconst blog = {JsonSerializer.Serialize(buildData.blog)}";

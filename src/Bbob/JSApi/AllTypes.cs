@@ -25,7 +25,7 @@ public class JSApiType
             this.author = config.author;
             this.description = config.description;
             this.about = config.about;
-            this.copyright = $"© year author Powered by Bbob & themeName";
+            this.copyright = $"© *year *author Powered by <a class=\"bbob-project-link\" href=\"https://github.com/Reknij/Bbob\">Bbob</a> & *themeName";
             this.blogCountOneTime = config.blogCountOneTime;
             this.allLink = config.allLink;
             this.baseUrl = config.baseUrl;
