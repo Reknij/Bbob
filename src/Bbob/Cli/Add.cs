@@ -106,7 +106,7 @@ public class Add : Command
                 return false;
             }
 
-            string downloadPath = Path.Combine(DownloadPath.Plugins, fileNameWithoutExtension);
+            string downloadPath = Path.Combine(isTheme ? DownloadPath.Themes : DownloadPath.Plugins, fileNameWithoutExtension);
             if (Directory.Exists(downloadPath))
             {
                 System.Console.WriteLine($"Already exists {fileNameWithoutExtension}, will override!");
