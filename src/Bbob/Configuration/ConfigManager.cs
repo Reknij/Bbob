@@ -88,7 +88,7 @@ public static class ConfigManager
         public ConfigJsonFix()
         {
             theme = "default";
-            author = "Jinker";
+            author = "Unknown author";
             description = "Nothing description...";
             about = "Nothing about...";
             blogName = "Bbob - Serverless Blog Framework";
