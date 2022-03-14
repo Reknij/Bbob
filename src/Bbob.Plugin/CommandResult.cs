@@ -1,5 +1,8 @@
 namespace Bbob.Plugin;
 
+/// <summary>
+/// Operation of plugin executed.
+/// </summary>
 public enum CommandOperation
 {
     None,
@@ -7,6 +10,10 @@ public enum CommandOperation
     Stop,
     RunMeAgain
 }
+
+/// <summary>
+/// Result of command executed.
+/// </summary>
 public struct CommandResult
 {
     public string Message {get;set;}
