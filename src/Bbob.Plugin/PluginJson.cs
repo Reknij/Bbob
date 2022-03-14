@@ -1,5 +1,8 @@
 namespace Bbob.Plugin;
 
+/// <summary>
+/// Information object of plugin.
+/// </summary>
 public class PluginJson
 {
     private string? _name;
@@ -37,6 +40,10 @@ public class PluginJson
     /// </summary>
     /// <value></value>
     public string entry { get; set; }
+
+    /// <summary>
+    /// Initialize information of plugin.
+    /// </summary>
     public PluginJson()
     {
         entry = "MainPlugin.dll";

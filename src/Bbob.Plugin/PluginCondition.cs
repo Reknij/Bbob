@@ -5,8 +5,11 @@ namespace Bbob.Plugin;
 /// </summary>
 public enum PluginOrder
 {
+    /// <summary>Ignore sort order</summary>
     Any,
+    /// <summary>Must before your plugin</summary>
     BeforeMe,
+    /// <summary>Must after your plugin</summary>
     AfterMe
 }
 
@@ -15,8 +18,11 @@ public enum PluginOrder
 /// </summary>
 public enum ConditionType
 {
+    /// <summary>Your plugin is require target plugin</summary>
     Require = 2,
+    /// <summary>Your plugin must sort order with target plugin</summary>
     OrderCheck = 4,
+    /// <summary>Your plugin is require and must sort order with target plugin</summary>
     All = Require | OrderCheck
 }
 
@@ -49,6 +55,11 @@ public class PluginCondition : Attribute
     /// </summary>
     /// <value></value>
     public string PluginName {get;set;}
+
+    /// <summary>
+    /// Initialize PluginCondition with target plugin name.
+    /// </summary>
+    /// <param name="pluginName"></param>
     public PluginCondition(string pluginName)
     {
         this.PluginName = pluginName;

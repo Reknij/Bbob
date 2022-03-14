@@ -5,5 +5,6 @@ namespace Bbob.Plugin;
 /// </summary>
 public enum NewTypes
 {
+    /// <summary>Create the article for blog</summary>
     blog
 }

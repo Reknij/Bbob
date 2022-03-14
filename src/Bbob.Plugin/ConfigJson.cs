@@ -1,4 +1,8 @@
 namespace Bbob.Plugin;
+
+/// <summary>
+/// Object of config.
+/// </summary>
 public class ConfigJson
 {
     /// <summary>
@@ -88,7 +92,6 @@ public class ConfigJson
     /// <summary>
     /// Plugin disable list.
     /// </summary>
-    /// <typeparam name="string"></typeparam>
     /// <returns></returns>
     public List<string> pluginsDisable { get; set; } = new List<string>();
 

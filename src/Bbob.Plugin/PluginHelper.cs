@@ -2,6 +2,10 @@
 using System.Text.Json;
 
 namespace Bbob.Plugin;
+
+/// <summary>
+/// To help your plugin to develop.
+/// </summary>
 public static class PluginHelper
 {
     /// <summary>
@@ -54,8 +58,17 @@ public static class PluginHelper
     /// </summary>
     /// <returns></returns>
     public static string DistributionDirectory => Path.Combine(CurrentDirectory, ConfigBbob.distributionPath);
+
+    /// <summary>
+    /// Delegates of PluginHelper.
+    /// </summary>
     public static class HelperDelegates
     {
+        /// <summary>
+        /// Delegate of modify object function.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <typeparam name="T"></typeparam>
         public delegate void ModifyObjectDelegate<T>(ref T? obj);
     }
     static Dictionary<string, object?> pluginsObject = new Dictionary<string, object?>();
@@ -378,7 +391,6 @@ public static class PluginHelper
     /// <summary>
     /// HashSet of plugins done. You should not use it.
     /// </summary>
-    /// <typeparam name="string"></typeparam>
     /// <returns></returns>
     public static HashSet<string> _pluginsDone = new HashSet<string>();
 

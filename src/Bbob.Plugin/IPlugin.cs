@@ -1,6 +1,10 @@
 ﻿using Bbob.Plugin;
 
 namespace Bbob.Plugin;
+
+/// <summary>
+/// Interface of plugin.
+/// </summary>
 public interface IPlugin
 {
     /// <summary>
