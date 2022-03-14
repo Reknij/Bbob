@@ -1,17 +1,17 @@
 namespace Bbob.Main.Cli;
 
-public class Remove: Command
+public class Remove : Command
 {
     public new static string Name => "remove";
-    public new static string Help => "Remove the theme or plugin. Auto detect.\n"+
-    "Use:\n"+
+    public new static string Help => "Remove the theme or plugin. Auto detect.\n" +
+    "Use:\n" +
     "// remove <name>";
 
-    public string PluginOrTheme {get;set;}
+    public string PluginOrTheme { get; set; }
     private bool isGlobal = false;
     public bool Global
     {
-        get=>isGlobal;
+        get => isGlobal;
         set
         {
             isGlobal = value;
@@ -46,7 +46,7 @@ public class Remove: Command
 
         bool isPlugin = PluginOrTheme.StartsWith("bbob-plugin-");
         bool isTheme = PluginOrTheme.StartsWith("bbob-theme-");
-        string directory = Path.Combine(isPlugin?DownloadPath.Plugins: DownloadPath.Themes, PluginOrTheme);
+        string directory = Path.Combine(isPlugin ? DownloadPath.Plugins : DownloadPath.Themes, PluginOrTheme);
         if (!isPlugin && !isTheme)
         {
             System.Console.WriteLine($"{FAILED}Can't remove because it not plugin or theme.");
@@ -58,7 +58,8 @@ public class Remove: Command
             return false;
         }
         Shared.SharedLib.DirectoryHelper.DeleteDirectory(directory);
-        System.Console.WriteLine($"{SUCCESS}Remove {PluginOrTheme}!");
+        string p = isGlobal ? "global" : "current";
+        System.Console.WriteLine($"{SUCCESS}Remove {PluginOrTheme} from {p} directory!");
         return true;
     }
 }
