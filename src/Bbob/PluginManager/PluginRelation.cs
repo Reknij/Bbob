@@ -78,29 +78,50 @@ public class PluginRelation
         if (getPcrFromPcrs(context, out var pcr) && pcr != null) return pcr;
         var c = new PluginContextRef(context);
         pcrs.Add(c);
-        foreach (var attr in Attribute.GetCustomAttributes(context.main.GetType()))
+        var attrs = Attribute.GetCustomAttributes(context.main.GetType());
+        HashSet<string> readyPluginNames = new HashSet<string>();
+        foreach (var attr in attrs)
         {
             if (attr is PluginCondition condition && (condition.ConditionType & ConditionType.OrderCheck) != 0)
             {
-                PluginContext? other = plugins.Find((item) => item.info.name == condition.PluginName);
-                if (other == null) continue;
-                var otherPcr = GetPluginContextRef(other);
-                switch (condition.PluginOrder)
+                List<PluginContext> others = new List<PluginContext>();
+                if (condition.PluginName == "*")
                 {
-                    default:
-                    case PluginOrder.Any: break;
-                    case PluginOrder.AfterMe:
-                        c.nexts.Add(otherPcr);
-                        otherPcr.previous.Add(c);
-                        break;
-                    case PluginOrder.BeforeMe:
-                        c.previous.Add(otherPcr);
-                        otherPcr.nexts.Add(c);
-                        break;
+                    if (attrs.Length > 1) throw new Exception($"Plugin <{context.info.name}> have condition set to '*'. But conditions more than one.");
+
+                    foreach (var p in plugins)
+                    {
+                        if (p.info.name == context.info.name) continue;
+                        if (!readyPluginNames.Contains(p.info.name)) others.Add(p);
+                    }
+                }
+                else
+                {
+                    PluginContext? o = plugins.Find((item) => item.info.name == condition.PluginName);
+                    if (o != null && !readyPluginNames.Contains(o.info.name)) others.Add(o);
+                }
+
+                foreach (var other in others)
+                {
+                    var otherPcr = GetPluginContextRef(other);
+                    switch (condition.PluginOrder)
+                    {
+                        default:
+                        case PluginOrder.Any: break;
+                        case PluginOrder.AfterMe:
+                            c.nexts.Add(otherPcr);
+                            otherPcr.previous.Add(c);
+                            break;
+                        case PluginOrder.BeforeMe:
+                            c.previous.Add(otherPcr);
+                            otherPcr.nexts.Add(c);
+                            break;
+                    }
+                    readyPluginNames.Add(other.info.name);
                 }
             }
         }
-                
+
         return c;
     }
 

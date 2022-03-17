@@ -203,7 +203,7 @@ public static class PluginSystem
             {
                 if (attr is PluginCondition condition)
                 {
-                    if ((condition.ConditionType & ConditionType.Require) != 0)
+                    if ((condition.ConditionType & ConditionType.Require) != 0 && condition.PluginName != "*")
                     {
                         if (!containPluginWithName(condition.PluginName))
                         {
