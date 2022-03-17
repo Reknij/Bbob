@@ -84,7 +84,7 @@ public class SitemapGenerator : IPlugin
                 break;
         }
     }
-    public void CommandComplete(Commands commands)
+    public Action? CommandComplete(Commands commands)
     {
         if (commands == Commands.GenerateCommand && articlesUrl.Count > 0)
         {
@@ -95,6 +95,8 @@ public class SitemapGenerator : IPlugin
             generateRobotTxt(distribution);
             PluginHelper.printConsole("Success generate sitemap.");
         }
+
+        return null;
     }
 
     private void InsertFuncToIndex(string distribution)

@@ -6,7 +6,7 @@ namespace Bbob.Main.BuildInPlugin;
 [PluginCondition("LinkProcess", PluginOrder = PluginOrder.BeforeMe)]
 public class ArchiveProcess : IPlugin
 {
-    public void CommandComplete(Commands command)
+    public Action? CommandComplete(Commands command)
     {
         if (command == Commands.GenerateCommand)
         {
@@ -36,5 +36,6 @@ public class ArchiveProcess : IPlugin
                 blog.archives = FilterSourceHandler.BuildFilterFile(a, PluginHelper.DistributionDirectory, "archives");
             }
         }
+        return null;
     }
 }

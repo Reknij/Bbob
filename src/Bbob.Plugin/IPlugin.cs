@@ -10,7 +10,7 @@ public interface IPlugin
     /// <summary>
     /// Initialize command. Example 'i', 'init'.
     /// </summary>
-    void InitCommand(){}
+    void InitCommand() { }
 
     /// <summary>
     /// New command. Example 'n', 'new'.
@@ -18,23 +18,23 @@ public interface IPlugin
     /// <param name="filePath">File path of new command to save.</param>
     /// <param name="content">Content of file to save.</param>
     /// <param name="types">New command option.</param>
-    void NewCommand(string filePath, ref string content, NewTypes types = NewTypes.blog){}
+    void NewCommand(string filePath, ref string content, NewTypes types = NewTypes.blog) { }
 
     /// <summary>
     /// Generate command. Example 'g', 'generate'.
     /// </summary>
     /// <param name="filePath">Article file path to process.</param>
     /// <param name="stage">Stage of generation.</param>
-    void GenerateCommand(string filePath, GenerationStage stage){}
+    void GenerateCommand(string filePath, GenerationStage stage) { }
 
     /// <summary>
     /// Deploy command. Example 'd', 'deploy'.
     /// </summary>
-    void DeployCommand(){}
+    void DeployCommand() { }
 
     /// <summary>
     /// Will be executed when the target command is executed.
     /// </summary>
     /// <param name="commands">Command executed.</param>
-    void CommandComplete(Commands commands){}
+    Action? CommandComplete(Commands commands) { return null; }
 }

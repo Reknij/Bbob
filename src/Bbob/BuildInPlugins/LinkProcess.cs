@@ -32,7 +32,7 @@ public class LinkProcess : IPlugin
         return false;
     }
 
-    public void CommandComplete(Commands command)
+    public Action? CommandComplete(Commands command)
     {
         if (command == Commands.GenerateCommand)
         {
@@ -52,6 +52,7 @@ public class LinkProcess : IPlugin
             blog.nextFileLinks = pack.Item2;
             PluginHelper.printConsole($"Resolve {links.Count} files.");
         }
+        return null;
     }
 
     private void sort(List<dynamic> links)

@@ -108,7 +108,7 @@ public class MarkdownParser : IPlugin
             {
                 if (article == null) return;
                 article.toc = toc.ToHtml();
-                article.contentParsed = result.ToHtml();
+                article.contentParsed = $"<div id='bbob-markdown-content'>{result.ToHtml()}</div>";
             });
         }
     }

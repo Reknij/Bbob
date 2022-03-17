@@ -11,9 +11,9 @@ public class ExtraLinks: IPlugin
         PluginHelper.registerObject("extraLinks", new Dictionary<string, string>());
     }
 
-    public void CommandComplete(Commands cmd)
+    public Action? CommandComplete(Commands cmd)
     {
-        if (cmd != Commands.GenerateCommand) return;
+        if (cmd != Commands.GenerateCommand) return null;
         Dictionary<string, string> extraLinks = PluginHelper.getRegisteredObjectNoNull<Dictionary<string, string>>("extraLinks");
         List<ExtraLink> e = new List<ExtraLink>();
         foreach (var item in extraLinks)
@@ -21,6 +21,8 @@ public class ExtraLinks: IPlugin
             e.Add(new ExtraLink(item.Key, item.Value));
         }
         PluginHelper.registerMeta("extraLinks", e);
+
+        return null;
     }
 
     private class ExtraLink

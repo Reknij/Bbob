@@ -48,7 +48,7 @@ public class CategoryProcess : IPlugin
         }
     }
 
-    public void CommandComplete(Commands command)
+    public Action? CommandComplete(Commands command)
     {
         if (command == Commands.GenerateCommand)
         {
@@ -79,6 +79,7 @@ public class CategoryProcess : IPlugin
                 blog.categories = FilterSourceHandler.BuildFilterFile(list, PluginHelper.DistributionDirectory, "categories");
             }
         }
+        return null;
     }
     private void sort(List<KeyValuePair<string, List<dynamic>>> all)
     {

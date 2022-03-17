@@ -11,7 +11,7 @@ public class TagProcess : IPlugin
         PluginHelper.savePluginJsonConfig<MyConfig>(new MyConfig());
     }
 
-    public void CommandComplete(Commands command)
+    public Action? CommandComplete(Commands command)
     {
         if (command == Commands.GenerateCommand)
         {
@@ -43,6 +43,7 @@ public class TagProcess : IPlugin
                 blog.tags = FilterSourceHandler.BuildFilterFile(list, PluginHelper.DistributionDirectory, "tags");
             }
         }
+        return null;
     }
 
     private void sort(List<KeyValuePair<string, List<dynamic>>> all)

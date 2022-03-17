@@ -61,11 +61,13 @@ public class Creator : Command
             System.Console.WriteLine($"{FAILED}Error run new command of plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
             return false;
         }
+        List<Action> actions = new List<Action>();
         try
         {
             PluginSystem.cyclePlugins((plugin) =>
             {
-                plugin.CommandComplete(Commands.NewCommand);
+                var a = plugin.CommandComplete(Commands.NewCommand);
+                if (a != null)actions.Add(a);
             });
             File.WriteAllText(filePath, content);
         }
@@ -78,6 +80,7 @@ public class Creator : Command
             System.Console.WriteLine($"{FAILED}Error run new command complete of plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
             return false;
         }
+        foreach (var a in actions) a();
         System.Console.WriteLine($"{SUCCESS}Article file in '{filePath}'");
         return true;
     }

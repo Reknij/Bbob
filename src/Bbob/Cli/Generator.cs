@@ -100,11 +100,13 @@ public class Generator : Command
             }
             if (isSkip()) continue;
         }
+        List<Action> actions = new();
         try
         {
             PluginSystem.cyclePlugins((plugin) =>
             {
-                plugin.CommandComplete(Commands.GenerateCommand);
+                var a = plugin.CommandComplete(Commands.GenerateCommand);
+                if (a != null) actions.Add(a);
             });
         }
         catch (System.Exception ex)
@@ -126,6 +128,9 @@ public class Generator : Command
             if (ThemeProcessor.CompressHtml(distribution)) System.Console.WriteLine("Compress html success.");
             else System.Console.WriteLine("Compress html failed.");
         }
+
+        foreach (var a in actions) a();
+
         DateTime afterGenerateDateTime = DateTime.Now;
         double diff = (afterGenerateDateTime - beforeGenerateDateTime).TotalSeconds;
         System.Console.WriteLine($"{SUCCESS} Generation has been run. ({string.Format("{0:0.00}", diff)} seconds)");

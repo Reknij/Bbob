@@ -32,11 +32,13 @@ public class Init : Command
             System.Console.WriteLine($"{FAILED}Error run init command plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
             return false;
         }
+        List<Action> actions = new List<Action>();
         try
         {
             PluginSystem.cyclePlugins((plugin) =>
             {
-                plugin.CommandComplete(Commands.InitCommand);
+                var a = plugin.CommandComplete(Commands.InitCommand);
+                if (a != null) actions.Add(a);
             });
         }
         catch (System.Exception ex)
@@ -48,6 +50,7 @@ public class Init : Command
             System.Console.WriteLine($"{FAILED}Error run init command complete plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
             return false;
         }
+        foreach (var a in actions) a();
         System.Console.WriteLine($"{SUCCESS}Initialize has been run.");
         return true;
     }

@@ -31,9 +31,9 @@ public class MarkdownStyle : IPlugin
         article.contentParsed = $"<article class=\"markdown-body\">{article.contentParsed}</article>{script}";
     }
 
-    public void CommandComplete(Commands cmd)
+    public Action? CommandComplete(Commands cmd)
     {
-        if (cmd != Commands.GenerateCommand) return;
+        if (cmd != Commands.GenerateCommand) return null;
         string indexFile = Path.Combine(PluginHelper.DistributionDirectory, "index.html");
         string indexPlain = File.ReadAllText(indexFile);
         PluginHelper.getPluginJsonConfig<MyConfig>(out MyConfig? tar);
@@ -46,6 +46,7 @@ public class MarkdownStyle : IPlugin
         string replacement1 = $"<head>{css}{highlight}$1</head>";
         indexPlain = Regex.Replace(indexPlain, patternHead, replacement1, RegexOptions.Singleline);
         File.WriteAllText(indexFile, indexPlain);
+        return null;
     }
 
     public class MyConfig

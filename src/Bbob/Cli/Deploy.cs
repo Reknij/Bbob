@@ -46,6 +46,7 @@ public class Deploy : Command
             System.Console.WriteLine($"{FAILED}Error run deploy command in plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
             return false;
         }
+        List<Action> actions = new List<Action>();
         try
         {
             PluginSystem.cyclePlugins((plugin) =>
@@ -62,6 +63,7 @@ public class Deploy : Command
             System.Console.WriteLine($"{FAILED}Error run deploy command complete in plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
             return false;
         }
+        foreach (var a in actions) a();
         System.Console.WriteLine($"{SUCCESS}Deployment has been run");
         return true;
     }
