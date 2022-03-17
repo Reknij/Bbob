@@ -8,12 +8,12 @@ namespace Bbob.Plugin;
 public interface IPlugin
 {
     /// <summary>
-    /// Initialize command. Example 'i', 'init'.
+    /// Initialize command. Example 'i', 'init'. PluginHelper.registerMeta no working.
     /// </summary>
     void InitCommand() { }
 
     /// <summary>
-    /// New command. Example 'n', 'new'.
+    /// New command. Example 'n', 'new'. PluginHelper.registerMeta no working.
     /// </summary>
     /// <param name="filePath">File path of new command to save.</param>
     /// <param name="content">Content of file to save.</param>
@@ -28,7 +28,7 @@ public interface IPlugin
     void GenerateCommand(string filePath, GenerationStage stage) { }
 
     /// <summary>
-    /// Deploy command. Example 'd', 'deploy'.
+    /// Deploy command. Example 'd', 'deploy'. PluginHelper.registerMeta no working.
     /// </summary>
     void DeployCommand() { }
 
@@ -36,5 +36,6 @@ public interface IPlugin
     /// Will be executed when the target command is executed.
     /// </summary>
     /// <param name="commands">Command executed.</param>
+    /// <returns>Execute action when command is done. PluginHelper.registerMeta no working in action.</returns>
     Action? CommandComplete(Commands commands) { return null; }
 }
