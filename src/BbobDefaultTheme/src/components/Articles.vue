@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeMount, onBeforeUnmount, Ref, ref, watch } from 'vue';
+import { onBeforeMount, onBeforeUnmount, onMounted, Ref, ref, watch } from 'vue';
 import { onBeforeRouteLeave, onBeforeRouteUpdate, useRouter } from 'vue-router';
 import Bbob, { LinkInfo } from '../../../Bbob/JSApi/Bbob';
 import { scrollToDownEventRegist, scrollToDownEventUnRegist } from '../composition/functionsRegister';
@@ -36,26 +36,29 @@ if (props.mode == 'default' && mainLinks.value.length > 6) {
 }
 let articlesEnd = ref(props.mode == 'scroll' && Bbob.blog.nextFileLinks.length == 0);
 const load = () => {
-    if (props.mode == 'scroll'){
+    if (props.mode == 'scroll') {
         Bbob.api.nextLinkInfos((linkArray) => {
-        if (linkArray) {
-            mainLinks.value.push(...linkArray);
-            Bbob.blog.links = mainLinks.value;
-        }
-        else {
-            articlesEnd.value = true;
-        }
-    })
+            if (linkArray) {
+                mainLinks.value.push(...linkArray);
+                Bbob.blog.links = mainLinks.value;
+            }
+            else {
+                articlesEnd.value = true;
+            }
+        })
     }
 }
 let indexEvent = -1;
-onBeforeMount(()=>{
+onBeforeMount(() => {
     indexEvent = scrollToDownEventRegist(load)
 })
-onBeforeUnmount(()=>{
-    if (indexEvent != -1){
+onBeforeUnmount(() => {
+    if (indexEvent != -1) {
         scrollToDownEventUnRegist(indexEvent);
     }
+})
+onMounted(() => {
+    Bbob.meta.extra.prerenderNow = true;
 })
 </script>
 
@@ -72,7 +75,7 @@ onBeforeUnmount(()=>{
                 <h3>
                     <router-link
                         class="articleTitle"
-                        :to="Bbob.meta.extra.shortAddress?`/article/${link.address}`:`/article?address=${link.address}`"
+                        :to="Bbob.meta.extra.shortAddress ? `/article/${link.address}` : `/article?address=${link.address}`"
                     >{{ link.title }}</router-link>
                 </h3>
                 <el-divider v-if="link.categories" content-position="left">

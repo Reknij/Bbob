@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import { onMounted } from 'vue';
 import Bbob from '../../../Bbob/JSApi/Bbob'
 
+onMounted(() => {
+    Bbob.meta.extra.prerenderNow = true;
+})
 </script>
 
 <template>
@@ -13,7 +17,7 @@ import Bbob from '../../../Bbob/JSApi/Bbob'
         </el-card>
         <el-card style="margin-top: 10px;">
             <template #header>
-                <h2>About {{Bbob.meta.blogName}}</h2>
+                <h2>About {{ Bbob.meta.blogName }}</h2>
             </template>
             <p>{{ Bbob.meta.about }}</p>
         </el-card>

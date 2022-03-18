@@ -22,6 +22,7 @@ Bbob.api.getArticleFromAddress(address, (art) => {
     article.value = art;
     if (htmlContent && art.contentParsed) {
         htmlContent.innerHTML = art.contentParsed;
+        Bbob.meta.extra.prerenderNow = true;
         Bbob.api.executeScriptElements(htmlContent);
     }
     document.title = art.title;

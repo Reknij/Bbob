@@ -3,5 +3,13 @@
     "description": "Bbob default theme.",
     "author": "Jinker",
     "articleBaseUrl": "/article?address=",
-    "articleBaseUrlShort": "/article/"
+    "articleBaseUrlShort": "/article/",
+    "prerender": {
+        "enable": true,
+        "otherUrls":[
+            "/",
+            "/articles/scroll",
+            "/about"
+        ]
+    }
 }
