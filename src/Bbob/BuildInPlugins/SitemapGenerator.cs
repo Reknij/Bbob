@@ -45,7 +45,7 @@ public class SitemapGenerator : IPlugin
     }
     class MyConfig
     {
-        public bool redirectUrl { get; set; } = true;
+        public bool redirectUrl { get; set; } = false;
     }
     public void InitCommand()
     {
@@ -73,7 +73,7 @@ public class SitemapGenerator : IPlugin
                         string address = value.address;
                         string remake = articleBaseUrl.Replace("&", "~and~").Replace('?', '&');
                         string redirectUrl = $"{fullUrl}?{remake}{address}";
-                        string normalUrl = $"{fullUrl}{articleBaseUrl}{address}";
+                        string normalUrl = $"{fullUrl.Remove(fullUrl.Length - 1)}{articleBaseUrl}{address}";
                         articlesUrl.Add(new KeyValuePair<string, string>(value.title, config.redirectUrl ? redirectUrl : normalUrl));
                     }
                 }
