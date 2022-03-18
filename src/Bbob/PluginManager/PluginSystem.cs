@@ -169,7 +169,7 @@ public static class PluginSystem
                 System.Console.WriteLine($"Disable build-in plugin <{buildInPlugin.name}>");
                 continue;
             }
-            InitializeExecutingPlugin(getPluginInfo(type));
+            InitializeExecutingPlugin(buildInPlugin);
             var p = (IPlugin?)Activator.CreateInstance(type);
             if (p == null) continue;
             buildInPlugins.Add(p);
@@ -179,8 +179,14 @@ public static class PluginSystem
     private static void LoadThirdPlugins()
     {
         List<KeyValuePair<string, PluginJson>> thirdPluginsInfo = GetThirdPluginsInfo();
+        var config = Configuration.ConfigManager.MainConfig;
         foreach (var third in thirdPluginsInfo)
         {
+            if (!config.isPluginEnable(third.Value))
+            {
+                System.Console.WriteLine($"Disable third plugin <{third.Value.name}>");
+                continue;
+            }
             string pluginDll = Path.Combine(third.Key, third.Value.entry);
             InitializeExecutingPlugin(third.Value);
             var mainPlugin = new PluginAssemblyLoadContext(pluginDll, third.Value);

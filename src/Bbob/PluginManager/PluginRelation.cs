@@ -87,8 +87,6 @@ public class PluginRelation
                 List<PluginContext> others = new List<PluginContext>();
                 if (condition.PluginName == "*")
                 {
-                    if (attrs.Length > 1) throw new Exception($"Plugin <{context.info.name}> have condition set to '*'. But conditions more than one.");
-
                     foreach (var p in plugins)
                     {
                         if (p.info.name == context.info.name) continue;
