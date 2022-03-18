@@ -50,6 +50,7 @@ public class BuildWebArticleJson : IPlugin
         PluginHelper.getPluginJsonConfig<MyConfig>(out MyConfig? configPlugin);
         bool isShortAddress = configPlugin != null ? configPlugin.shortAddress : false;
         article.address = isShortAddress ? Path.GetFileNameWithoutExtension(newName) : $"{baseUrl}{JSApi.JSAPiHelper.bbobAssets}/{folder}/{newName}";
+        article.contentHash = hash;
         if (isShortAddress)
         {
             Meta meta = new Meta($"{baseUrl}{JSApi.JSAPiHelper.bbobAssets}/{folder}/", ".json");
