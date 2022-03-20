@@ -4,8 +4,10 @@ public class Remove : Command
 {
     public new static string Name => "remove";
     public new static string Help => "Remove the theme or plugin. Auto detect.\n" +
+    "<option>:\n" +
+    "--global | -g : remove <content> from global directory.\n\n" +
     "Use:\n" +
-    "// remove <name>";
+    "// remove [option] <name>";
 
     public string PluginOrTheme { get; set; }
     private bool isGlobal = false;
@@ -44,10 +46,9 @@ public class Remove : Command
         const string SUCCESS = "Success: ";
         const string FAILED = "Failed: ";
 
-        bool isPlugin = PluginOrTheme.StartsWith("bbob-plugin-");
-        bool isTheme = PluginOrTheme.StartsWith("bbob-theme-");
-        string directory = Path.Combine(isPlugin ? DownloadPath.Plugins : DownloadPath.Themes, PluginOrTheme);
-        if (!isPlugin && !isTheme)
+        CliShared.TextType type = CliShared.isPluginOrThemeName(PluginOrTheme);
+        string directory = Path.Combine(type == CliShared.TextType.Plugin ? DownloadPath.Plugins : DownloadPath.Themes, PluginOrTheme);
+        if (type == CliShared.TextType.None)
         {
             System.Console.WriteLine($"{FAILED}Can't remove because it not plugin or theme.");
             return false;

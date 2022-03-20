@@ -1,3 +1,8 @@
+# 2022-3-20 19:52:00
+## Bbob
+- optimize `add` command. Support `-r` or `--replace` option, to add plugin with replace no overwrite.
+- optimize `add` and `remove` command. Option `-g` have full write `--global`.
+
 # 2022-3-20 12:58:00
 ## Bbob
 - fix CategoryProcess and TagProcess fix multiple identical tags bug.

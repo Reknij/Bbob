@@ -9,11 +9,14 @@ public class Add : Command
     public new static string Help => "Add the theme or plugin. Auto detect.\n" +
     "<option>:\n" +
     "--address | -a : Add from address. <content> is address.\n" +
-    "--file | -f : Add from local path. <content> is local file path.\n\n" +
+    "--file | -f : Add from local path. <content> is local file path.\n" +
+    "--global | -g : Add <content> to global directory.\n" +
+    "--replace | -r : Replace <content> no overwrite.\n\n" +
     "Use:\n" +
     "// add <option> <content>";
 
     public string Content { get; set; } = "";
+    public bool Replace { get; set; } = false;
     private bool isGlobal = false;
     public bool Global
     {
@@ -45,9 +48,10 @@ public class Add : Command
         File
     }
     public Options Option { get; set; } = Options.Address;
-    public Add(string content, Options option, bool Global) : base(false)
+    public Add(string content, Options option, bool Global, bool Replace = false) : base(false)
     {
         this.Content = content;
+        this.Replace = Replace;
         this.Option = option;
         this.Global = Global;
     }
@@ -58,33 +62,30 @@ public class Add : Command
         const string FAILED = "Failed: ";
         if (Directory.Exists(DownloadPath.Temp)) Shared.SharedLib.DirectoryHelper.DeleteDirectory(DownloadPath.Temp);
         Directory.CreateDirectory(DownloadPath.Temp);
-        string fileNameWithoutExtension = "";
+        string name = "";
+        string tempFilePath = "";
+        string addStatus = "Added";
+        CliShared.TextType type;
         if (Option == Options.Address)
         {
             Uri address;
             try
             {
                 address = new Uri(Content);
+                name = Path.GetFileNameWithoutExtension(address.LocalPath);
             }
             catch (System.Exception)
             {
                 System.Console.WriteLine($"{FAILED}Please make sure content is url!");
                 return false;
             }
-            fileNameWithoutExtension = Path.GetFileNameWithoutExtension(address.LocalPath);
-            if (!isValidFilePath(fileNameWithoutExtension))
-            {
-                System.Console.WriteLine($"{FAILED}It is invalid: {fileNameWithoutExtension}");
-                return false;
-            }
-            bool isTheme = Path.GetFileNameWithoutExtension(address.LocalPath).StartsWith("bbob-theme-");
-            bool isPlugin = Path.GetFileNameWithoutExtension(address.LocalPath).StartsWith("bbob-plugin-");
-            if (!isTheme && !isPlugin)
+            type = CliShared.isPluginOrThemeName(name);
+            if (type == CliShared.TextType.None)
             {
                 System.Console.WriteLine($"{FAILED}Can't add because it no theme or plugin.");
                 return false;
             }
-            string tempFilePath = Path.Combine(DownloadPath.Temp, Path.GetRandomFileName());
+            tempFilePath = Path.Combine(DownloadPath.Temp, Path.GetRandomFileName());
             HttpClient client = new HttpClient();
             try
             {
@@ -105,13 +106,6 @@ public class Add : Command
                 System.Console.WriteLine($"{FAILED}Please make sure it is valid address!");
                 return false;
             }
-
-            string downloadPath = Path.Combine(isTheme ? DownloadPath.Themes : DownloadPath.Plugins, fileNameWithoutExtension);
-            if (Directory.Exists(downloadPath))
-            {
-                System.Console.WriteLine($"Already exists {fileNameWithoutExtension}, will override!");
-            }
-            getContentFromFile(tempFilePath, downloadPath, true);
         }
         else if (Option == Options.File)
         {
@@ -122,25 +116,14 @@ public class Add : Command
             }
             try
             {
-                fileNameWithoutExtension = Path.GetFileNameWithoutExtension(Content);
-                if (!isValidFilePath(fileNameWithoutExtension))
-                {
-                    System.Console.WriteLine($"{FAILED}It is invalid: {fileNameWithoutExtension}");
-                    return false;
-                }
-                bool isTheme = Path.GetFileNameWithoutExtension(Content).StartsWith("bbob-theme-");
-                bool isPlugin = Path.GetFileNameWithoutExtension(Content).StartsWith("bbob-plugin-");
-                if (!isTheme && !isPlugin)
+                name = Path.GetFileNameWithoutExtension(Content);
+                tempFilePath = Content;
+                type = CliShared.isPluginOrThemeName(name);
+                if (type == CliShared.TextType.None)
                 {
                     System.Console.WriteLine($"{FAILED}Can't add because it no theme or plugin.");
                     return false;
                 }
-                string downloadPath = Path.Combine(isTheme ? DownloadPath.Themes : DownloadPath.Plugins, fileNameWithoutExtension);
-                if (Directory.Exists(downloadPath))
-                {
-                    System.Console.WriteLine($"Already exists {fileNameWithoutExtension}, will override!");
-                }
-                getContentFromFile(Content, downloadPath, false);
             }
             catch (System.Exception)
             {
@@ -148,9 +131,28 @@ public class Add : Command
                 return false;
             }
         }
+        else return false;
+
+        if (!isValidFilePath(name))
+        {
+            System.Console.WriteLine($"{FAILED}It is invalid: {name}");
+            return false;
+        }
+        string downloadPath = Path.Combine(type == CliShared.TextType.Theme ? DownloadPath.Themes : DownloadPath.Plugins, name);
+        if (Directory.Exists(downloadPath))
+        {
+            if (Replace)
+            {
+                Shared.SharedLib.DirectoryHelper.DeleteDirectory(downloadPath);
+                addStatus = "Replace";
+            }
+            else addStatus = "Overwrite";
+        }
+        getContentFromFile(tempFilePath, downloadPath, false);
+
         Shared.SharedLib.DirectoryHelper.DeleteDirectory(DownloadPath.Temp);
         string p = Global ? "global" : "current";
-        System.Console.WriteLine($"{SUCCESS}Added {fileNameWithoutExtension} to {p} directory path.!");
+        System.Console.WriteLine($"{SUCCESS}{addStatus} {name} to {p} directory path.!");
         return true;
     }
 

@@ -205,57 +205,81 @@ class ConsoleParser
             case Commands.Add.Current:
                 {
                     Add.Options option = Add.Options.Address;
-                    if (++i < length)
+                    string content = string.Empty;
+                    bool global = false;
+                    bool replace = false;
+                    Func<string, bool> checkArgument = (argument) =>
                     {
-                        switch (arguments[i])
+                        switch (argument)
                         {
                             case Commands.Add.Address:
                             case Commands.Add.AddressAka:
-                                option = Add.Options.Address;
-                                break;
                             case Commands.Add.File:
                             case Commands.Add.FileAka:
-                                option = Add.Options.File;
+                                option = argument == Commands.Add.Address ? Add.Options.Address : Add.Options.File;
+                                if (++i < length) content = arguments[i];
+                                else
+                                {
+                                    System.Console.WriteLine("No exists argument <content>!");
+                                    return false;
+                                }
+                                break;
+                            case Commands.Add.Global:
+                            case Commands.Add.GlobalAka:
+                                global = true;
+                                break;
+                            case Commands.Add.Replace:
+                            case Commands.Add.ReplaceAka:
+                                replace = true;
                                 break;
                             default:
-                                System.Console.WriteLine($"Unknown option '{arguments[i]}'!");
-                                return;
+                                System.Console.WriteLine($"Unknown option '{argument}'!");
+                                return false;
                         }
-                    }
-                    if (++i < length)
+                        return true;
+                    };
+                    while (++i < length)
                     {
-                        string content = arguments[i];
-                        bool global = false;
-                        if (++i < length)
-                        {
-                            if (arguments[i] == "-g") global = true;
-                            else System.Console.WriteLine($"Unknown option '{arguments[i]}'");
-                        }
-                        Add install = new Add(content, option, global);
-                        install.Process();
+                        if (!checkArgument(arguments[i])) return;
                     }
-                    else
+                    if (string.IsNullOrWhiteSpace(content))
                     {
-                        System.Console.WriteLine("Please enter content!");
+                         System.Console.WriteLine("Please enter the <content> of your want add.");
+                        return;
                     }
+                    Add install = new Add(content, option, global, replace);
+                    install.Process();
                 }
                 break;
             case Commands.Remove.Current:
-                if (++i < length)
                 {
-                    string name = arguments[i];
+                    string name = string.Empty;
                     bool global = false;
-                    if (++i < length)
+                    Func<string, bool> checkArgument = (argument) =>
                     {
-                        if (arguments[i] == "-g") global = true;
-                        else System.Console.WriteLine($"Unknown option '{arguments[i]}'");
+                        switch (argument)
+                        {
+                            case Commands.Remove.Global:
+                            case Commands.Remove.GlobalAka:
+                                global = true;
+                                break;
+                            default:
+                                name = argument;
+                                break;
+                        }
+                        return true;
+                    };
+                    while (++i < length)
+                    {
+                        if (!checkArgument(arguments[i])) return;
+                    }
+                    if (string.IsNullOrWhiteSpace(name))
+                    {
+                        System.Console.WriteLine("Please enter the <name> of your want remove.");
+                        return;
                     }
                     Remove remove = new Remove(name, global);
                     remove.Process();
-                }
-                else
-                {
-                    System.Console.WriteLine("Please enter content!");
                 }
                 break;
             default:
@@ -357,11 +381,17 @@ class ConsoleParser
             public const string AddressAka = "-a";
             public const string File = "--file";
             public const string FileAka = "-f";
+            public const string Global = "--global";
+            public const string GlobalAka = "-g";
+            public const string Replace = "--replace";
+            public const string ReplaceAka = "-r";
         }
 
         public static class Remove
         {
             public const string Current = "remove";
+            public const string Global = Add.Global;
+            public const string GlobalAka = Add.GlobalAka;
         }
     }
 }
