@@ -1,6 +1,12 @@
 # Bbob
 One serverless blog framework.
 
+# Install
+Now only support install from nuget.
+```
+dotnet tool install -g bbob
+```
+
 # How to use?
 About usage and plugin develop, please see the [Documents](https://reknij.github.io/Bbob.Doc/)
 
