@@ -60,15 +60,17 @@ public class CategoryProcess : IPlugin
                 {
                     if (Extensions.IsPropertyExists<List<object>>(link, "categories", out List<object> categories))
                     {
+                        HashSet<string> addedText = new HashSet<string>();
                         foreach (var t in categories)
                         {
-                            if (t is string text)
+                            if (t is string text && !addedText.Contains(text))
                             {
                                 if (!all.ContainsKey(text))
                                 {
                                     all.Add(text, new List<dynamic> { link });
                                 }
                                 else all[text].Add(link);
+                                addedText.Add(text);
                             }
                         }
                     }

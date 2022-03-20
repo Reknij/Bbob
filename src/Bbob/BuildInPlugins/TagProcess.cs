@@ -20,22 +20,24 @@ public class TagProcess : IPlugin
             {
                 Dictionary<string, List<dynamic>> all = new Dictionary<string, List<dynamic>>();
                 foreach (var link in links)
+                {
+                    if (Extensions.IsPropertyExists<List<object>>(link, "tags", out List<object> tags))
                     {
-                        if (Extensions.IsPropertyExists<List<object>>(link, "tags", out List<object> tags))
+                        HashSet<string> addedText = new HashSet<string>();
+                        foreach (var t in tags)
                         {
-                            foreach (var t in tags)
+                            if (t is string text && !addedText.Contains(text))
                             {
-                                if (t is string text)
+                                if (!all.ContainsKey(text))
                                 {
-                                    if (!all.ContainsKey(text))
-                                    {
-                                        all.Add(text, new List<dynamic> { link });
-                                    }
-                                    else all[text].Add(link);
+                                    all.Add(text, new List<dynamic> { link });
                                 }
+                                else all[text].Add(link);
+                                addedText.Add(text);
                             }
                         }
                     }
+                }
 
                 var list = all.ToList();
                 sort(list);
@@ -60,11 +62,11 @@ public class TagProcess : IPlugin
             if (cs.ContainsKey(tag1.Key) && !cs.ContainsKey(tag2.Key))
             {
                 return -1; //improve
-                }
+            }
             else if (!cs.ContainsKey(tag1.Key) && cs.ContainsKey(tag2.Key))
             {
                 return 1; //decline
-                }
+            }
             else if (!cs.ContainsKey(tag1.Key) && !cs.ContainsKey(tag2.Key))
             {
                 return sortTagsDefault(tag1, tag2);
@@ -85,6 +87,6 @@ public class TagProcess : IPlugin
 
     public record class MyConfig
     {
-        public string[] sort {get;set;} = Array.Empty<string>();
+        public string[] sort { get; set; } = Array.Empty<string>();
     }
 }
