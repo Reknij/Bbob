@@ -1,4 +1,17 @@
-# 2022-3-5 19:54:00
+# 2022-3-20 12:58:00
+## Bbob
+- fix CategoryProcess and TagProcess fix multiple identical tags bug.
+- BuildWebArticleJson config add new option.
+
+# 2022-3-18 16:49:00
+## Bbob
+- BuildWebArticleJson plugin will assign content hash to 'article'.
+- SitemapGenerator fix bug and config default value change.
+- Add `ExtraLink` plugin.
+## BbobDefaultTheme
+- support bbob-plugin-prerender.
+
+# 2022-3-5 19:54:00 v1.3.1
 ## Bbob
 - optimize preview.
 
