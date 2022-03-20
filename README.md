@@ -15,3 +15,6 @@ Feel funny
 
 # SEO
 I solve it with [bbob-plugin-prerender](https://github.com/Reknij/bbob-plugin-prerender).
+
+# Last update
+- optimize `add` and `remove` command.
