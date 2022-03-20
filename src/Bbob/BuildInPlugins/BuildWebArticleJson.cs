@@ -49,7 +49,9 @@ public class BuildWebArticleJson : IPlugin
         string baseUrl = PluginHelper.ConfigBbob.baseUrl;
         PluginHelper.getPluginJsonConfig<MyConfig>(out MyConfig? configPlugin);
         bool isShortAddress = configPlugin != null ? configPlugin.shortAddress : false;
+        bool shortAddressEndWithSlash = configPlugin != null ? configPlugin.shortAddressEndWithSlash : false;
         article.address = isShortAddress ? Path.GetFileNameWithoutExtension(newName) : $"{baseUrl}{JSApi.JSAPiHelper.bbobAssets}/{folder}/{newName}";
+        if (shortAddressEndWithSlash) article.address += '/';
         article.contentHash = hash;
         if (isShortAddress)
         {
@@ -61,6 +63,7 @@ public class BuildWebArticleJson : IPlugin
     public class MyConfig
     {
         public bool shortAddress {get;set;} = false;
+        public bool shortAddressEndWithSlash {get;set;} = false;
     }
     public record class Meta(string startOfAddress, string endOfAddress);
 
