@@ -17,4 +17,7 @@ Feel funny
 I solve it with [bbob-plugin-prerender](https://github.com/Reknij/bbob-plugin-prerender).
 
 # Last update
-- optimize `add` and `remove` command.
+- update js api.
+- BbobDefaultTheme use promise function.
+- fix load plugin from nuget packages error which directory is not exists.
+- fix preview throw error which port is used.
