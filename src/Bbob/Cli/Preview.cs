@@ -1,3 +1,4 @@
+using System.Net.NetworkInformation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.FileProviders;
@@ -8,9 +9,9 @@ namespace Bbob.Main.Cli;
 public class Preview : Command
 {
     public new static string Name => "preview";
-    public new static string Help => "Preview the blog from distribution (folder name 'dist').\n"+
-    "Use:\n"+
-    "// preview\n"+
+    public new static string Help => "Preview the blog from distribution (folder name 'dist').\n" +
+    "Use:\n" +
+    "// preview\n" +
     "// p";
 
     string distribution;
@@ -24,7 +25,7 @@ public class Preview : Command
         const string FAILED = "Failed preview: ";
         if (!Directory.Exists(distribution))
         {
-            System.Console.WriteLine($"{FAILED}Distribution not exists!"); 
+            System.Console.WriteLine($"{FAILED}Distribution not exists!");
             return false;
         }
         if (Directory.GetFiles(distribution, "*", SearchOption.AllDirectories).Length == 0)
@@ -40,7 +41,7 @@ public class Preview : Command
     public void StartPreview()
     {
         var config = Configuration.ConfigManager.MainConfig;
-        string url = $"http://localhost:{config.previewPort}";
+        string url = $"http://localhost:{GetAvailablePort(config.previewPort)}";
         var builder = WebApplication.CreateBuilder();
         builder.Logging.ClearProviders();
         var app = builder.Build();
@@ -62,5 +63,20 @@ public class Preview : Command
         System.Console.WriteLine($"Preview running at {url}{config.baseUrl}");
         System.Console.WriteLine("Ctrl + C to stop preview.");
         app.Run(url);
+    }
+
+    private static int GetAvailablePort(int startingPort)
+    {
+        if (startingPort > ushort.MaxValue) throw new ArgumentException($"Can't be greater than {ushort.MaxValue}", nameof(startingPort));
+        var ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
+
+        var connectionsEndpoints = ipGlobalProperties.GetActiveTcpConnections().Select(c => c.LocalEndPoint);
+        var tcpListenersEndpoints = ipGlobalProperties.GetActiveTcpListeners();
+        var udpListenersEndpoints = ipGlobalProperties.GetActiveUdpListeners();
+        var portsInUse = connectionsEndpoints.Concat(tcpListenersEndpoints)
+                                             .Concat(udpListenersEndpoints)
+                                             .Select(e => e.Port);
+
+        return Enumerable.Range(startingPort, ushort.MaxValue - startingPort + 1).Except(portsInUse).FirstOrDefault();
     }
 }

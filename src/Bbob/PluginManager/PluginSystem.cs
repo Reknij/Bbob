@@ -101,7 +101,7 @@ public static class PluginSystem
         if (Directory.Exists(pluginCurrentDirectory)) folders.AddRange(Directory.GetDirectories(pluginCurrentDirectory));
 
         string nugetPackages = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
-        string[] packages = Directory.GetDirectories(nugetPackages);
+        string[] packages = Directory.Exists(nugetPackages)? Directory.GetDirectories(nugetPackages): Array.Empty<string>();
         Func<string, string> getVersion = (package) =>
         {
             List<string> directories = new List<string>(Directory.GetDirectories(package));
