@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { onBeforeMount, ref, watch } from 'vue';
 import { onBeforeRouteLeave, useRoute } from 'vue-router';
 import Bbob, { Article } from '../../../Bbob/JSApi/Bbob'
 import { normal } from '../composition/changeSize';
 
-const noArticle = 'No exists article!';
+let isLoading = ref(true);
 const route = useRoute();
 let address = route.params.address ? route.params.address as string : '';
 if (Bbob.meta.extra.shortAddress) {
@@ -14,20 +14,16 @@ else {
     address = route.query.address as string;
 }
 let article = ref<Article>({
-    title: noArticle,
-    date: noArticle,
+    title: "loading article...",
+    date: "loading article...",
+    contentParsed: ""
+});
+onBeforeMount(async () => {
+    article.value = await Bbob.api.getArticleFromAddressAsync(address)
+    document.title = article.value.title;
+    isLoading.value = false;
+    Bbob.meta.extra.prerenderNow = true;
 })
-Bbob.api.getArticleFromAddress(address, (art) => {
-    let htmlContent = document.getElementById('htmlContent');
-    article.value = art;
-    if (htmlContent && art.contentParsed) {
-        htmlContent.innerHTML = art.contentParsed;
-        Bbob.meta.extra.prerenderNow = true;
-        Bbob.api.executeScriptElements(htmlContent);
-    }
-    document.title = art.title;
-})
-
 onBeforeRouteLeave(() => {
     document.title = Bbob.meta.blogName
     return true;
@@ -37,10 +33,10 @@ let tocDrawer = ref(false)
 </script>
 
 <template>
-    <div id="parent">
+    <div id="parent" v-loading="isLoading">
         <div id="content">
             <el-card>
-                <span id="htmlContent"></span>
+                <span id="htmlContent" v-html="article.contentParsed"></span>
             </el-card>
 
             <el-drawer
