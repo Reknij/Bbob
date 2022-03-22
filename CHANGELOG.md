@@ -1,10 +1,10 @@
-# 2022-3-22 14:07:00
+# 2022-3-22 14:07:00 v1.3.4
 ## Bbob
 - update js api.
 ## BbobDefaultTheme
 - use promise function.
 
-# 2022-3-20 19:52:00
+# 2022-3-20 19:52:00 v1.3.3
 ## Bbob
 - optimize `add` command. Support `-r` or `--replace` option, to add plugin with replace no overwrite.
 - optimize `add` and `remove` command. Option `-g` have full write `--global`.
