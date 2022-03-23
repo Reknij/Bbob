@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Bbob.Plugin;
 
 namespace Bbob.Main.BuildInPlugin;
@@ -43,7 +44,7 @@ public class BuildWebArticleJson : IPlugin
             fs.Position = 0; //set to 0 to read.
             hash = Shared.SharedLib.HashHelper.GetContentHash(fs);
         }
-        string newName = PluginHelper.ConfigBbob.useHashName?$"{Path.GetFileNameWithoutExtension(filePath)}-{hash.Substring(0, 9)}.json": $"{Path.GetFileNameWithoutExtension(filePath)}.json";
+        string newName = PluginHelper.ConfigBbob.useHashName ? $"{Path.GetFileNameWithoutExtension(filePath)}-{hash.Substring(0, 9)}.json" : $"{Path.GetFileNameWithoutExtension(filePath)}.json";
         string newLocal = Path.Combine(FileLocalFolder, newName);
         if (FileLocal != newLocal) File.Move(FileLocal, newLocal, true);
         string baseUrl = PluginHelper.ConfigBbob.baseUrl;
@@ -60,10 +61,40 @@ public class BuildWebArticleJson : IPlugin
         }
     }
 
+    public Action? CommandComplete(Commands cmd)
+    {
+        if (cmd != Commands.GenerateCommand) return null;
+
+        return () =>
+        {
+            string[] files = Directory.GetFiles(PluginHelper.DistributionDirectory, "bbob*.js");
+            string bbobJs = string.Empty;
+            foreach (var item in files)
+            {
+                if (bbobJs == string.Empty && Regex.IsMatch(item, "bbob(.{10})?.js")) bbobJs = item;
+                else
+                {
+                    PluginHelper.ExecutingCommandResult = new CommandResult("Can't insert function, found bbob js file but is not single.", CommandOperation.Stop);
+                    return;
+                }
+            }
+            if (bbobJs == string.Empty)
+            {
+                PluginHelper.ExecutingCommandResult = new CommandResult("Can't insert function, bbob js file is not exists!", CommandOperation.Stop);
+                return;
+            }
+            string bbobJsString = File.ReadAllText(bbobJs);
+            string code = "$1=meta.extra.shortAddress.startOfAddress+$1+meta.extra.shortAddress.endOfAddress;";
+            bbobJsString = Regex.Replace(bbobJsString, @"getArticleFromAddress\(([A-Za-z0-9_]+),\s*([A-Za-z0-9_]+)\)\s*{", "getArticleFromAddress($1,$2){" + code, RegexOptions.Singleline);
+            bbobJsString = Regex.Replace(bbobJsString, @"getArticleFromAddressAsync\(([A-Za-z0-9_]+)\)\s*{", "getArticleFromAddressAsync($1){" + code, RegexOptions.Singleline);
+            File.WriteAllText(bbobJs, bbobJsString);
+        };
+    }
+
     public class MyConfig
     {
-        public bool shortAddress {get;set;} = false;
-        public bool shortAddressEndWithSlash {get;set;} = false;
+        public bool shortAddress { get; set; } = false;
+        public bool shortAddressEndWithSlash { get; set; } = false;
     }
     public record class Meta(string startOfAddress, string endOfAddress);
 

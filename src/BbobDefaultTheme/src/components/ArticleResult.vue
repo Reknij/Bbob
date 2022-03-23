@@ -7,10 +7,7 @@ import { normal } from '../composition/changeSize';
 let isLoading = ref(true);
 const route = useRoute();
 let address = route.params.address ? route.params.address as string : '';
-if (Bbob.meta.extra.shortAddress) {
-    address = `${Bbob.meta.extra.shortAddress.startOfAddress}${address}${Bbob.meta.extra.shortAddress.endOfAddress}`
-}
-else {
+if (!Bbob.meta.extra.shortAddress) {
     address = route.query.address as string;
 }
 let article = ref<Article>({
