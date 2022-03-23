@@ -46,7 +46,8 @@ public class Remove : Command
         const string SUCCESS = "Success: ";
         const string FAILED = "Failed: ";
 
-        CliShared.TextType type = CliShared.isPluginOrThemeName(PluginOrTheme);
+        CliShared.TextType type = CliShared.isPluginOrThemeName(PluginOrTheme, out string fixedName);
+        PluginOrTheme = fixedName;
         string directory = Path.Combine(type == CliShared.TextType.Plugin ? DownloadPath.Plugins : DownloadPath.Themes, PluginOrTheme);
         if (type == CliShared.TextType.None)
         {

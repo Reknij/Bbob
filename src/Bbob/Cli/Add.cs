@@ -79,7 +79,7 @@ public class Add : Command
                 System.Console.WriteLine($"{FAILED}Please make sure content is url!");
                 return false;
             }
-            type = CliShared.isPluginOrThemeName(name);
+            type = CliShared.isPluginOrThemeName(name, out name);
             if (type == CliShared.TextType.None)
             {
                 System.Console.WriteLine($"{FAILED}Can't add because it no theme or plugin.");
@@ -118,7 +118,7 @@ public class Add : Command
             {
                 name = Path.GetFileNameWithoutExtension(Content);
                 tempFilePath = Content;
-                type = CliShared.isPluginOrThemeName(name);
+                type = CliShared.isPluginOrThemeName(name, out name);
                 if (type == CliShared.TextType.None)
                 {
                     System.Console.WriteLine($"{FAILED}Can't add because it no theme or plugin.");
