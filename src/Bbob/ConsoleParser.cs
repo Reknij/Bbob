@@ -33,6 +33,8 @@ class ConsoleParser
             arguments = l.ToArray();
             length = arguments.Length;
         }
+        string url = $"http://localhost:{CliShared.GetAvailablePort(Configuration.ConfigManager.MainConfig.previewPort)}";
+
         int i = 0;
         if (length == 0)
         {
@@ -63,7 +65,7 @@ class ConsoleParser
                                 break;
                             case Commands.Preview.BeOption:
                             case Commands.Preview.BeOptionAka:
-                                PreviewIt(dist);
+                                PreviewIt(dist, url);
                                 break;
                             default:
                                 System.Console.WriteLine($"Unknown option '{arguments[i]}'!");
@@ -105,7 +107,31 @@ class ConsoleParser
             case Commands.Preview.Current:
             case Commands.Preview.CurrentAka:
                 InitializeBbob.Initialize(InitializeBbob.InitializeOptions.All);
-                PreviewIt(dist);
+                {
+                    Func<bool> check = () =>
+                    {
+                        switch (arguments[i])
+                        {
+                            case Commands.Preview.Host.Current:
+                            case Commands.Preview.Host.CurrentAka:
+                                if (++i < length) url = arguments[i];
+                                else
+                                {
+                                    System.Console.WriteLine("Please enter your host value");
+                                    return false;
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                        return true;
+                    };
+                    if (++i < length)
+                    {
+                        check();
+                    }
+                    PreviewIt(dist, url);
+                }
                 break;
             case Commands.ResetConfig.Current:
             case Commands.ResetConfig.CurrentAka:
@@ -244,7 +270,7 @@ class ConsoleParser
                     }
                     if (string.IsNullOrWhiteSpace(content))
                     {
-                         System.Console.WriteLine("Please enter the <content> of your want add.");
+                        System.Console.WriteLine("Please enter the <content> of your want add.");
                         return;
                     }
                     Add install = new Add(content, option, global, replace);
@@ -301,9 +327,9 @@ class ConsoleParser
         deploy.Process();
     }
 
-    private void PreviewIt(string dist)
+    private void PreviewIt(string dist, string url)
     {
-        var preview = new Bbob.Main.Cli.Preview(dist);
+        var preview = new Bbob.Main.Cli.Preview(dist, url);
         System.Console.WriteLine("Running preview...");
         preview.Process();
     }
@@ -352,6 +378,11 @@ class ConsoleParser
             public const string CurrentAka = "p";
             public const string BeOption = "--preview";
             public const string BeOptionAka = "-p";
+            public static class Host
+            {
+                public const string Current = "--url";
+                public const string CurrentAka = "-u";
+            }
         }
 
         public static class ResetConfig

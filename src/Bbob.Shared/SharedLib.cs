@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Bbob.Shared;
 public static class SharedLib
@@ -166,6 +167,12 @@ public static class SharedLib
             url2 = url2.TrimStart('/', '\\');
 
             return string.Format("{0}/{1}", url1, url2);
+        }
+
+        public static bool IsValid(string url)
+        {
+            return Regex.IsMatch(url, @"^(http|https)://|[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,6}(:[0-9]{1,5})?(/.*)?$/ix
+");
         }
     }
 }

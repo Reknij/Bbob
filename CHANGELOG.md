@@ -1,3 +1,7 @@
+# 2022-3-24 19:58:00
+## Bbob
+- optimize preview command, support `url` option.
+
 # 2022-3-22 14:07:00 v1.3.4
 ## Bbob
 - update js api.

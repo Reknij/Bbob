@@ -1,6 +1,5 @@
-using System.Net.NetworkInformation;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 
@@ -15,9 +14,35 @@ public class Preview : Command
     "// p";
 
     string distribution;
-    public Preview(string distribution)
+    private string url = string.Empty;
+    public string Url
+    {
+        get => url;
+        set
+        {
+            if (Shared.SharedLib.UrlHelper.IsValid(value))
+            {
+                var result = Regex.Match(value, @".+\:([0-9]+)");
+                if (result.Success && int.TryParse(result.Result("$1"), out int port) && (port < 1024 || port > 49151))
+                {
+                    System.Console.WriteLine("Port in url is invalid, value must 1024 - 49151! Auto set to default port.");
+                    value = Regex.Replace(value, @"(.+\:)([0-9]+)", @$"$1 {CliShared.GetAvailablePort(Configuration.ConfigManager.MainConfig.previewPort)}").Replace(" ", "");
+                }
+                url = value;
+            }
+            else
+            {
+                string u = $"http://localhost:{CliShared.GetAvailablePort(Configuration.ConfigManager.MainConfig.previewPort)}";
+                System.Console.WriteLine($"Host is invalid! Auto set to default url '{u}'");
+                url = u;
+            }
+            if (url.Length > 0 && url.Last() == '/') url = url.Remove(url.Length - 1, 1);
+        }
+    }
+    public Preview(string distribution, string url)
     {
         this.distribution = distribution;
+        this.Url = url;
     }
     public override bool Process()
     {
@@ -33,15 +58,15 @@ public class Preview : Command
             System.Console.WriteLine($"{FAILED}Distribution is not exists any files!");
             return false;
         }
-        StartPreview();
-        System.Console.WriteLine($"{SUCCESS}Preview has been run.");
-        return true;
+        bool result = StartPreview();
+        if (result) System.Console.WriteLine($"{SUCCESS}Preview has been run.");
+        else System.Console.WriteLine($"{FAILED}Preview has stopped.");
+        return result;
     }
 
-    public void StartPreview()
+    public bool StartPreview()
     {
         var config = Configuration.ConfigManager.MainConfig;
-        string url = $"http://localhost:{GetAvailablePort(config.previewPort)}";
         var builder = WebApplication.CreateBuilder();
         builder.Logging.ClearProviders();
         var app = builder.Build();
@@ -60,23 +85,17 @@ public class Preview : Command
             FileProvider = new PhysicalFileProvider(distribution),
 
         });
-        System.Console.WriteLine($"Preview running at {url}{config.baseUrl}");
+        System.Console.WriteLine($"Preview running at {Url}{config.baseUrl}");
         System.Console.WriteLine("Ctrl + C to stop preview.");
-        app.Run(url);
-    }
-
-    private static int GetAvailablePort(int startingPort)
-    {
-        if (startingPort > ushort.MaxValue) throw new ArgumentException($"Can't be greater than {ushort.MaxValue}", nameof(startingPort));
-        var ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
-
-        var connectionsEndpoints = ipGlobalProperties.GetActiveTcpConnections().Select(c => c.LocalEndPoint);
-        var tcpListenersEndpoints = ipGlobalProperties.GetActiveTcpListeners();
-        var udpListenersEndpoints = ipGlobalProperties.GetActiveUdpListeners();
-        var portsInUse = connectionsEndpoints.Concat(tcpListenersEndpoints)
-                                             .Concat(udpListenersEndpoints)
-                                             .Select(e => e.Port);
-
-        return Enumerable.Range(startingPort, ushort.MaxValue - startingPort + 1).Except(portsInUse).FirstOrDefault();
+        try
+        {
+            app.Run(Url);
+        }
+        catch (System.Exception ex)
+        {
+            System.Console.WriteLine("Run preview error:\n" + ex.Message);
+            return false;
+        }
+        return true;
     }
 }
