@@ -10,8 +10,25 @@ public static class ConfigManager
     public static string ConfigPath { get; set; } = Path.Combine(Environment.CurrentDirectory, "config.json");
     private static ConfigJson? mConfig;
     private static ConfigJson? dConfig;
-    public static ConfigJson MainConfig { get=>mConfig ?? throw new NullReferenceException("MainConfig is null"); set=>mConfig = value; }
-    public static ConfigJson DefaultConfig { get=>mConfig ?? throw new NullReferenceException("DefaultConfig is null"); set=>dConfig = value; }
+    public static ConfigJson MainConfig
+    {
+        get
+        {
+            if (mConfig == null) LoadConfigs();
+            return mConfig ?? throw new NullReferenceException("MainConfig is null");
+        }
+        set => mConfig = value;
+    }
+    public static ConfigJson DefaultConfig
+    {
+        get
+        {
+            if (dConfig == null) LoadConfigs();
+            return dConfig ?? throw new NullReferenceException("MainConfig is null");
+        }
+        set => dConfig = value;
+    }
+
     public static void LoadConfigs()
     {
         MainConfig = new ConfigJsonFix();
@@ -132,7 +149,7 @@ public static class ConfigManager
             }
             var domainMatch = Regex.Match(domain, @"^(?:\w+://)?([^/?]*)");
             if (!domainMatch.Success) System.Console.WriteLine("Warning: config.domain is invalid!");
-            else if(domainMatch.Value != domain)
+            else if (domainMatch.Value != domain)
             {
                 System.Console.WriteLine("Warning: domain is have invalid sub url.");
                 domain = domainMatch.Value;

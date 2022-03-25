@@ -17,8 +17,8 @@ public class Program
                     System.Console.WriteLine($"Bbob v{Program.Version}, {RuntimeInformation.FrameworkDescription}, {Environment.OSVersion}");
                     System.Console.WriteLine($"Base directory: {AppContext.BaseDirectory}");
                     return;
-                case "--help":
-                case "-h":
+                case ConsoleParser.Commands.Help.Current:
+                case ConsoleParser.Commands.Help.CurrentAka:
                     System.Console.WriteLine($"Bbob help:");
                     PrintCommandsHelp();
                     return;
@@ -27,10 +27,8 @@ public class Program
             }
         }
         Console.WriteLine($"【Bbob v{Version}】");
-        Configuration.ConfigManager.LoadConfigs();
         ConsoleParser parser = new ConsoleParser(args);
         parser.Parse();
-        Console.WriteLine("-----End-----");
     }
     private static void PrintCommandsHelp()
     {
