@@ -5,6 +5,9 @@
 - new command `run`. will enter mode of target plugin to run custom command.
 - optimize help message.
 - Load plugin will check interface version.
+## BbobDefaultTheme
+- article page front have information now.
+- fix title position.
 ## Bbob.Plugin
 - refactoring all unsafe field.
 - add registerCustomCommand function.
