@@ -24,6 +24,7 @@ public class EnableAndDisable : Command
     {
         this.option = options;
         this.pluginName = pluginName.ToUpper();
+        if (this.pluginName.StartsWith("PLUGIN-") || this.pluginName.StartsWith("THEME-")) this.pluginName = $"BBOB-{this.pluginName}";
         this.direct = direct;
     }
     public override bool Process()

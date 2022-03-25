@@ -138,7 +138,7 @@ public class Add : Command
             System.Console.WriteLine($"{FAILED}It is invalid: {name}");
             return false;
         }
-        string downloadPath = Path.Combine(type == CliShared.TextType.Theme ? DownloadPath.Themes : DownloadPath.Plugins, name);
+        string downloadPath = Path.Combine(type == CliShared.TextType.Theme ? DownloadPath.Themes : DownloadPath.Plugins, name.ToUpper());
         if (Directory.Exists(downloadPath))
         {
             if (Replace)

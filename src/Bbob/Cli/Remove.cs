@@ -9,7 +9,12 @@ public class Remove : Command
     "Use:\n" +
     "// remove [option] <name>";
 
-    public string PluginOrTheme { get; set; }
+    private string _pluginOrTheme = string.Empty;
+    public string PluginOrTheme
+    {
+        get=> _pluginOrTheme;
+        set=> _pluginOrTheme = value.ToUpper();
+    }
     private bool isGlobal = false;
     public bool Global
     {
