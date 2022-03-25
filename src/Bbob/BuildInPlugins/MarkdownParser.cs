@@ -69,47 +69,61 @@ public class MarkdownParser : IPlugin
                 parseLinkInfo(yamlString, filePath);
                 doc.Remove(yamlFrontMatterBlock);
             }
-            else throw new NullReferenceException();
+            else PluginHelper.ExecutingCommandResult = new CommandResult("Front matter is null or can't parse.", CommandOperation.Skip);
         }
     }
 
     private void parseLinkInfo(string plain, string filePath)
     {
-        Dictionary<string, object> yaml = serializer.Deserialize<Dictionary<string, object>>(plain);
-        dynamic article = new ExpandoObject();
-        foreach (var y in yaml)
+        try
         {
-            if (y.Value != null)
+            Dictionary<string, object> yaml = serializer.Deserialize<Dictionary<string, object>>(plain);
+            dynamic article = new ExpandoObject();
+            foreach (var y in yaml)
             {
-                ((IDictionary<String, Object>)article).Add(y.Key, y.Value);
+                if (y.Value != null)
+                {
+                    ((IDictionary<String, Object>)article).Add(y.Key, y.Value);
+                }
             }
+            PluginHelper.registerObject("article", article);
         }
-        PluginHelper.registerObject("article", article);
+        catch (System.Exception ex)
+        {
+            PluginHelper.ExecutingCommandResult = new CommandResult($"Parse front matter error: {ex.Message}", CommandOperation.Skip);
+        }
     }
     private void parseMarkdownToHtml()
     {
-        if (PluginHelper.getRegisteredObject<string>("markdown", out string? value) && value != null)
+        try
         {
-            var result = Markdown.Parse(value, pipeline);
-            var headingBlocks = result.Descendants<HeadingBlock>();
-            Toc toc = new Toc();
-            int tocCount = 1;
-            foreach (var headingBlock in headingBlocks)
+            if (PluginHelper.getRegisteredObject<string>("markdown", out string? value) && value != null)
             {
-                if (headingBlock.Inline?.FirstChild != null && headingBlock.Inline.FirstChild is LiteralInline li)
+                var result = Markdown.Parse(value, pipeline);
+                var headingBlocks = result.Descendants<HeadingBlock>();
+                Toc toc = new Toc();
+                int tocCount = 1;
+                foreach (var headingBlock in headingBlocks)
                 {
-                    headingBlock.GetAttributes().Id = $"toc-{tocCount++}";
-                    string name = li.Content.ToString();
-                    string id = headingBlock.GetAttributes().Id ?? throw new NullReferenceException("Get toc id null!");
-                    toc.Add(headingBlock.Level, name, id);
+                    if (headingBlock.Inline?.FirstChild != null && headingBlock.Inline.FirstChild is LiteralInline li)
+                    {
+                        headingBlock.GetAttributes().Id = $"toc-{tocCount++}";
+                        string name = li.Content.ToString();
+                        string id = headingBlock.GetAttributes().Id ?? throw new NullReferenceException("Get toc id null!");
+                        toc.Add(headingBlock.Level, name, id);
+                    }
                 }
+                PluginHelper.modifyRegisteredObject<dynamic>("article", (ref dynamic? article) =>
+                {
+                    if (article == null) return;
+                    article.toc = toc.ToHtml();
+                    article.contentParsed = $"<div id='bbob-markdown-content'>{result.ToHtml()}</div>";
+                });
             }
-            PluginHelper.modifyRegisteredObject<dynamic>("article", (ref dynamic? article) =>
-            {
-                if (article == null) return;
-                article.toc = toc.ToHtml();
-                article.contentParsed = $"<div id='bbob-markdown-content'>{result.ToHtml()}</div>";
-            });
+        }
+        catch (System.Exception ex)
+        {
+            PluginHelper.ExecutingCommandResult = new CommandResult($"Parse markdown error: {ex.Message}", CommandOperation.Skip);
         }
     }
 
