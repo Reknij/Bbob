@@ -49,9 +49,16 @@ public class PluginAssemblyLoadContext : AssemblyLoadContext
         {
             Version now = IPluginAssembly.GetName().Version ?? new Version(0, 0, 0, 0);
             Version tar = assemblyName.Version ?? new Version(0, 0, 0, 0);
-            if (tar != now && (tar.Major != now.Major || tar.Minor != now.Minor))
+            if (tar != now)
             {
-                Warning = $"Plugin <{PluginInfo.name}> interface version is old. Please update plugin interface first, otherwise plugin will not working.";
+                if (tar.Major > now.Major || (tar.Major == now.Major && tar.Minor > now.Minor))
+                {
+                    Warning = $"Plugin <{PluginInfo.name}> interface version is newer than version now. Please update Bbob-Cli first, otherwise plugin will not working.";
+                }
+                else if (tar.Major < now.Major || (tar.Major == now.Major && tar.Minor < now.Minor))
+                {
+                    Warning = $"Plugin <{PluginInfo.name}> interface version is older than version now. Please update plugin first, otherwise plugin will not working.";
+                }
             }
             return null;
         }
