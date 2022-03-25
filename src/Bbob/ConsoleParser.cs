@@ -17,7 +17,6 @@ class ConsoleParser
 
     public void Parse()
     {
-        string dist = Path.Combine(Environment.CurrentDirectory, Configuration.ConfigManager.MainConfig.distributionPath);
         int length = arguments.Length;
         if (length >= 3 && arguments[length - 2] == "--config-file")
         {
@@ -33,7 +32,6 @@ class ConsoleParser
             arguments = l.ToArray();
             length = arguments.Length;
         }
-        string url = $"http://localhost:{CliShared.GetAvailablePort(Configuration.ConfigManager.MainConfig.previewPort)}";
 
         int i = 0;
         if (length == 0)
@@ -42,40 +40,57 @@ class ConsoleParser
             return;
         }
         string afp = Path.Combine(Environment.CurrentDirectory, "articles");
+        Func<Action, bool> isHelp = (act) =>
+        {
+            if (++i < length && (arguments[i] == Commands.Help.Current || arguments[i] == Commands.Help.CurrentAka))
+            {
+                act();
+                return true;
+            }
+            --i;
+            return false;
+        };
         switch (arguments[i])
         {
             case Commands.Init.Current:
             case Commands.Init.CurrentAka:
+                if (isHelp(printHelp<Init>)) return;
                 InitializeBbob.Initialize(InitializeBbob.InitializeOptions.All);
                 Init init = new Init();
                 init.Process();
                 break;
             case Commands.Generate.Current:
             case Commands.Generate.CurrentAka:
-                InitializeBbob.Initialize(InitializeBbob.InitializeOptions.All);
-                Generator generater = new Generator(dist, afp);
-                if (generater.Process())
+                if (isHelp(printHelp<Generator>)) return;
                 {
-                    if (++i < length)
-                        switch (arguments[i])
-                        {
-                            case Commands.Deploy.BeOption:
-                            case Commands.Deploy.BeOptionAka:
-                                DeployIt(dist);
-                                break;
-                            case Commands.Preview.BeOption:
-                            case Commands.Preview.BeOptionAka:
-                                PreviewIt(dist, url);
-                                break;
-                            default:
-                                System.Console.WriteLine($"Unknown option '{arguments[i]}'!");
-                                return;
-                        }
+                    InitializeBbob.Initialize(InitializeBbob.InitializeOptions.All);
+                    string dist = Path.Combine(Environment.CurrentDirectory, Configuration.ConfigManager.MainConfig.distributionPath);
+                    Generator generater = new Generator(dist, afp);
+                    if (generater.Process())
+                    {
+                        if (++i < length)
+                            switch (arguments[i])
+                            {
+                                case Commands.Deploy.BeOption:
+                                case Commands.Deploy.BeOptionAka:
+                                    DeployIt(dist);
+                                    break;
+                                case Commands.Preview.BeOption:
+                                case Commands.Preview.BeOptionAka:
+                                    string url = $"http://localhost:{CliShared.GetAvailablePort(Configuration.ConfigManager.MainConfig.previewPort)}";
+                                    PreviewIt(dist, url);
+                                    break;
+                                default:
+                                    System.Console.WriteLine($"Unknown option '{arguments[i]}'!");
+                                    return;
+                            }
+                    }
+                    break;
                 }
-                break;
 
             case Commands.New.Current:
             case Commands.New.CurrentAka:
+                if (isHelp(printHelp<Creator>)) return;
                 NewTypes types = NewTypes.blog;
                 string? filename = null;
                 if (++i < length)
@@ -101,13 +116,19 @@ class ConsoleParser
                 break;
             case Commands.Deploy.Current:
             case Commands.Deploy.CurrentAka:
-                InitializeBbob.Initialize(InitializeBbob.InitializeOptions.All);
-                DeployIt(dist);
-                break;
+                if (isHelp(printHelp<Deploy>)) return;
+                {
+                    InitializeBbob.Initialize(InitializeBbob.InitializeOptions.All);
+                    string dist = Path.Combine(Environment.CurrentDirectory, Configuration.ConfigManager.MainConfig.distributionPath);
+                    DeployIt(dist);
+                    break;
+                }
             case Commands.Preview.Current:
             case Commands.Preview.CurrentAka:
+                if (isHelp(printHelp<Preview>)) return;
                 InitializeBbob.Initialize(InitializeBbob.InitializeOptions.All);
                 {
+                    string url = $"http://localhost:{CliShared.GetAvailablePort(Configuration.ConfigManager.MainConfig.previewPort)}";
                     Func<bool> check = () =>
                     {
                         switch (arguments[i])
@@ -130,11 +151,13 @@ class ConsoleParser
                     {
                         check();
                     }
+                    string dist = Path.Combine(Environment.CurrentDirectory, Configuration.ConfigManager.MainConfig.distributionPath);
                     PreviewIt(dist, url);
                 }
                 break;
             case Commands.ResetConfig.Current:
             case Commands.ResetConfig.CurrentAka:
+                if (isHelp(printHelp<ResetConfig>)) return;
                 if (++i < length)
                 {
                     ResetConfig resetConfig = new ResetConfig(arguments[i]);
@@ -142,6 +165,7 @@ class ConsoleParser
                 }
                 break;
             case Commands.EnableAndDisable.Enable:
+                if (isHelp(printHelp<EnableAndDisable>)) return;
                 {
                     string pluginName = "";
                     bool direct = false;
@@ -172,6 +196,7 @@ class ConsoleParser
                 }
                 break;
             case Commands.EnableAndDisable.Disable:
+                if (isHelp(printHelp<EnableAndDisable>)) return;
                 {
                     string pluginName = "";
                     bool direct = false;
@@ -202,6 +227,7 @@ class ConsoleParser
                 break;
             case Commands.List.Current:
             case Commands.List.CurrentAka:
+                if (isHelp(printHelp<List>)) return;
                 {
                     DataType type = DataType.Plugins;
                     if (++i < length)
@@ -229,6 +255,7 @@ class ConsoleParser
                 }
                 break;
             case Commands.Add.Current:
+                if (isHelp(printHelp<Add>)) return;
                 {
                     Add.Options option = Add.Options.Address;
                     string content = string.Empty;
@@ -278,6 +305,7 @@ class ConsoleParser
                 }
                 break;
             case Commands.Remove.Current:
+                if (isHelp(printHelp<Remove>)) return;
                 {
                     string name = string.Empty;
                     bool global = false;
@@ -308,10 +336,40 @@ class ConsoleParser
                     remove.Process();
                 }
                 break;
+            case Commands.Run.Current:
+                if (isHelp(printHelp<Run>)) return;
+                {
+                    InitializeBbob.Initialize(InitializeBbob.InitializeOptions.All);
+                    string pluginName = string.Empty;
+                    string command = pluginName;
+                    string[] args = Array.Empty<string>();
+                    if (++i < length)
+                    {
+                        pluginName = arguments[i];
+                        if (++i < length)
+                        {
+                            command = arguments[i];
+                            if (++i < length) Array.Copy(arguments, i, args = new string[length - i], 0, args.Length);
+                        }
+                        Run run = new Run(pluginName, command, args);
+                        run.Process();
+                    }
+                    else System.Console.WriteLine("Please enter plugin name!");
+                    break;
+                }
             default:
                 System.Console.WriteLine($"Unknown command: {arguments[i]}!");
                 break;
         }
+    }
+
+    private void printHelp<T>() where T : Command
+    {
+        Type type = typeof(T);
+        string Name = (string?)type.GetProperty("Name", BindingFlags.Public | BindingFlags.Static)?.GetValue(null) ?? "";
+        string Help = (string?)type.GetProperty("Help", BindingFlags.Public | BindingFlags.Static)?.GetValue(null) ?? "";
+
+        System.Console.WriteLine($"Command '{Name}': {Help}");
     }
 
     private void eodPlugin(EnableAndDisable.Options option, string pluginName, bool direct)
@@ -334,7 +392,7 @@ class ConsoleParser
         preview.Process();
     }
 
-    static class Commands
+    public static class Commands
     {
         public static class Help
         {
@@ -423,6 +481,11 @@ class ConsoleParser
             public const string Current = "remove";
             public const string Global = Add.Global;
             public const string GlobalAka = Add.GlobalAka;
+        }
+
+        public static class Run
+        {
+            public const string Current = "run";
         }
     }
 }
