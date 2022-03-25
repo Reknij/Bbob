@@ -198,8 +198,15 @@ public static class PluginSystem
             var mainPlugin = new PluginAssemblyLoadContext(pluginDll, third.Value);
             if (mainPlugin.havePlugin)
             {
-                System.Console.WriteLine($"Loaded third plugin <{third.Value.name}>");
-                thirdPlugins.Add(mainPlugin);
+                if (mainPlugin.Warning != string.Empty)
+                {
+                    System.Console.WriteLine($"Warning: {mainPlugin.Warning}");
+                }
+                else
+                {
+                    System.Console.WriteLine($"Loaded third plugin <{third.Value.name}>");
+                    thirdPlugins.Add(mainPlugin);
+                }
             }
         }
     }
