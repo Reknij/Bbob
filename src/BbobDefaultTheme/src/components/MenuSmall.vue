@@ -17,7 +17,7 @@ let drawer = ref(false)
             <div class="menu"></div>
             <div class="menu"></div>
         </div>
-        <h1 class="oneLine" @click="router.push('/')">{{ Bbob.meta.blogName }}</h1>
+        <h1 class="title" @click="router.push('/')">{{ Bbob.meta.blogName }}</h1>
     </div>
 </template>
 

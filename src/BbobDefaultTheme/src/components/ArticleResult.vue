@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { onBeforeMount, ref, watch } from 'vue';
-import { onBeforeRouteLeave, useRoute } from 'vue-router';
+import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router';
 import Bbob, { Article } from '../../../Bbob/JSApi/Bbob'
 import { normal } from '../composition/changeSize';
 
 let isLoading = ref(true);
 const route = useRoute();
+const router = useRouter();
 let address = route.params.address ? route.params.address as string : '';
 if (!Bbob.meta.extra.shortAddress) {
     address = route.query.address as string;
@@ -33,6 +34,32 @@ let tocDrawer = ref(false)
     <div id="parent" v-loading="isLoading">
         <div id="content">
             <el-card>
+                <span
+                    style="text-align: center; display: block; font-size: xx-large; font-weight: bold;"
+                >{{ article.title }}</span>
+                <span style="text-align: center; display: block; font-size: small; color: #909399;">
+                    Posted on
+                    <span style="text-decoration: underline dashed;">{{ article.date }}</span>
+                </span>
+                <div style="text-align: center; margin-top: 5px;">
+                    <el-tag
+                    v-if="article.categories"
+                    class="tagItem"
+                    v-for="(category, index) in article.categories"
+                    :key="index"
+                    type="warning"
+                    @click="router.push(`/filter/categories?checked=${category}`)"
+                >{{ category }}</el-tag>
+                <el-tag
+                    v-if="article.tags"
+                    class="tagItem"
+                    v-for="(tag, index) in article.tags"
+                    :key="index"
+                    type="success"
+                    @click="router.push(`/filter/tags?checked=${tag}`)"
+                >{{ tag }}</el-tag>
+                </div>
+                <el-divider></el-divider>
                 <span id="htmlContent" v-html="article.contentParsed"></span>
             </el-card>
 
@@ -77,5 +104,9 @@ div#content img {
     display: block;
     margin: 0px auto;
     max-width: calc(768px - var(--el-card-padding) * 2);
+}
+.tagItem {
+    margin-left: 5px;
+    cursor: pointer;
 }
 </style>
