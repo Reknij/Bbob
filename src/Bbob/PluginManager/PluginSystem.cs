@@ -101,7 +101,7 @@ public static class PluginSystem
         if (Directory.Exists(pluginCurrentDirectory)) folders.AddRange(Directory.GetDirectories(pluginCurrentDirectory));
 
         string nugetPackages = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
-        string[] packages = Directory.Exists(nugetPackages)? Directory.GetDirectories(nugetPackages): Array.Empty<string>();
+        string[] packages = Directory.Exists(nugetPackages) ? Directory.GetDirectories(nugetPackages) : Array.Empty<string>();
         Func<string, string> getVersion = (package) =>
         {
             List<string> directories = new List<string>(Directory.GetDirectories(package));
@@ -161,9 +161,12 @@ public static class PluginSystem
         buildInPlugins.Clear();
 
         Type[] types = GetBuildInPlugins();
+        HashSet<string> pluginsLoaded = typeof(PluginHelper).GetField("pluginsLoaded", BindingFlags.NonPublic | BindingFlags.Static)?.GetValue(null) as HashSet<string> ??
+        throw new FieldAccessException("Can't access pluginsLoaded from PluginHelper!");
         foreach (var type in types)
         {
             var buildInPlugin = getPluginInfo(type);
+            pluginsLoaded.Add(buildInPlugin.name.ToUpper());
             if (!config.isPluginEnable(buildInPlugin))
             {
                 System.Console.WriteLine($"Disable build-in plugin <{buildInPlugin.name}>");
@@ -180,8 +183,11 @@ public static class PluginSystem
     {
         List<KeyValuePair<string, PluginJson>> thirdPluginsInfo = GetThirdPluginsInfo();
         var config = Configuration.ConfigManager.MainConfig;
+        HashSet<string> pluginsLoaded = typeof(PluginHelper).GetField("pluginsLoaded", BindingFlags.NonPublic | BindingFlags.Static)?.GetValue(null) as HashSet<string> ??
+        throw new FieldAccessException("Can't access pluginsLoaded from PluginHelper!");
         foreach (var third in thirdPluginsInfo)
         {
+            pluginsLoaded.Add(third.Value.name.ToUpper());
             if (!config.isPluginEnable(third.Value))
             {
                 System.Console.WriteLine($"Disable third plugin <{third.Value.name}>");
@@ -242,7 +248,9 @@ public static class PluginSystem
     public delegate void CyclePluginDelegate(IPlugin plugin);
     public static void cyclePlugins(CyclePluginDelegate cyclePluginDelegate)
     {
-        PluginHelper._pluginsDone.Clear();
+        HashSet<string> pluginsDone = typeof(PluginHelper).GetField("pluginsDone", BindingFlags.NonPublic | BindingFlags.Static)?.GetValue(null) as HashSet<string> ??
+        throw new FieldAccessException("Cant access pluginsDone from PluginHelper!");
+        pluginsDone.Clear();
         List<PluginContext> requireRunAgain = new();
 
         Func<PluginContext, bool> runPlugin = (context) =>
@@ -253,7 +261,7 @@ public static class PluginSystem
             {
                 default:
                 case CommandOperation.None:
-                    PluginHelper._pluginsDone.Add(context.info.name);
+                    pluginsDone.Add(context.info.name);
                     break;
                 case CommandOperation.RunMeAgain:
                     requireRunAgain.Add(context);

@@ -144,14 +144,16 @@ public class Generator : Command
 
     private BuildData GetBuildData()
     {
+        Dictionary<string, object> metas = typeof(PluginHelper).GetField("metas", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)?.GetValue(null) as Dictionary<string, object> ??
+        throw new FieldAccessException("Can't access metas from PluginHelper!");
         if (PluginHelper.getRegisteredObject<dynamic>("blog", out dynamic? blog) && blog != null)
         {
-            return new BuildData(blog, PluginHelper._getAllMetas());
+            return new BuildData(blog, metas);
         }
         else
         {
             System.Console.WriteLine("'blog' is missing!");
         }
-        return new BuildData(new ExpandoObject(), PluginHelper._getAllMetas());
+        return new BuildData(new ExpandoObject(), metas);
     }
 }

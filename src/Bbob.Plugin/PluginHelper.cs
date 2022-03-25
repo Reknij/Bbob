@@ -73,6 +73,9 @@ public static class PluginHelper
     }
     static Dictionary<string, object?> pluginsObject = new Dictionary<string, object?>();
     static Dictionary<string, object> metas = new Dictionary<string, object>();
+    static HashSet<string> pluginsDone = new HashSet<string>();
+    static HashSet<string> pluginsLoaded = new HashSet<string>();
+    static Dictionary<string, Dictionary<string, Action<string[]>>> customCommands = new ();
 
     /// <summary>
     /// Register object with target name to PluginHelper.
@@ -362,13 +365,13 @@ public static class PluginHelper
     /// <returns>True if done, otherwise false.</returns>
     public static bool isTargetPluginDone(string name)
     {
-        return _pluginsDone.Contains(name);
+        return pluginsDone.Contains(name);
     }
 
     /// <summary>
     /// Check plugin is enable and is done or not.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="name">Name of plugin.</param>
     /// <returns>True if enable and done, otherwise false.</returns>
     public static bool isTargetPluginEnableAndDone(string name)
     {
@@ -378,25 +381,40 @@ public static class PluginHelper
     /// <summary>
     /// Check plugin is enable or disable.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="name">Name of plugin.</param>
     /// <returns>True if enable, otherwise false.</returns>
     public static bool isTargetPluginEnable(string name) => ConfigBbob.isPluginEnable(name);
 
     /// <summary>
-    /// Metas of all plugins register. You should not use it.
+    /// Check plugin is loaded or not.
     /// </summary>
+    /// <param name="name">Name of plugin.</param>
     /// <returns></returns>
-    public static Dictionary<string, object> _getAllMetas() => metas;
+    public static bool isTargetPluginLoaded(string name)
+    {
+        return pluginsLoaded.Contains(name.ToUpper());
+    }
 
     /// <summary>
     /// HashSet of plugins done. You should not use it.
     /// </summary>
     /// <returns></returns>
-    public static HashSet<string> _pluginsDone = new HashSet<string>();
 
     /// <summary>
     /// Bbob will check the command operation in command result to determine execution next.
     /// </summary>
     /// <value></value>
     public static CommandResult ExecutingCommandResult { get; set; }
+
+    /// <summary>
+    /// Register custom command from your plugin.
+    /// </summary>
+    /// <param name="command">Command to register.</param>
+    /// <param name="function">Function to execute which command called.</param>
+    public static void registerCustomCommand(string command, Action<string[]> function)
+    {
+        string pluginName = ExecutingPlugin.name.ToUpper();
+        if (!customCommands.ContainsKey(pluginName)) customCommands.Add(pluginName, new Dictionary<string, Action<string[]>>());
+        customCommands[pluginName].Add(command, function);
+    }
 }
