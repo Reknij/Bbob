@@ -1,5 +1,5 @@
 using Bbob.Plugin;
-using System.Reflection;
+using Bbob.Plugin.Cores;
 using System.Text.RegularExpressions;
 
 namespace Bbob.Main.Cli;
@@ -27,9 +27,6 @@ public class Run : Command
     {
         const string SUCCESS = "SUCCESS: ";
         const string FAILED = "FAILED: ";
-        var customCommands = typeof(PluginHelper).GetField("customCommands", BindingFlags.NonPublic | BindingFlags.Static)?.GetValue(null)
-        as Dictionary<string, Dictionary<string, Action<string[]>>> ??
-        throw new FieldAccessException("Can't access customCommands from PluginHelper!");
 
         if (!PluginHelper.isTargetPluginLoaded(pluginName))
         {
@@ -41,14 +38,14 @@ public class Run : Command
             System.Console.WriteLine($"{FAILED}Target plugin is disable! Please enable to try again.");
             return false;
         }
-        if (!customCommands.ContainsKey(pluginName))
+        if (!PluginHelperCore.customCommands.ContainsKey(pluginName))
         {
             System.Console.WriteLine($"{FAILED}Target plugin is no register any custom command!");
             return false;
         }
         Func<string, bool> existsCommand = (cmd) =>
         {
-            if (!customCommands[pluginName].ContainsKey(cmd))
+            if (!PluginHelperCore.customCommands[pluginName].ContainsKey(cmd))
             {
                 System.Console.WriteLine($"{FAILED}Target plugin is no register custom command '{cmd}'.");
                 return false;
@@ -59,7 +56,7 @@ public class Run : Command
         if (!string.IsNullOrWhiteSpace(command))
         {
             if (!existsCommand(command)) return false;
-            customCommands[pluginName][command](arguments);
+            PluginHelperCore.customCommands[pluginName][command](arguments);
         }
         else
         {
@@ -86,7 +83,7 @@ public class Run : Command
                     continue;
                 }
                 Array.Copy(args, 1, arguments = new string[args.Length - 1], 0, arguments.Length);
-                customCommands[pluginName][command](arguments);
+                PluginHelperCore.customCommands[pluginName][command](arguments);
                 readC();
             }
             System.Console.WriteLine("Custom command mode exited.");

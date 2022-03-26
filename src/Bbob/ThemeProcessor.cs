@@ -9,11 +9,11 @@ public static class ThemeProcessor
 {
     static readonly string themesFolder = Path.Combine(AppContext.BaseDirectory, "themes"); //themes in base of Bbob directory.
     static readonly string thirdThemesFolder = Path.Combine(Environment.CurrentDirectory, "themes"); //themes in base of Bbob directory.
-
+    public static bool ShowLoadedMessage {get;set;} = true;
     static Dictionary<string, Theme> themes = new Dictionary<string, Theme>();
     public static void LoadAllTheme()
     {
-        System.Console.WriteLine("Loading Themes...");
+        if (ShowLoadedMessage) System.Console.WriteLine("Loading Themes...");
         themes.Clear();
         Directory.CreateDirectory(themesFolder);
         Directory.CreateDirectory(thirdThemesFolder);

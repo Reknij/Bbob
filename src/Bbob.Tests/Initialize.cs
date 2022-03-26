@@ -7,6 +7,7 @@ using System.IO;
 using static Bbob.Main.ThemeProcessor;
 using System.Text.Json;
 using Bbob.Plugin;
+using Bbob.Plugin.Cores;
 
 namespace Bbob.Tests;
 
@@ -31,7 +32,7 @@ public class Initialize
                 author = "Jinker"
             });
         }
-        PluginHelper.ThemePath = themeFolder;
+        PluginHelperCore.themePath = themeFolder;
         PluginSystem.LoadAllPlugins();
     }
 }

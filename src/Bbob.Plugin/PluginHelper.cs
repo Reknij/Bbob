@@ -1,6 +1,8 @@
-
+using static Bbob.Plugin.Cores.PluginHelperCore;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 
+[assembly: InternalsVisibleTo("Bbob.Main")]
 namespace Bbob.Plugin;
 
 /// <summary>
@@ -12,13 +14,13 @@ public static class PluginHelper
     /// Path of target theme folder.
     /// </summary>
     /// <value></value>
-    public static string ThemePath { get; set; } = "null";
+    public static string ThemePath => themePath;
 
     /// <summary>
     /// Config of Bbob cli.
     /// </summary>
     /// <returns></returns>
-    public static ConfigJson ConfigBbob { get; set; } = new ConfigJson();
+    public static ConfigJson ConfigBbob => configBbob ?? throw new NullReferenceException("Config of bbob is null!");
     private static PluginJson? _ExecutingPlugin;
 
     /// <summary>
@@ -30,34 +32,29 @@ public static class PluginHelper
         get => _ExecutingPlugin ?? throw new NullReferenceException("Executing plugin is null.");
         set => _ExecutingPlugin = value;
     }
-    private static string? _currentDirectory;
-    private static string? _baseDirectory;
 
     /// <summary>
     /// Current path of executing Bbob cli.
     /// </summary>
     /// <value></value>
-    public static string CurrentDirectory
-    {
-        get => _currentDirectory ?? throw new NullReferenceException("current directory is null.");
-        set => _currentDirectory = value;
-    }
+    public static string CurrentDirectory => currentDirectory;
 
     /// <summary>
     /// Base path of Bbob cli.
     /// </summary>
     /// <value></value>
-    public static string BaseDirectory
-    {
-        get => _baseDirectory ?? throw new NullReferenceException("base directory is null.");
-        set => _baseDirectory = value;
-    }
+    public static string BaseDirectory => baseDirectory;
 
     /// <summary>
     /// Bbob command distribution path.
     /// </summary>
     /// <returns></returns>
     public static string DistributionDirectory => Path.Combine(CurrentDirectory, ConfigBbob.distributionPath);
+
+    /// <summary>
+    /// Loaded plugin order.
+    /// </summary>
+    public static string[] PluginsLoadedOrder => pluginsLoadedOrder;
 
     /// <summary>
     /// Delegates of PluginHelper.
@@ -71,11 +68,6 @@ public static class PluginHelper
         /// <typeparam name="T"></typeparam>
         public delegate void ModifyObjectDelegate<T>(ref T? obj);
     }
-    static Dictionary<string, object?> pluginsObject = new Dictionary<string, object?>();
-    static Dictionary<string, object> metas = new Dictionary<string, object>();
-    static HashSet<string> pluginsDone = new HashSet<string>();
-    static HashSet<string> pluginsLoaded = new HashSet<string>();
-    static Dictionary<string, Dictionary<string, Action<string[]>>> customCommands = new ();
 
     /// <summary>
     /// Register object with target name to PluginHelper.
@@ -215,7 +207,7 @@ public static class PluginHelper
             }
             catch (System.Exception ex)
             {
-                System.Console.WriteLine($"Get plugin config error:\n{ex.ToString()}");
+                System.Console.WriteLine($"[{ExecutingPlugin.name}]: Get plugin config error:\n{ex.ToString()}");
             }
         }
         config = default(T);
@@ -251,7 +243,7 @@ public static class PluginHelper
         }
         catch (System.Exception ex)
         {
-            System.Console.WriteLine($"Save plugin config error:\n{ex.ToString()}");
+            System.Console.WriteLine($"[{ExecutingPlugin.name}]: Save plugin config error:\n{ex.ToString()}");
         }
     }
 
@@ -338,9 +330,17 @@ public static class PluginHelper
     /// <returns>Type instance of theme.json.</returns>
     public static T? getThemeInfo<T>()
     {
-        using (FileStream fs = File.OpenRead(Path.Combine(ThemePath, "theme.json")))
+        try
         {
-            return JsonSerializer.Deserialize<T>(fs);
+            using (FileStream fs = File.OpenRead(Path.Combine(ThemePath, "theme.json")))
+            {
+                return JsonSerializer.Deserialize<T>(fs);
+            }
+        }
+        catch (System.Exception ex)
+        {
+            System.Console.WriteLine($"[{ExecutingPlugin.name}]: Get theme info error:\n{ex.ToString()}");
+            return default(T);
         }
     }
 

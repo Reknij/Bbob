@@ -1,4 +1,5 @@
 using Bbob.Plugin;
+using Bbob.Plugin.Cores;
 using System.Reflection;
 using System.Text.Json;
 
@@ -13,16 +14,21 @@ public static class PluginSystem
     static List<IPlugin> buildInPlugins = new List<IPlugin>();
     static List<PluginContext> allPlugin = new List<PluginContext>();
 
+    public static bool ShowLoadedMessage { get; set; } = true;
     public static void LoadAllPlugins()
     {
         Directory.CreateDirectory(configsFolder);
-        System.Console.WriteLine("Loading Plugin System...");
-        PluginHelper.CurrentDirectory = Environment.CurrentDirectory;
-        PluginHelper.BaseDirectory = AppContext.BaseDirectory;
+        if (ShowLoadedMessage) System.Console.WriteLine("Loading Plugin System...");
+        PluginHelperCore.currentDirectory = Environment.CurrentDirectory;
+        PluginHelperCore.baseDirectory = AppContext.BaseDirectory;
+        PluginHelperCore.pluginsLoaded.Clear();
         LoadBuildInPlugins();
         LoadThirdPlugins();
-        if ((BuildInPluginCount + ThirdPluginCount) > 0) System.Console.WriteLine($"Loaded {AllPluginCount} plugins. ({BuildInPluginCount}|{ThirdPluginCount})");
-        else System.Console.WriteLine("Warning: plugins are loaded.");
+        if (ShowLoadedMessage)
+        {
+            if ((BuildInPluginCount + ThirdPluginCount) > 0) System.Console.WriteLine($"Loaded {AllPluginCount} plugins. ({BuildInPluginCount}|{ThirdPluginCount})");
+            else System.Console.WriteLine("Warning: plugins are loaded.");
+        }
         foreach (var p in buildInPlugins)
         {
             allPlugin.Add(new PluginContext(p, getPluginInfo(p)));
@@ -75,12 +81,22 @@ public static class PluginSystem
             {
                 using (FileStream fs = new FileStream(pluginJsonPath, FileMode.Open, FileAccess.ReadWrite))
                 {
-                    PluginJson? pluginInfo = JsonSerializer.Deserialize<PluginJson>(fs);
-                    if (pluginInfo == null)
+                    PluginJson? pluginInfo = null;
+                    try
                     {
-                        System.Console.WriteLine("Plugin json file can't loaded.");
+                        pluginInfo = JsonSerializer.Deserialize<PluginJson>(fs);
+                        if (pluginInfo == null)
+                        {
+                            System.Console.WriteLine("Plugin json file can't loaded.");
+                            return;
+                        }
+                    }
+                    catch (System.Exception ex)
+                    {
+                        System.Console.WriteLine("Load plugin json error: " + ex.Message);
                         return;
                     }
+
                     try
                     {
                         var a = pluginInfo.name;
@@ -161,36 +177,32 @@ public static class PluginSystem
         buildInPlugins.Clear();
 
         Type[] types = GetBuildInPlugins();
-        HashSet<string> pluginsLoaded = typeof(PluginHelper).GetField("pluginsLoaded", BindingFlags.NonPublic | BindingFlags.Static)?.GetValue(null) as HashSet<string> ??
-        throw new FieldAccessException("Can't access pluginsLoaded from PluginHelper!");
         foreach (var type in types)
         {
             var buildInPlugin = getPluginInfo(type);
-            pluginsLoaded.Add(buildInPlugin.name.ToUpper());
+            PluginHelperCore.pluginsLoaded.Add(buildInPlugin.name.ToUpper());
             if (!config.isPluginEnable(buildInPlugin))
             {
-                System.Console.WriteLine($"Disable build-in plugin <{buildInPlugin.name}>");
+                if (ShowLoadedMessage) System.Console.WriteLine($"Disable build-in plugin <{buildInPlugin.name}>");
                 continue;
             }
             InitializeExecutingPlugin(buildInPlugin);
             var p = (IPlugin?)Activator.CreateInstance(type);
             if (p == null) continue;
             buildInPlugins.Add(p);
-            System.Console.WriteLine($"Loaded build-in plugin <{buildInPlugin.name}>");
+            if (ShowLoadedMessage) System.Console.WriteLine($"Loaded build-in plugin <{buildInPlugin.name}>");
         }
     }
     private static void LoadThirdPlugins()
     {
         List<KeyValuePair<string, PluginJson>> thirdPluginsInfo = GetThirdPluginsInfo();
         var config = Configuration.ConfigManager.MainConfig;
-        HashSet<string> pluginsLoaded = typeof(PluginHelper).GetField("pluginsLoaded", BindingFlags.NonPublic | BindingFlags.Static)?.GetValue(null) as HashSet<string> ??
-        throw new FieldAccessException("Can't access pluginsLoaded from PluginHelper!");
         foreach (var third in thirdPluginsInfo)
         {
-            pluginsLoaded.Add(third.Value.name.ToUpper());
+            PluginHelperCore.pluginsLoaded.Add(third.Value.name.ToUpper());
             if (!config.isPluginEnable(third.Value))
             {
-                System.Console.WriteLine($"Disable third plugin <{third.Value.name}>");
+                if (ShowLoadedMessage) System.Console.WriteLine($"Disable third plugin <{third.Value.name}>");
                 continue;
             }
             string pluginDll = Path.Combine(third.Key, third.Value.entry);
@@ -204,7 +216,7 @@ public static class PluginSystem
                 }
                 else
                 {
-                    System.Console.WriteLine($"Loaded third plugin <{third.Value.name}>");
+                    if (ShowLoadedMessage) System.Console.WriteLine($"Loaded third plugin <{third.Value.name}>");
                     thirdPlugins.Add(mainPlugin);
                 }
             }
@@ -250,14 +262,18 @@ public static class PluginSystem
         }
         PluginRelation pluginRelation = new PluginRelation(allPlugin);
         allPlugin = pluginRelation.ProcessRelation();
+        int length = allPlugin.Count;
+        PluginHelperCore.pluginsLoadedOrder = new string[length];
+        for (int i = 0; i < length; i++)
+        {
+            PluginHelperCore.pluginsLoadedOrder[i] = allPlugin[i].info.name;
+        }
     }
 
     public delegate void CyclePluginDelegate(IPlugin plugin);
     public static void cyclePlugins(CyclePluginDelegate cyclePluginDelegate)
     {
-        HashSet<string> pluginsDone = typeof(PluginHelper).GetField("pluginsDone", BindingFlags.NonPublic | BindingFlags.Static)?.GetValue(null) as HashSet<string> ??
-        throw new FieldAccessException("Cant access pluginsDone from PluginHelper!");
-        pluginsDone.Clear();
+        PluginHelperCore.pluginsDone.Clear();
         List<PluginContext> requireRunAgain = new();
 
         Func<PluginContext, bool> runPlugin = (context) =>
@@ -268,7 +284,7 @@ public static class PluginSystem
             {
                 default:
                 case CommandOperation.None:
-                    pluginsDone.Add(context.info.name);
+                    PluginHelperCore.pluginsDone.Add(context.info.name);
                     break;
                 case CommandOperation.RunMeAgain:
                     requireRunAgain.Add(context);

@@ -1,5 +1,6 @@
 using Bbob.Main.PluginManager;
 using Bbob.Plugin;
+using Bbob.Plugin.Cores;
 
 namespace Bbob.Main;
 
@@ -24,7 +25,7 @@ public static class InitializeBbob
             ThemeProcessor.LoadAllTheme();
             if (ThemeProcessor.getTheme(out var info) && info != null)
             {
-                PluginHelper.ThemePath = info.Path;
+                PluginHelperCore.themePath = info.Path;
             }
             else
             {

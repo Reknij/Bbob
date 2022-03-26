@@ -2,12 +2,14 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Bbob.Plugin;
+using Bbob.Plugin.Cores;
 
 namespace Bbob.Main.Configuration;
 
 public static class ConfigManager
 {
     public static string ConfigPath { get; set; } = Path.Combine(Environment.CurrentDirectory, "config.json");
+    public static bool ShowLoadedMessage {get;set;} = true;
     private static ConfigJson? mConfig;
     private static ConfigJson? dConfig;
     public static ConfigJson MainConfig
@@ -66,7 +68,7 @@ public static class ConfigManager
                 if (loaded)
                 {
                     ((ConfigJsonFix)MainConfig).Recheck();
-                    System.Console.WriteLine("Loaded config file.");
+                    if (ShowLoadedMessage) System.Console.WriteLine("Loaded config file.");
                 }
                 else
                 {
@@ -98,7 +100,7 @@ public static class ConfigManager
     public static void SaveConfig() => SaveConfig(MainConfig, ConfigPath);
 
     public static void registerConfigToPluginSystem() => registerConfigToPluginSystem(MainConfig);
-    public static void registerConfigToPluginSystem(ConfigJson config) => PluginHelper.ConfigBbob = config;
+    public static void registerConfigToPluginSystem(ConfigJson config) => PluginHelperCore.configBbob = config;
 
     public class ConfigJsonFix : ConfigJson
     {

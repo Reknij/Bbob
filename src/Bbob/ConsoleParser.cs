@@ -91,6 +91,7 @@ class ConsoleParser
             case Commands.New.Current:
             case Commands.New.CurrentAka:
                 if (isHelp(printHelp<Creator>)) return;
+                TurnMessageShow(TurnOption.Theme, false);
                 NewTypes types = NewTypes.blog;
                 string? filename = null;
                 if (++i < length)
@@ -118,6 +119,7 @@ class ConsoleParser
             case Commands.Deploy.CurrentAka:
                 if (isHelp(printHelp<Deploy>)) return;
                 {
+                    TurnMessageShow(TurnOption.Theme, false);
                     InitializeBbob.Initialize(InitializeBbob.InitializeOptions.All);
                     string dist = Path.Combine(Environment.CurrentDirectory, Configuration.ConfigManager.MainConfig.distributionPath);
                     DeployIt(dist);
@@ -126,6 +128,7 @@ class ConsoleParser
             case Commands.Preview.Current:
             case Commands.Preview.CurrentAka:
                 if (isHelp(printHelp<Preview>)) return;
+                TurnMessageShow(TurnOption.Plugin | TurnOption.Theme, false);
                 InitializeBbob.Initialize(InitializeBbob.InitializeOptions.All);
                 {
                     string url = $"http://localhost:{CliShared.GetAvailablePort(Configuration.ConfigManager.MainConfig.previewPort)}";
@@ -158,6 +161,7 @@ class ConsoleParser
             case Commands.ResetConfig.Current:
             case Commands.ResetConfig.CurrentAka:
                 if (isHelp(printHelp<ResetConfig>)) return;
+                TurnMessageShow(TurnOption.All, false);
                 if (++i < length)
                 {
                     ResetConfig resetConfig = new ResetConfig(arguments[i]);
@@ -167,6 +171,7 @@ class ConsoleParser
             case Commands.EnableAndDisable.Enable:
                 if (isHelp(printHelp<EnableAndDisable>)) return;
                 {
+                    TurnMessageShow(TurnOption.All, false);
                     string pluginName = "";
                     bool direct = false;
                     if (++i < length)
@@ -198,6 +203,7 @@ class ConsoleParser
             case Commands.EnableAndDisable.Disable:
                 if (isHelp(printHelp<EnableAndDisable>)) return;
                 {
+                    TurnMessageShow(TurnOption.All, false);
                     string pluginName = "";
                     bool direct = false;
                     if (++i < length)
@@ -229,6 +235,7 @@ class ConsoleParser
             case Commands.List.CurrentAka:
                 if (isHelp(printHelp<List>)) return;
                 {
+                    TurnMessageShow(TurnOption.All, false);
                     DataType type = DataType.Plugins;
                     if (++i < length)
                     {
@@ -257,6 +264,7 @@ class ConsoleParser
             case Commands.Add.Current:
                 if (isHelp(printHelp<Add>)) return;
                 {
+                    TurnMessageShow(TurnOption.All, false);
                     Add.Options option = Add.Options.Address;
                     string content = string.Empty;
                     bool global = false;
@@ -307,6 +315,7 @@ class ConsoleParser
             case Commands.Remove.Current:
                 if (isHelp(printHelp<Remove>)) return;
                 {
+                    TurnMessageShow(TurnOption.All, false);
                     string name = string.Empty;
                     bool global = false;
                     Func<string, bool> checkArgument = (argument) =>
@@ -339,6 +348,7 @@ class ConsoleParser
             case Commands.Run.Current:
                 if (isHelp(printHelp<Run>)) return;
                 {
+                    TurnMessageShow(TurnOption.All, false);
                     InitializeBbob.Initialize(InitializeBbob.InitializeOptions.All);
                     string pluginName = string.Empty;
                     string command = pluginName;
@@ -361,6 +371,20 @@ class ConsoleParser
                 System.Console.WriteLine($"Unknown command: {arguments[i]}!");
                 break;
         }
+    }
+
+    private enum TurnOption
+    {
+        Plugin = 2,
+        Theme = 4,
+        Config = 6,
+        All = Plugin | Theme | Config
+    }
+    private void TurnMessageShow(TurnOption turnOff, bool isOn = true)
+    {
+        if ((turnOff & TurnOption.Plugin) != 0) PluginSystem.ShowLoadedMessage = isOn;
+        if ((turnOff & TurnOption.Theme) != 0) ThemeProcessor.ShowLoadedMessage = isOn;
+        if ((turnOff & TurnOption.Config) != 0) Configuration.ConfigManager.ShowLoadedMessage = isOn;
     }
 
     private void printHelp<T>() where T : Command

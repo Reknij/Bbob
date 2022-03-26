@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Dynamic;
 using System.Text.Json;
 using System.Security.Cryptography;
+using Bbob.Plugin.Cores;
 
 namespace Bbob.Main.Cli;
 
@@ -144,16 +145,14 @@ public class Generator : Command
 
     private BuildData GetBuildData()
     {
-        Dictionary<string, object> metas = typeof(PluginHelper).GetField("metas", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)?.GetValue(null) as Dictionary<string, object> ??
-        throw new FieldAccessException("Can't access metas from PluginHelper!");
         if (PluginHelper.getRegisteredObject<dynamic>("blog", out dynamic? blog) && blog != null)
         {
-            return new BuildData(blog, metas);
+            return new BuildData(blog, PluginHelperCore.metas);
         }
         else
         {
             System.Console.WriteLine("'blog' is missing!");
         }
-        return new BuildData(new ExpandoObject(), metas);
+        return new BuildData(new ExpandoObject(), PluginHelperCore.metas);
     }
 }
