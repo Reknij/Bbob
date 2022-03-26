@@ -119,4 +119,11 @@ onMounted(() => {
     text-decoration: none;
     color: #409eff;
 }
+.el-timeline {
+        padding-inline-start: 0px;
+}
+.el-timeline-item__timestamp{
+    color: black;
+    margin-left: 15px;
+}
 </style>

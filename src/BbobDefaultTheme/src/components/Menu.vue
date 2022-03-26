@@ -53,7 +53,7 @@ div.menu {
 .nav-wrapper {
   display: flex;
   justify-content: space-between;
-  border-bottom: #dcdfe6 solid 1px;
+  border-bottom: #313331 solid 1px;
 }
 .nav-container {
   display: flex;
@@ -75,7 +75,10 @@ div.menu {
   color: #409EFF;
 }
 .nav-item-selected {
-  border-bottom: #409eff solid 2px;
+  border-bottom: #409eff solid 3px;
+  height: 99%;
   margin-bottom: 10px;
+  font-size: large;
+  font-weight: bold;
 }
 </style>

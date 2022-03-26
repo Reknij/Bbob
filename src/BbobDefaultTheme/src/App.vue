@@ -12,7 +12,7 @@ function setElMainWidth(normal: boolean) {
     let element = document.documentElement as HTMLElement;
     if (element) {
         if (normal) element.style.setProperty('--mainContentPadding', '20px');
-        else element.style.setProperty('--mainContentPadding', '20px 5px');
+        else element.style.setProperty('--mainContentPadding', '20px 8px');
     }
     else console.log('is null')
 }
@@ -80,5 +80,8 @@ if (dt) {
 }
 body{
     margin: 0px;
+}
+.el-card__body{
+    padding: 10px 20px;
 }
 </style>
