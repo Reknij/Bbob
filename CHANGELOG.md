@@ -1,3 +1,13 @@
+# 2022-3-26
+## Bbob
+- optimize command message show.
+## Bbob.Plugin
+- refactoring unsafe fields.
+- add PluginsLoadedOrder.
+## BbobDefaultTheme
+- refactoring ui.
+- support meta to configurate background image, welcome text and description.
+
 # 2022-3-25
 ## Bbob
 - `add` and `remove` command will auto set value to uppper.
@@ -7,7 +17,7 @@
 - Load plugin will check interface version.
 ## BbobDefaultTheme
 - article page front have information now.
-- fix title position.
+- fix title position. 
 ## Bbob.Plugin
 - refactoring all unsafe field.
 - add registerCustomCommand function.
