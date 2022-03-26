@@ -12,7 +12,7 @@ function setElMainWidth(normal: boolean) {
     let element = document.documentElement as HTMLElement;
     if (element) {
         if (normal) element.style.setProperty('--mainContentPadding', '20px');
-        else element.style.setProperty('--mainContentPadding', '20px 0px');
+        else element.style.setProperty('--mainContentPadding', '20px 5px');
     }
     else console.log('is null')
 }
@@ -29,7 +29,7 @@ if (dt) {
 <template>
     <img class="background" v-if="hasBackground" :src="dt.background" />
     <div class="background backgroundApp"></div>
-    <el-container v-infinite-scroll="scrollToDownInvoke" class="app-container center">
+    <el-container v-infinite-scroll="scrollToDownInvoke" class="app-container center" style="min-height: 100vh;">
         <el-header style="height: auto;">
             <div class="app-container">
                 <Menu v-if="normal"></Menu>
@@ -76,6 +76,9 @@ if (dt) {
     transform: translate(-50%, -50%);
 }
 .center {
-    margin: auto !important;
+    margin: 0px auto !important;
+}
+body{
+    margin: 0px;
 }
 </style>
