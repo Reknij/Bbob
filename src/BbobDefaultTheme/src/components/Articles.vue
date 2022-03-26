@@ -74,7 +74,7 @@ onMounted(() => {
             <el-card>
                 <h3>
                     <router-link
-                        class="articleTitle"
+                        class="articlesTitle"
                         :to="Bbob.meta.extra.shortAddress ? `/article/${link.address}` : `/article?address=${link.address}`"
                     >{{ link.title }}</router-link>
                 </h3>
@@ -111,11 +111,11 @@ onMounted(() => {
     margin-left: 5px;
     cursor: pointer;
 }
-.articleTitle {
+.articlesTitle {
     text-decoration: none;
     color: #303133;
 }
-.articleTitle:hover {
+.articlesTitle:hover {
     text-decoration: none;
     color: #409eff;
 }

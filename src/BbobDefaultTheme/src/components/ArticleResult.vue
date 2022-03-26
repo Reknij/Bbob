@@ -5,6 +5,7 @@ import Bbob, { Article } from '../../../Bbob/JSApi/Bbob'
 import { normal } from '../composition/changeSize';
 
 let isLoading = ref(true);
+let articleLoadingMs = 300;
 const route = useRoute();
 const router = useRouter();
 let address = route.params.address ? route.params.address as string : '';
@@ -17,10 +18,22 @@ let article = ref<Article>({
     contentParsed: ""
 });
 onBeforeMount(async () => {
+    let start = new Date().getTime();
     article.value = await Bbob.api.getArticleFromAddressAsync(address)
-    document.title = article.value.title;
-    isLoading.value = false;
+    let diff = (new Date().getTime() - start); //milliseconds interval
+    document.title = `${article.value.title} - ${Bbob.meta.blogName}`;
+    let wait = articleLoadingMs - diff;
+    if (wait > 0) {
+        setTimeout(() => {
+            isLoading.value = false;
+        }, wait);
+    }
+    else {
+        isLoading.value = false;
+    }
+
     Bbob.meta.extra.prerenderNow = true;
+    window.scrollTo(0, 0);
 })
 onBeforeRouteLeave(() => {
     document.title = Bbob.meta.blogName
@@ -31,64 +44,63 @@ let tocDrawer = ref(false)
 </script>
 
 <template>
-    <div id="parent" v-loading="isLoading">
-        <div id="content">
-            <el-card>
-                <span
-                    style="text-align: center; display: block; font-size: xx-large; font-weight: bold;"
-                >{{ article.title }}</span>
-                <span style="text-align: center; display: block; font-size: small; color: #909399;">
-                    Posted on
-                    <span style="text-decoration: underline dashed;">{{ article.date }}</span>
-                </span>
-                <div style="text-align: center; margin-top: 5px;">
-                    <el-tag
-                    v-if="article.categories"
-                    class="tagItem"
-                    v-for="(category, index) in article.categories"
-                    :key="index"
-                    type="warning"
-                    @click="router.push(`/filter/categories?checked=${category}`)"
-                >{{ category }}</el-tag>
-                <el-tag
-                    v-if="article.tags"
-                    class="tagItem"
-                    v-for="(tag, index) in article.tags"
-                    :key="index"
-                    type="success"
-                    @click="router.push(`/filter/tags?checked=${tag}`)"
-                >{{ tag }}</el-tag>
-                </div>
-                <el-divider></el-divider>
-                <span id="htmlContent" v-html="article.contentParsed"></span>
-            </el-card>
-
-            <el-drawer
-                :size="normal ? '50%' : '100%'"
-                v-if="article.toc"
-                v-model="tocDrawer"
-                direction="ltr"
-            >
-                <template #title>
-                    <h4>Table of content</h4>
-                </template>
+    <div id="content">
+        <el-card>
+            <el-skeleton :animated="true" :loading="isLoading" :rows="20">
                 <template #default>
-                    <div>
-                        <span @click="tocDrawer = false" v-html="article.toc"></span>
+                    <span class="articleTitle">{{ article.title }}</span>
+                    <span class="articleDate">
+                        Posted on
+                        <span style="text-decoration: underline dashed;">{{ article.date }}</span>
+                    </span>
+                    <div style="text-align: center; margin-top: 5px;">
+                        <el-tag
+                            v-if="article.categories"
+                            class="tagItem"
+                            v-for="(category, index) in article.categories"
+                            :key="index"
+                            type="warning"
+                            @click="router.push(`/filter/categories?checked=${category}`)"
+                        >{{ category }}</el-tag>
+                        <el-tag
+                            v-if="article.tags"
+                            class="tagItem"
+                            v-for="(tag, index) in article.tags"
+                            :key="index"
+                            type="success"
+                            @click="router.push(`/filter/tags?checked=${tag}`)"
+                        >{{ tag }}</el-tag>
                     </div>
+                    <el-divider></el-divider>
+                    <span id="htmlContent" v-html="article.contentParsed"></span>
                 </template>
-            </el-drawer>
+            </el-skeleton>
+        </el-card>
 
-            <el-affix style="margin-left: calc(100% - 60px);" :offset="80" position="bottom">
-                <el-button @click="tocDrawer = true" type="primary">Toc</el-button>
-            </el-affix>
-        </div>
+        <el-drawer
+            :size="normal ? '50%' : '100%'"
+            v-if="article.toc"
+            v-model="tocDrawer"
+            direction="ltr"
+        >
+            <template #title>
+                <h4>{{ article.title }}</h4>
+            </template>
+            <template #default>
+                <div>
+                    <span @click="tocDrawer = false" v-html="article.toc"></span>
+                </div>
+            </template>
+        </el-drawer>
+
+        <el-affix style="margin-left: calc(100% - 60px);" :offset="80" position="bottom">
+            <el-button @click="tocDrawer = true" type="primary">Toc</el-button>
+        </el-affix>
     </div>
 </template>
 
 <style>
 #content {
-    max-width: 768px;
     margin-left: auto;
     margin-right: auto;
 }
@@ -100,7 +112,7 @@ let tocDrawer = ref(false)
     color: #409eff;
     text-decoration: underline;
 }
-div#content img {
+#content img {
     display: block;
     margin: 0px auto;
     max-width: calc(768px - var(--el-card-padding) * 2);
@@ -108,5 +120,20 @@ div#content img {
 .tagItem {
     margin-left: 5px;
     cursor: pointer;
+}
+.toc-number {
+    display: none;
+}
+.articleTitle {
+    text-align: center;
+    display: block;
+    font-size: xx-large;
+    font-weight: bold;
+}
+.articleDate {
+    text-align: center;
+    display: block;
+    font-size: small;
+    color: #909399;
 }
 </style>
