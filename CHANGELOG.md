@@ -2,6 +2,7 @@
 ## Bbob
 - Some build-in plugin add custom command to modify config. Example, `bbob run categoryprocess config mode folder` to change `CategoryProcess` plugin config.mode to `folder`.
 - `SkipIfDraft` refactoring to `ArticleStatusDetect`, support `important` field in article. If article have `important` field in front matter, will stop generation.
+- Fixed preview listening port still using the next port even if the port is not already in use
 ## Bbob.Plugin
 - PluginHelper.savePluginJsonConfig add option `JsonSerializerOptions`. Default write indented.
 
