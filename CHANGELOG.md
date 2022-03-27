@@ -5,6 +5,8 @@
 - Fixed preview listening port still using the next port even if the port is not already in use
 ## Bbob.Plugin
 - PluginHelper.savePluginJsonConfig add option `JsonSerializerOptions`. Default write indented.
+## BbobDefaultTheme
+- add dark mode.
 
 # 2022-3-26
 ## Bbob
