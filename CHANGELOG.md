@@ -1,3 +1,8 @@
+# 2022-3-27
+## Bbob
+- Some build-in plugin add custom command to modify config. Example, `bbob run categoryprocess config mode folder` to change `CategoryProcess` plugin config.mode to `folder`.
+- `SkipIfDraft` refactoring to `ArticleStatusDetect`, support `important` field in article. If article have `important` field in front matter, will stop generation.
+
 # 2022-3-26
 ## Bbob
 - optimize command message show.
