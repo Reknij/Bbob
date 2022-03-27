@@ -2,6 +2,8 @@
 One serverless blog framework.
 
 # Install
+Requires .Net 6+
+
 Now only support install from nuget.
 ```
 dotnet tool install -g bbob
