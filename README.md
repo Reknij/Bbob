@@ -15,11 +15,12 @@ About usage and plugin develop, please see the [Documents](https://reknij.github
 # Why make it?
 Feel funny
 
-# SEO
-I solve it with [bbob-plugin-prerender](https://github.com/Reknij/bbob-plugin-prerender).
-
 # Last update
 - update js api.
 - BbobDefaultTheme use promise function.
 - fix load plugin from nuget packages error which directory is not exists.
 - fix preview throw error which port is used.
+
+# Recommended plugins
+- [bbob-plugin-disqus](https://github.com/Reknij/bbob-plugin-disqus) Let your article have comment.
+- [bbob-plugin-prerender](https://github.com/Reknij/bbob-plugin-prerender) Generate static page for seo.
