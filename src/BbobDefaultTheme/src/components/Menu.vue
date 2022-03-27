@@ -38,22 +38,16 @@ let props = defineProps({
 <style>
 .title:hover {
   cursor: pointer;
-  color: #409EFF;
+  color: var(--theme-selected-color);
 }
 .title {
-  color: #313331;
+  color: var(--theme-font-color);
   margin-left: 20px;
-}
-div.menu {
-  width: 35px;
-  height: 5px;
-  background-color: black;
-  margin: 6px 0;
 }
 .nav-wrapper {
   display: flex;
   justify-content: space-between;
-  border-bottom: #313331 solid 1px;
+  border-bottom: var(--theme-font-color) solid 1px;
 }
 .nav-container {
   display: flex;
@@ -68,14 +62,14 @@ div.menu {
 }
 .nav-item-a {
   text-decoration: none;
-  color: #313331;
+  color: var(--theme-font-color);
   margin: auto;
 }
 .nav-item-a:hover {
-  color: #409EFF;
+  color: var(--theme-selected-color);
 }
 .nav-item-selected {
-  border-bottom: #409eff solid 3px;
+  border-bottom: var(--theme-selected-color) solid 3px;
   height: 99%;
   margin-bottom: 10px;
   font-size: large;

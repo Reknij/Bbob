@@ -84,7 +84,7 @@ let tocDrawer = ref(false)
             direction="ltr"
         >
             <template #title>
-                <h4>{{ article.title }}</h4>
+                <h4 style="color: var(--theme-font-color);">{{ article.title }}</h4>
             </template>
             <template #default>
                 <div>
@@ -105,11 +105,11 @@ let tocDrawer = ref(false)
     margin-right: auto;
 }
 .toc-item a {
-    color: #303133;
+    color: var(--theme-font-color);
     text-decoration: none;
 }
 .toc-item a:hover {
-    color: #409eff;
+    color: var(--theme-selected-color);
     text-decoration: underline;
 }
 #content img {
@@ -129,11 +129,12 @@ let tocDrawer = ref(false)
     display: block;
     font-size: xx-large;
     font-weight: bold;
+    color: var(--theme-font-color)
 }
 .articleDate {
     text-align: center;
     display: block;
     font-size: small;
-    color: #909399;
+    color: var(--theme-date-color);
 }
 </style>

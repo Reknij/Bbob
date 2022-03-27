@@ -6,20 +6,25 @@ import Bbob from '../../../Bbob/JSApi/Bbob'
 <template>
     <div style="text-align: center;">
         <span class="copyright" v-html="Bbob.meta.copyright"></span>
-         <br>
-        <el-tag color="white" class="extraLink" v-if="Bbob.meta.extra.extraLinks" v-for="(link, i) in Bbob.meta.extra.extraLinks" :key="i">
-            <a :href="link.address">{{link.name}}</a>
-        </el-tag>
+        <br />
+        <a
+            class="extraLink"
+            :href="link.address"
+            v-if="Bbob.meta.extra.extraLinks"
+            v-for="(link, i) in Bbob.meta.extra.extraLinks"
+            :key="i"
+        >{{ link.name }}</a>
     </div>
 </template>
 
 <style>
-.extraLink {
+.extraLink{
     margin: 5px 0px 2px 2px;
+    text-decoration: underline;
+    color: var(--theme-font-color);
 }
-.extraLink a {
-    text-decoration: none;
-    color: black;
+.extraLink:hover{
+    color: var(--theme-selected-color);
 }
 .copyright {
     margin: auto 0px;

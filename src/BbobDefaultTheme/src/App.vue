@@ -4,6 +4,7 @@ import Footer from './components/Footer.vue';
 import { setMaxWidth, normal } from './composition/changeSize';
 import MenuSmall from './components/MenuSmall.vue';
 import { scrollToDownInvoke } from './composition/functionsRegister';
+import { changeToDark } from './composition/modeChange';
 import { watch } from 'vue';
 import Bbob from '../../Bbob/JSApi/Bbob';
 
@@ -22,14 +23,25 @@ watch(() => normal.value, () => setElMainWidth(normal.value));
 let hasBackground = false;
 let dt = Bbob.meta.extra.defaultTheme;
 if (dt) {
+    let element = document.documentElement as HTMLElement;
     if (dt.background) hasBackground = true;
+    else {
+        element.style.setProperty('--theme-cover-min-width', '100vw')
+    }
+    if (dt.mode) {
+        if (dt.mode == 'dark') changeToDark();
+    }
 }
 </script>
 
 <template>
     <img class="background" v-if="hasBackground" :src="dt.background" />
-    <div class="background backgroundApp"></div>
-    <el-container v-infinite-scroll="scrollToDownInvoke" class="app-container center" style="min-height: 100vh;">
+    <div class="background cover" id="app-cover"></div>
+    <el-container
+        v-infinite-scroll="scrollToDownInvoke"
+        class="app-container center"
+        style="min-height: 100vh;"
+    >
         <el-header style="height: auto;">
             <div class="app-container">
                 <Menu v-if="normal"></Menu>
@@ -50,6 +62,12 @@ if (dt) {
 <style>
 :root {
     --mainContentPadding: 20px;
+    --theme-cover-color: rgba(255, 255, 255, 0.6);
+    --theme-font-color: #313331;
+    --theme-selected-color: #409eff;
+    --theme-background-color: #ffffff;
+    --theme-border-color: #ebeef5;
+    --theme-cover-min-width: 1024px;
 }
 .app-container {
     max-width: 1024px;
@@ -67,9 +85,9 @@ if (dt) {
     width: auto;
     z-index: -10;
 }
-.backgroundApp {
-    background-color: rgba(255, 255, 255, 0.6);
-    min-width: 1024px;
+.cover {
+    background-color: var(--theme-cover-color);
+    min-width: var(--theme-cover-min-width);
     top: 50%;
     left: 50%;
     -ms-transform: translate(-50%, -50%);
@@ -78,10 +96,34 @@ if (dt) {
 .center {
     margin: 0px auto !important;
 }
-body{
+body {
     margin: 0px;
 }
-.el-card__body{
+.el-card__body {
     padding: 10px 20px;
+}
+.el-card {
+    --el-card-border-color: var(--theme-border-color);
+    --el-card-border-radius: 4px;
+    --el-card-padding: 20px;
+    --el-card-bg-color: var(--theme-background-color);
+}
+.el-drawer {
+    background-color: var(--theme-background-color);
+}
+.el-divider__text {
+    background-color: transparent;
+}
+.el-menu {
+    background-color: var(--theme-background-color);
+}
+.el-menu-item {
+    color: var(--theme-font-color);
+}
+.el-menu-item.is-active {
+    color: var(--theme-selected-color);
+}
+#app {
+    color: var(--theme-font-color) !important;
 }
 </style>

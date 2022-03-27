@@ -113,17 +113,17 @@ onMounted(() => {
 }
 .articlesTitle {
     text-decoration: none;
-    color: #303133;
+    color: var(--theme-font-color);
 }
 .articlesTitle:hover {
     text-decoration: none;
-    color: #409eff;
+    color: var(--theme-selected-color);
 }
 .el-timeline {
         padding-inline-start: 0px;
 }
 .el-timeline-item__timestamp{
-    color: black;
+    color: var(--theme-date-color);
     margin-left: 15px;
 }
 </style>

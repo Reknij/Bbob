@@ -26,7 +26,7 @@ let drawer = ref(false)
 div.menu {
     width: 35px;
     height: 5px;
-    background-color: black;
+    background-color: var(--theme-font-color);
     margin: 6px 0;
 }
 .menu-container {

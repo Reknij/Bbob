@@ -71,7 +71,7 @@ watch(() => router.currentRoute.value, (value, oldValue) => {
 </script>
 
 <template>
-    <h1 style="text-align: center;">{{title}}</h1>
+    <h1 style="text-align: center; color: var(--theme-font-color);">{{title}}</h1>
     <el-divider ></el-divider>
     <el-check-tag
         v-if="filterTags.length"
