@@ -8,6 +8,36 @@ public class MarkdownStyle : IPlugin
 {
     readonly string InitDoneFile = Path.Combine(PluginHelper.CurrentDirectory, "BbobInitDone");
     public bool IsInitDone => File.Exists(InitDoneFile);
+
+    public MarkdownStyle()
+    {
+        PluginHelper.registerCustomCommand("config", (args) =>
+        {
+            if (args.Length == 2)
+            {
+                PluginHelper.getPluginJsonConfig<MyConfig>(out var tar);
+                MyConfig myConfig = tar ?? new MyConfig();
+                switch (args[0])
+                {
+                    case "mode":
+                        var value = args[1];
+                        if (value != "light" && value != "dark")
+                        {
+                            PluginHelper.printConsole("mode must is 'light' or 'dark'!");
+                            return;
+                        }
+                        myConfig.mode = value;
+                        break;
+
+                    default:
+                        PluginHelper.printConsole($"Unknown config name 'args[0]'!");
+                        return;
+                }
+                PluginHelper.printConsole("Config save success!");
+                PluginHelper.savePluginJsonConfig<MyConfig>(myConfig);
+            }
+        });
+    }
     public void InitCommand()
     {
         if (!PluginHelper.isPluginJsonConfigExists())

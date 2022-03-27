@@ -5,6 +5,35 @@ using Bbob.Plugin;
 namespace Bbob.Main.BuildInPlugin;
 public class BuildWebArticleJson : IPlugin
 {
+    public BuildWebArticleJson()
+    {
+        PluginHelper.registerCustomCommand("config", (args) =>
+        {
+            if (args.Length == 2)
+            {
+                PluginHelper.getPluginJsonConfig<MyConfig>(out var tar);
+                MyConfig myConfig = tar ?? new MyConfig();
+                switch (args[0])
+                {
+                    case "shortAddress":
+                        var value = args[1];
+                        if (!bool.TryParse(value, out bool result))
+                        {
+                            PluginHelper.printConsole("shortAddress must is boolean value!");
+                            return;
+                        }
+                        myConfig.shortAddress = result;
+                        break;
+
+                    default:
+                        PluginHelper.printConsole($"Unknown config name 'args[0]'!");
+                        return;
+                }
+                PluginHelper.printConsole("Config save success!");
+                PluginHelper.savePluginJsonConfig<MyConfig>(myConfig);
+            }
+        });
+    }
     public void InitCommand()
     {
         if (!PluginHelper.isPluginJsonConfigExists())

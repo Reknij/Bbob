@@ -6,6 +6,36 @@ namespace Bbob.Main.BuildInPlugin;
 [PluginCondition("LinkProcess", PluginOrder = PluginOrder.BeforeMe)]
 public class CategoryProcess : IPlugin
 {
+    public CategoryProcess()
+    {
+        PluginHelper.registerCustomCommand("config", (args) =>
+        {
+            if (args.Length == 2)
+            {
+                PluginHelper.getPluginJsonConfig<MyConfig>(out var tar);
+                MyConfig myConfig = tar ?? new MyConfig();
+                switch (args[0])
+                {
+                    case "mode":
+                        var value = args[1];
+                        if (value != "default" && value != "folder")
+                        {
+                            PluginHelper.printConsole("mode must is 'default' or 'folder'!");
+                            return;
+                        }
+                        myConfig.mode = value;
+                        break;
+
+                    default:
+                        PluginHelper.printConsole($"Unknown config name 'args[0]'!");
+                        return;
+                }
+                PluginHelper.printConsole("Config save success!");
+                PluginHelper.savePluginJsonConfig<MyConfig>(myConfig);
+            }
+        });
+    }
+
     public void InitCommand()
     {
         if (!PluginHelper.isPluginJsonConfigExists())

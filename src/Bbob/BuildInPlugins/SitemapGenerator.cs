@@ -33,10 +33,37 @@ public class SitemapGenerator : IPlugin
                 else PluginHelper.printConsole("theme.articleBaseUrl and theme is null, target theme is not support.");
             }
         }
+
+        PluginHelper.registerCustomCommand("config", (args) =>
+        {
+            if (args.Length == 2)
+            {
+                PluginHelper.getPluginJsonConfig<MyConfig>(out var tar);
+                MyConfig myConfig = tar ?? new MyConfig();
+                switch (args[0])
+                {
+                    case "redirectUrl":
+                        var value = args[1];
+                        if (!bool.TryParse(value, out bool result))
+                        {
+                            PluginHelper.printConsole("redirectUrl must is boolean value!");
+                            return;
+                        }
+                        myConfig.redirectUrl = result;
+                        break;
+
+                    default:
+                        PluginHelper.printConsole($"Unknown config name 'args[0]'!");
+                        return;
+                }
+                PluginHelper.printConsole("Config save success!");
+                PluginHelper.savePluginJsonConfig<MyConfig>(myConfig);
+            }
+        });
     }
     class BWAJ
     {
-        public bool shortAddress{get;set;}
+        public bool shortAddress { get; set; }
     }
     class Theme
     {

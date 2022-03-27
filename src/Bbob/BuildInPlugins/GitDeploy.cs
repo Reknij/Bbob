@@ -9,6 +9,42 @@ public class GitDeploy : IPlugin
     static readonly string ghDirectoryName = ".deploy_git";
     static readonly string ghDirectory = Path.Combine(PluginHelper.CurrentDirectory, ghDirectoryName);
 
+    public GitDeploy()
+    {
+        PluginHelper.registerCustomCommand("config", (args) =>
+        {
+            PluginHelper.getPluginJsonConfig<GitConfig>(out var tar);
+            GitConfig config = tar ?? new GitConfig();
+            if (args.Length == 2)
+            {
+                string value = args[1];
+                switch (args[0])
+                {
+                    case "repos":
+                        config.repos = value;
+                        break;
+                    case "branch":
+                        config.branch = value;
+                        break;
+                    case "message":
+                        config.message = value;
+                        break;
+                    case "type":
+                        if (value != "github")
+                        {
+                            PluginHelper.printConsole("type only allow 'github'!");
+                            return;
+                        }
+                        config.type = value;
+                        break;
+                    default: break;
+                }
+                PluginHelper.printConsole("Config save success!");
+                PluginHelper.savePluginJsonConfig<GitConfig>(config);
+            }
+        });
+    }
+
     public void InitCommand()
     {
         if (!PluginHelper.isPluginJsonConfigExists())
