@@ -21,17 +21,12 @@ public static class PluginHelper
     /// </summary>
     /// <returns></returns>
     public static ConfigJson ConfigBbob => configBbob ?? throw new NullReferenceException("Config of bbob is null!");
-    private static PluginJson? _ExecutingPlugin;
 
     /// <summary>
     /// Information of executing plugin.
     /// </summary>
     /// <value></value>
-    public static PluginJson ExecutingPlugin
-    {
-        get => _ExecutingPlugin ?? throw new NullReferenceException("Executing plugin is null.");
-        set => _ExecutingPlugin = value;
-    }
+    public static PluginJson ExecutingPlugin => executingPlugin ?? throw new NullReferenceException("Executing plugin is null.");
 
     /// <summary>
     /// Current path of executing Bbob cli.
@@ -415,6 +410,11 @@ public static class PluginHelper
     {
         string pluginName = ExecutingPlugin.name.ToUpper();
         if (!customCommands.ContainsKey(pluginName)) customCommands.Add(pluginName, new Dictionary<string, Action<string[]>>());
-        customCommands[pluginName].Add(command, function);
+        PluginJson registerPlugin = ExecutingPlugin;
+        customCommands[pluginName].Add(command, (args) =>
+        {
+            executingPlugin = registerPlugin;
+            function(args);
+        });
     }
 }

@@ -348,7 +348,7 @@ public static class PluginSystem
     }
     private static void InitializeExecutingPlugin(PluginJson info)
     {
-        PluginHelper.ExecutingPlugin = info;
+        PluginHelperCore.executingPlugin = info;
         PluginHelper.ExecutingCommandResult = new CommandResult();
     }
 

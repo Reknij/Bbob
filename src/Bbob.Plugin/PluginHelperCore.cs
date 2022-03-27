@@ -16,4 +16,5 @@ internal static class PluginHelperCore
     internal static string themePath = "null";
     internal static string currentDirectory = "null";
     internal static string baseDirectory = "null";
+    internal static PluginJson? executingPlugin;
 }
