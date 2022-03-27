@@ -208,18 +208,12 @@ public static class PluginSystem
             string pluginDll = Path.Combine(third.Key, third.Value.entry);
             InitializeExecutingPlugin(third.Value);
             var mainPlugin = new PluginAssemblyLoadContext(pluginDll, third.Value);
-            if (mainPlugin.havePlugin)
+            if (mainPlugin.havePlugin && mainPlugin.Warning != string.Empty)
             {
-                if (mainPlugin.Warning != string.Empty)
-                {
-                    System.Console.WriteLine($"Warning: {mainPlugin.Warning}");
-                }
-                else
-                {
-                    if (ShowLoadedMessage) System.Console.WriteLine($"Loaded third plugin <{third.Value.name}>");
-                    thirdPlugins.Add(mainPlugin);
-                }
+                if (ShowLoadedMessage) System.Console.WriteLine($"Loaded third plugin <{third.Value.name}>");
+                thirdPlugins.Add(mainPlugin);
             }
+            if (mainPlugin.Warning != string.Empty) System.Console.WriteLine($"Warning: {mainPlugin.Warning}");
         }
     }
     private static HashSet<string> showWarningSet = new HashSet<string>();
