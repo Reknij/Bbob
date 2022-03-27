@@ -218,13 +218,19 @@ public static class PluginHelper
     public static bool getPluginJsonConfig<T>(out T? config) =>
     getPluginJsonConfig<T>(ExecutingPlugin.name ?? throw new NullReferenceException("Executing plugin name is null."), out config);
 
+
+    private static JsonSerializerOptions savePluginJsonConfigOptions = new JsonSerializerOptions()
+    {
+        WriteIndented=  true
+    };
     /// <summary>
     /// Save object to target plugin config. It is json file.
     /// </summary>
     /// <param name="pluginName">Target plugin name</param>
     /// <param name="config">Object config</param>
+    /// <param name="options">Json save options.</param>
     /// <typeparam name="T">Type of object config</typeparam>
-    public static void savePluginJsonConfig<T>(string pluginName, T config)
+    public static void savePluginJsonConfig<T>(string pluginName, T config, JsonSerializerOptions? options = null)
     {
         try
         {
@@ -233,7 +239,7 @@ public static class PluginHelper
             if (File.Exists(pluginConfigJson)) File.Delete(pluginConfigJson);
             using (FileStream fs = File.OpenWrite(pluginConfigJson))
             {
-                JsonSerializer.Serialize<T>(fs, config);
+                JsonSerializer.Serialize<T>(fs, config, options ?? savePluginJsonConfigOptions);
             }
         }
         catch (System.Exception ex)
@@ -246,9 +252,10 @@ public static class PluginHelper
     /// Save object to executing plugin config. It is json file.
     /// </summary>
     /// <param name="config">Object config</param>
+    /// <param name="options">Json save options.</param>
     /// <typeparam name="T">Type of object config</typeparam>
-    public static void savePluginJsonConfig<T>(T config) =>
-    savePluginJsonConfig<T>(ExecutingPlugin.name, config);
+    public static void savePluginJsonConfig<T>(T config, JsonSerializerOptions? options = null) =>
+    savePluginJsonConfig<T>(ExecutingPlugin.name, config, options);
 
     /// <summary>
     /// Check plugin config is exists or not.
