@@ -208,7 +208,7 @@ public static class PluginSystem
             string pluginDll = Path.Combine(third.Key, third.Value.entry);
             InitializeExecutingPlugin(third.Value);
             var mainPlugin = new PluginAssemblyLoadContext(pluginDll, third.Value);
-            if (mainPlugin.havePlugin && mainPlugin.Warning != string.Empty)
+            if (mainPlugin.havePlugin && mainPlugin.Warning == string.Empty)
             {
                 if (ShowLoadedMessage) System.Console.WriteLine($"Loaded third plugin <{third.Value.name}>");
                 thirdPlugins.Add(mainPlugin);
