@@ -46,6 +46,7 @@ public class BuildWebArticleJson : IPlugin
             PluginHelper.printConsole("Already exists config.");
         }
     }
+    Dictionary<string, int> numbers = new Dictionary<string, int>();
     public void GenerateCommand(string filePath, GenerationStage stage)
     {
         if (stage != GenerationStage.Confirm) return;
@@ -61,6 +62,20 @@ public class BuildWebArticleJson : IPlugin
         //string FileLocalFolder = Path.Combine(distribution, JSApi.JSAPiHelper.bbobAssets, folder, year, month, day);
         string FileLocalFolder = Path.Combine(PluginHelper.DistributionDirectory, JSApi.JSAPiHelper.bbobAssets, folder);
         string FileLocal = Path.Combine(FileLocalFolder, targetFile);
+
+        if (File.Exists(FileLocal))
+        {
+            string name = Path.GetFileNameWithoutExtension(FileLocal);
+            int number = numbers.ContainsKey(name) ? numbers[name] : 2;
+            PluginHelper.printConsole($"Already exists article json {name}, will change to other name");
+            while (File.Exists(FileLocal))
+            {
+                string otherName = $"{name}-{number++}";
+                FileLocal = Path.Combine(FileLocalFolder, $"{otherName}.json");
+            }
+            numbers[name] = number;
+        }
+
         Directory.CreateDirectory(FileLocalFolder);
         string hash = "";
         using (FileStream fs = new FileStream(FileLocal, FileMode.Create, FileAccess.ReadWrite))
