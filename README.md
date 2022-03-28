@@ -15,7 +15,7 @@ About usage and plugin develop, please see the [Documents](https://reknij.github
 # Why make it?
 Feel funny
 
-# Last update
+# Last update 2022-3-22
 - update js api.
 - BbobDefaultTheme use promise function.
 - fix load plugin from nuget packages error which directory is not exists.
