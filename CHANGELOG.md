@@ -21,7 +21,7 @@
 # 2022-3-25
 ## Bbob
 - `add` and `remove` command will auto set value to uppper.
-- `enable` and `disqus` command will auto set value to uppper. If start with 'plugin-' or 'theme-' will auto add 'bbob-' to front of value.
+- `enable` and `disable` command will auto set value to uppper. If start with 'plugin-' or 'theme-' will auto add 'bbob-' to front of value.
 - new command `run`. will enter mode of target plugin to run custom command.
 - optimize help message.
 - Load plugin will check interface version.
