@@ -111,6 +111,8 @@ public class BuildWebArticleJson : IPlugin
 
         return () =>
         {
+            PluginHelper.getPluginJsonConfig<MyConfig>(out var tar);
+            MyConfig config = tar ?? new MyConfig();
             string[] files = Directory.GetFiles(PluginHelper.DistributionDirectory, "bbob*.js");
             string bbobJs = string.Empty;
             foreach (var item in files)
@@ -129,6 +131,7 @@ public class BuildWebArticleJson : IPlugin
             }
             string bbobJsString = File.ReadAllText(bbobJs);
             string code = "$1=meta.extra.shortAddress.startOfAddress+$1+meta.extra.shortAddress.endOfAddress;";
+            if (config.shortAddressEndWithSlash) code = "let l=$1.length;if(l>1&&$1[l-1]=='/'){$1=$1.slice(0, -1);}" + code;
             bbobJsString = Regex.Replace(bbobJsString, @"getArticleFromAddress\(([A-Za-z0-9_]+),\s*([A-Za-z0-9_]+)\)\s*{", "getArticleFromAddress($1,$2){" + code, RegexOptions.Singleline);
             bbobJsString = Regex.Replace(bbobJsString, @"getArticleFromAddressAsync\(([A-Za-z0-9_]+)\)\s*{", "getArticleFromAddressAsync($1){" + code, RegexOptions.Singleline);
             File.WriteAllText(bbobJs, bbobJsString);
