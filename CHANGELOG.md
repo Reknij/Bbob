@@ -1,3 +1,7 @@
+# 2022-3-28
+## Bbob
+- `BuildWebArticleJson` fix same name articles.
+
 # 2022-3-27
 ## Bbob
 - Some build-in plugin add custom command to modify config. Example, `bbob run categoryprocess config mode folder` to change `CategoryProcess` plugin config.mode to `folder`.
@@ -16,7 +20,7 @@
 - add PluginsLoadedOrder.
 ## BbobDefaultTheme
 - refactoring ui.
-- support meta to configurate background image, welcome text and description.
+- support meta to configurate background image or video, welcome text and description.
 
 # 2022-3-25
 ## Bbob
