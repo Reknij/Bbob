@@ -5,26 +5,22 @@ import { setMaxWidth, normal } from './composition/changeSize';
 import MenuSmall from './components/MenuSmall.vue';
 import { scrollToDownInvoke } from './composition/functionsRegister';
 import { changeToDark } from './composition/modeChange';
-import { watch } from 'vue';
+import { onMounted, ref, VideoHTMLAttributes, watch } from 'vue';
 import Bbob from '../../Bbob/JSApi/Bbob';
 
 setMaxWidth(768);
-function setElMainWidth(normal: boolean) {
-    let element = document.documentElement as HTMLElement;
-    if (element) {
-        if (normal) element.style.setProperty('--mainContentPadding', '20px');
-        else element.style.setProperty('--mainContentPadding', '20px 8px');
-    }
-    else console.log('is null')
-}
-setElMainWidth(normal.value);
-watch(() => normal.value, () => setElMainWidth(normal.value));
 
 let hasBackground = false;
+let source = ref('');
+let isVideo = false;
 let dt = Bbob.meta.extra.defaultTheme;
 if (dt) {
     let element = document.documentElement as HTMLElement;
-    if (dt.background) hasBackground = true;
+    if (dt.background) {
+        hasBackground = true
+        source.value = dt.background.sourceH;
+        if (dt.background.isVideo) isVideo = dt.background.isVideo;
+    }
     else {
         element.style.setProperty('--theme-cover-min-width', '100vw')
     }
@@ -32,10 +28,50 @@ if (dt) {
         if (dt.mode == 'dark') changeToDark();
     }
 }
+
+function setElMainWidth(normal: boolean) {
+    let element = document.documentElement as HTMLElement;
+    if (element) {
+        if (normal) {
+            element.style.setProperty('--mainContentPadding', '20px');
+            source.value = dt.background.sourceH;
+            replay();
+        }
+        else {
+            element.style.setProperty('--mainContentPadding', '20px 8px');
+            source.value = dt.background.sourceV;
+            replay();
+        }
+    }
+    else console.log('is null')
+}
+setElMainWidth(normal.value);
+watch(() => normal.value, () => setElMainWidth(normal.value));
+function replay() {
+    let video = document.getElementById('videoBg') as HTMLVideoElement;
+    if (video) video.load();
+}
 </script>
 
 <template>
-    <img class="background" v-if="hasBackground" :src="dt.background" />
+    <img
+        class="background bgToCenter"
+        style="background-size: cover;"
+        v-if="hasBackground && !isVideo"
+        :src="source"
+    />
+    <video
+        id="videoBg"
+        class="background bgToCenter"
+        autoplay
+        muted
+        loop
+        v-else-if="hasBackground && isVideo"
+    >
+        <source :src="source" type="video/mp4" />
+        <source :src="source" type="video/webm" />
+        <source :src="source" type="video/ogg" />
+    </video>
     <div class="background cover" id="app-cover"></div>
     <el-container
         v-infinite-scroll="scrollToDownInvoke"
@@ -71,6 +107,12 @@ if (dt) {
 }
 .app-container {
     max-width: 1024px;
+}
+.bgToCenter {
+    height: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 #mainContent {
     padding: var(--mainContentPadding);
