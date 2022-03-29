@@ -22,7 +22,7 @@ onBeforeMount(async () => {
     let start = new Date().getTime();
     article.value = await Bbob.api.getArticleFromAddressAsync(address)
     watch(htmlContent, () => {
-        Bbob.api.executeScriptElements(htmlContent.value as any);
+        if (htmlContent.value) Bbob.api.executeScriptElements(htmlContent.value as any);
     })
     let diff = (new Date().getTime() - start); //milliseconds interval
     document.title = `${article.value.title} - ${Bbob.meta.blogName}`;

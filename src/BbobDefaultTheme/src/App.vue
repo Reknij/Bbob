@@ -102,7 +102,7 @@ function replay() {
     --theme-cover-color: rgba(255, 255, 255, 0.6);
     --theme-font-color: #313331;
     --theme-selected-color: #409eff;
-    --theme-background-color: #ffffff;
+    --theme-background-color: #ffffff99;
     --theme-border-color: #ebeef5;
     --theme-cover-min-width: 1024px;
 }
