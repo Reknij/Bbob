@@ -136,8 +136,8 @@ class ConsoleParser
                     {
                         switch (arguments[i])
                         {
-                            case Commands.Preview.Host.Current:
-                            case Commands.Preview.Host.CurrentAka:
+                            case Commands.Preview.Url.Current:
+                            case Commands.Preview.Url.CurrentAka:
                                 if (++i < length) url = arguments[i];
                                 else
                                 {
@@ -466,7 +466,7 @@ class ConsoleParser
             public const string CurrentAka = "p";
             public const string BeOption = "--preview";
             public const string BeOptionAka = "-p";
-            public static class Host
+            public static class Url
             {
                 public const string Current = "--url";
                 public const string CurrentAka = "-u";
