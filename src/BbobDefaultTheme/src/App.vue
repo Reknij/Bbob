@@ -75,6 +75,7 @@ function replay() {
     <div class="background cover" id="app-cover"></div>
     <el-container
         v-infinite-scroll="scrollToDownInvoke"
+        :infinite-scroll-distance="60"
         class="app-container center"
         style="min-height: 100vh;"
     >

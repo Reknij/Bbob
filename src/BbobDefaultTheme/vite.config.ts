@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [
     vue(),
     importToCDN({
-      modules:[
+      modules: [
         {
           name: 'vue',
           var: 'Vue',
@@ -26,5 +26,8 @@ export default defineConfig({
         },
       ]
     })
-  ]
+  ],
+  server: {
+    host: true
+  }
 })
