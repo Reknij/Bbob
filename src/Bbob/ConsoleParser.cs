@@ -265,7 +265,7 @@ class ConsoleParser
                 if (isHelp(printHelp<Add>)) return;
                 {
                     TurnMessageShow(TurnOption.All, false);
-                    Add.Options option = Add.Options.Address;
+                    Add.Options? option = null;
                     string content = string.Empty;
                     bool global = false;
                     bool replace = false;
@@ -277,6 +277,7 @@ class ConsoleParser
                             case Commands.Add.AddressAka:
                             case Commands.Add.File:
                             case Commands.Add.FileAka:
+                                if (option != null) break;
                                 option = argument == Commands.Add.Address ? Add.Options.Address : Add.Options.File;
                                 if (++i < length) content = arguments[i];
                                 else
@@ -303,12 +304,17 @@ class ConsoleParser
                     {
                         if (!checkArgument(arguments[i])) return;
                     }
+                    if (option == null)
+                    {
+                        System.Console.WriteLine("Please enter option '--address' or '--file'!");
+                        return;
+                    }
                     if (string.IsNullOrWhiteSpace(content))
                     {
                         System.Console.WriteLine("Please enter the <content> of your want add.");
                         return;
                     }
-                    Add install = new Add(content, option, global, replace);
+                    Add install = new Add(content, option.Value, global, replace);
                     install.Process();
                 }
                 break;
