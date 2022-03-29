@@ -69,8 +69,10 @@ public static class PluginHelper
     /// </summary>
     /// <param name="name">Name of object</param>
     /// <param name="obj">Instance of object</param>
-    public static void registerObject(string name, object? obj)
+    /// <param name="option">Option of register object</param>
+    public static void registerObject(string name, object? obj, RegisterObjectOption? option = null)
     {
+        if (option != null) option.Process(ref name);
         if (pluginsObject.ContainsKey(name)) pluginsObject[name] = obj;
         else pluginsObject.Add(name, obj);
     }
@@ -80,8 +82,10 @@ public static class PluginHelper
     /// </summary>
     /// <param name="name">Name of object</param>
     /// <returns>True if exists, otherwise false.</returns>
-    public static bool existsObject(string name)
+    /// <param name="option">Option of register object</param>
+    public static bool existsObject(string name, RegisterObjectOption? option = null)
     {
+        if (option != null) option.Process(ref name);
         return pluginsObject.ContainsKey(name);
     }
 
@@ -90,8 +94,10 @@ public static class PluginHelper
     /// </summary>
     /// <param name="name">Name of object</param>
     /// <returns>True if exists and not null, otherwise false.</returns>
-    public static bool existsObjectNoNull(string name)
+    /// <param name="option">Option of register object</param>
+    public static bool existsObjectNoNull(string name, RegisterObjectOption? option = null)
     {
+        if (option != null) option.Process(ref name);
         return pluginsObject.ContainsKey(name) && pluginsObject[name] != null;
     }
 
@@ -101,8 +107,10 @@ public static class PluginHelper
     /// <param name="name">Name of object</param>
     /// <typeparam name="T">Type of object</typeparam>
     /// <returns>True if exists and not null, otherwise false.</returns>
-    public static bool existsObjectNoNull<T>(string name)
+    /// <param name="option">Option of register object</param>
+    public static bool existsObjectNoNull<T>(string name, RegisterObjectOption? option = null)
     {
+        if (option != null) option.Process(ref name);
         return pluginsObject.ContainsKey(name) && pluginsObject[name]?.GetType() == typeof(T);
     }
 
@@ -113,8 +121,10 @@ public static class PluginHelper
     /// <param name="value">Found object. May be null.</param>
     /// <typeparam name="T">Type of object</typeparam>
     /// <returns>True if object found, otherwise false.</returns>
-    public static bool getRegisteredObject<T>(string name, out T? value)
+    /// <param name="option">Option of register object</param>
+    public static bool getRegisteredObject<T>(string name, out T? value, RegisterObjectOption? option = null)
     {
+        if (option != null) option.Process(ref name);
         if (pluginsObject.TryGetValue(name, out object? v) && v is T)
         {
             value = (T)v;
@@ -130,8 +140,10 @@ public static class PluginHelper
     /// <param name="name">Name of object</param>
     /// <typeparam name="T">Type of object</typeparam>
     /// <returns>Object instance</returns>
-    public static T getRegisteredObjectNoNull<T>(string name)
+    /// <param name="option">Option of register object</param>
+    public static T getRegisteredObjectNoNull<T>(string name, RegisterObjectOption? option = null)
     {
+        if (option != null) option.Process(ref name);
         bool exists = getRegisteredObject<T>(name, out T? a);
         if (exists && a != null)
         {
@@ -155,8 +167,10 @@ public static class PluginHelper
     /// <param name="modifyObjectDelegate">Function to modify object.</param>
     /// <typeparam name="T">Type of target object</typeparam>
     /// <returns>True if found object, otherwise false.</returns>
-    public static bool modifyRegisteredObject<T>(string name, HelperDelegates.ModifyObjectDelegate<T> modifyObjectDelegate)
+    /// <param name="option">Option of register object</param>
+    public static bool modifyRegisteredObject<T>(string name, HelperDelegates.ModifyObjectDelegate<T> modifyObjectDelegate, RegisterObjectOption? option = null)
     {
+        if (option != null) option.Process(ref name);
         if (pluginsObject.TryGetValue(name, out object? value) && value is T)
         {
             T? obj = (T?)value;
@@ -173,8 +187,10 @@ public static class PluginHelper
     /// </summary>
     /// <param name="name">Name of object</param>
     /// <returns>True if remove success, otherwise false.</returns>
-    public static bool unregisterObject(string name)
+    /// <param name="option">Option of register object</param>
+    public static bool unregisterObject(string name, RegisterObjectOption? option = null)
     {
+        if (option != null) option.Process(ref name);
         return pluginsObject.Remove(name);
     }
 
@@ -221,7 +237,7 @@ public static class PluginHelper
 
     private static JsonSerializerOptions savePluginJsonConfigOptions = new JsonSerializerOptions()
     {
-        WriteIndented=  true
+        WriteIndented = true
     };
     /// <summary>
     /// Save object to target plugin config. It is json file.

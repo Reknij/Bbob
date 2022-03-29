@@ -1,3 +1,7 @@
+# 2022-3-29
+## Bbob.Plugin
+- register and get object support option.
+
 # 2022-3-28
 ## Bbob
 - `BuildWebArticleJson` fix same name articles.
