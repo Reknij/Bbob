@@ -15,7 +15,7 @@ About usage and plugin develop, please see the [Documents](https://reknij.github
 # Why make it?
 Feel funny
 
-# Last update 2022-3-29 v1.4.0
+# Last update 2022-3-29 v1.4.2
 ## Bbob
 - `BuildWebArticleJson` fix same name articles.
 - Some build-in plugin add custom command to modify config. Example, `bbob run categoryprocess config mode folder` to change `CategoryProcess` plugin config.mode to `folder`.
