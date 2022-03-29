@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeMount, ref, watch } from 'vue';
+import { onBeforeMount, onMounted, ref, watch } from 'vue';
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router';
 import Bbob, { Article } from '../../../Bbob/JSApi/Bbob'
 import { normal } from '../composition/changeSize';
@@ -17,9 +17,13 @@ let article = ref<Article>({
     date: "loading article...",
     contentParsed: ""
 });
+let htmlContent = ref(null);
 onBeforeMount(async () => {
     let start = new Date().getTime();
     article.value = await Bbob.api.getArticleFromAddressAsync(address)
+    watch(htmlContent, () => {
+        Bbob.api.executeScriptElements(htmlContent.value as any);
+    })
     let diff = (new Date().getTime() - start); //milliseconds interval
     document.title = `${article.value.title} - ${Bbob.meta.blogName}`;
     let wait = articleLoadingMs - diff;
@@ -35,6 +39,7 @@ onBeforeMount(async () => {
     Bbob.meta.extra.prerenderNow = true;
     window.scrollTo(0, 0);
 })
+
 onBeforeRouteLeave(() => {
     document.title = Bbob.meta.blogName
     return true;
@@ -72,7 +77,7 @@ let tocDrawer = ref(false)
                         >{{ tag }}</el-tag>
                     </div>
                     <el-divider></el-divider>
-                    <span id="htmlContent" v-html="article.contentParsed"></span>
+                    <span ref="htmlContent" v-html="article.contentParsed"></span>
                 </template>
             </el-skeleton>
         </el-card>
@@ -129,7 +134,7 @@ let tocDrawer = ref(false)
     display: block;
     font-size: xx-large;
     font-weight: bold;
-    color: var(--theme-font-color)
+    color: var(--theme-font-color);
 }
 .articleDate {
     text-align: center;
