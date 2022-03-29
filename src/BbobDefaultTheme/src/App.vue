@@ -34,12 +34,12 @@ function setElMainWidth(normal: boolean) {
     if (element) {
         if (normal) {
             element.style.setProperty('--mainContentPadding', '20px');
-            source.value = dt.background.sourceH;
+            if (dt.background && dt.background.sourceH) source.value = dt.background.sourceH;
             replay();
         }
         else {
             element.style.setProperty('--mainContentPadding', '20px 8px');
-            source.value = dt.background.sourceV;
+            if (dt.background && dt.background.sourceV) source.value = dt.background.sourceV;
             replay();
         }
     }
