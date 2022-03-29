@@ -207,13 +207,20 @@ public static class PluginSystem
             }
             string pluginDll = Path.Combine(third.Key, third.Value.entry);
             InitializeExecutingPlugin(third.Value);
-            var mainPlugin = new PluginAssemblyLoadContext(pluginDll, third.Value);
-            if (mainPlugin.havePlugin && mainPlugin.Warning == string.Empty)
+            try
             {
-                if (ShowLoadedMessage) System.Console.WriteLine($"Loaded third plugin <{third.Value.name}>");
-                thirdPlugins.Add(mainPlugin);
+                var mainPlugin = new PluginAssemblyLoadContext(pluginDll, third.Value);
+                if (mainPlugin.havePlugin && mainPlugin.Warning == string.Empty)
+                {
+                    if (ShowLoadedMessage) System.Console.WriteLine($"Loaded third plugin <{third.Value.name}>");
+                    thirdPlugins.Add(mainPlugin);
+                }
+                if (mainPlugin.Warning != string.Empty) System.Console.WriteLine($"Warning: {mainPlugin.Warning}");
             }
-            if (mainPlugin.Warning != string.Empty) System.Console.WriteLine($"Warning: {mainPlugin.Warning}");
+            catch (System.Exception ex)
+            {
+                System.Console.WriteLine("Load and initialize plugin has error:\n" + ex.Message);
+            }
         }
     }
     private static HashSet<string> showWarningSet = new HashSet<string>();
@@ -312,12 +319,6 @@ public static class PluginSystem
                 }
             }
         }
-    }
-
-    private static bool runPlugin(IPlugin plugin, PluginJson info, CyclePluginDelegate cyclePluginDelegate)
-    {
-
-        return true;
     }
     private class RunCount
     {
