@@ -58,7 +58,7 @@ public class MarkdownStyle : IPlugin
         PluginHelper.getRegisteredObject<dynamic>("article", out dynamic? article);
         if (article == null) return;
         string script = "<script>hljs.highlightAll()</script>";
-        article.contentParsed = $"<article class=\"markdown-body\">{article.contentParsed}</article>{script}";
+        article.contentParsed = $"<article style=\"background-color: transparent;\" class=\"markdown-body\">{article.contentParsed}</article>{script}";
     }
 
     public Action? CommandComplete(Commands cmd)
