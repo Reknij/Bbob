@@ -89,6 +89,7 @@ public class PluginRelation
                 {
                     foreach (var p in plugins)
                     {
+                        if (isTargetRequirePlugin(p, context)) continue;
                         if (p.info.name == context.info.name) continue;
                         if (!readyPluginNames.Contains(p.info.name)) others.Add(p);
                     }
@@ -107,10 +108,12 @@ public class PluginRelation
                         default:
                         case PluginOrder.Any: break;
                         case PluginOrder.AfterMe:
+                            if (otherPcr.nexts.Contains(c)) break;
                             c.nexts.Add(otherPcr);
                             otherPcr.previous.Add(c);
                             break;
                         case PluginOrder.BeforeMe:
+                            if (otherPcr.previous.Contains(c)) break;
                             c.previous.Add(otherPcr);
                             otherPcr.nexts.Add(c);
                             break;
@@ -123,6 +126,18 @@ public class PluginRelation
         return c;
     }
 
+    private bool isTargetRequirePlugin(PluginContext targetPlugin, PluginContext requirePlugin)
+    {
+        var attrs = Attribute.GetCustomAttributes(targetPlugin.main.GetType());
+        foreach (var attr in attrs)
+        {
+            if (attr is PluginCondition condition && (condition.ConditionType & ConditionType.OrderCheck) != 0)
+            {
+                if (condition.PluginName == requirePlugin.info.name) return true;
+            }
+        }
+        return false;
+    }
     private bool getPcrFromPcrs(PluginContext c) => getPcrFromPcrs(c, out var a);
     public bool getPcrFromPcrs(PluginContext c, out PluginContextRef? target)
     {

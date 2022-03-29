@@ -1,4 +1,4 @@
-
+namespace Bbob.Plugin;
 /// <summary>
 /// Option of register object
 /// </summary>
