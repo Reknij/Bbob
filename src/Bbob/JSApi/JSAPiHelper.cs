@@ -77,7 +77,7 @@ public static class JSAPiHelper
             fs.Position = 0; //set to 0 to read.
             hash = Shared.SharedLib.HashHelper.GetContentHash(fs);
         }
-        string newName = config.useHashName?$"bbob-{hash.Substring(0, 9)}.js": "bbob.js";
+        string newName = config.useHashName ? $"bbob-{hash.Substring(0, 9)}.js" : "bbob.js";
         string newPath = Path.Combine(dist, newName);
         if (mainjsDist != newPath) File.Move(mainjsDist, newPath);
         ProcessPublicPath(dist, themeInfo.index);
@@ -106,9 +106,19 @@ public static class JSAPiHelper
             if (Shared.SharedLib.PathHelper.FileNameEndWith(meta, ext))
             {
                 string name = Path.GetFileName(meta).Replace(ext, string.Empty);
-                object? third = JsonSerializer.Deserialize<IDictionary<string, object>>(File.ReadAllText(meta));
-                if (third == null) continue;
-                metasJson.Add(name, third);
+                try
+                {
+                    using (FileStream fs = File.OpenRead(meta))
+                    {
+                        object? third = JsonSerializer.Deserialize<IDictionary<string, object>>(fs);
+                        if (third == null) continue;
+                        metasJson.Add(name, third);
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    System.Console.WriteLine($"Get third meta from '{meta}' error:\n{ex.Message}");
+                }
             }
         }
         foreach (var item in pluginsMeta)
