@@ -398,9 +398,18 @@ public static class PluginHelper
     }
 
     /// <summary>
-    /// HashSet of plugins done. You should not use it.
+    /// Check plugins is loaded or not.
     /// </summary>
+    /// <param name="names">Name of plugins.</param>
     /// <returns></returns>
+    public static bool isTargetPluginLoaded(string[] names)
+    {
+        foreach (var name in names)
+        {
+            if (!isTargetPluginLoaded(name)) return false;
+        }
+        return true;
+    }
 
     /// <summary>
     /// Bbob will check the command operation in command result to determine execution next.
