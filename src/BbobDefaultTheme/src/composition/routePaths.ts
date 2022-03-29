@@ -1,26 +1,27 @@
+import { language} from '../Languages/LanguageHelper';
 const paths = [
     {
-        name: 'Home',
+        name: language.home,
         path: '/'
     },
     {
-        name: 'Articles',
+        name: language.articles,
         path: '/articles/scroll'
     },
     {
-        name: 'Archives',
+        name: language.archives,
         path: '/filter/archives'
     },
     {
-        name: 'Categories',
+        name: language.categories,
         path: '/filter/categories'
     },
     {
-        name: 'Tags',
+        name: language.tags,
         path: '/filter/tags'
     },
     {
-        name: 'About',
+        name: language.about,
         path: '/about'
     }
 ]

@@ -3,6 +3,7 @@ import { onBeforeMount, onMounted, ref, watch } from 'vue';
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router';
 import Bbob, { Article } from '../../../Bbob/JSApi/Bbob'
 import { normal } from '../composition/changeSize';
+import { language} from '../Languages/LanguageHelper';
 
 let isLoading = ref(true);
 let articleLoadingMs = 300;
@@ -53,9 +54,11 @@ let tocDrawer = ref(false)
         <el-card>
             <el-skeleton :animated="true" :loading="isLoading" :rows="20">
                 <template #default>
+                    <el-page-header id="backBtn" @back="router.push('/')" :title="language.back"></el-page-header>
                     <span class="articleTitle">{{ article.title }}</span>
+
                     <span class="articleDate">
-                        Posted on
+                        {{language.postedOn}}
                         <span style="text-decoration: underline dashed;">{{ article.date }}</span>
                     </span>
                     <div style="text-align: center; margin-top: 5px;">
@@ -116,6 +119,12 @@ let tocDrawer = ref(false)
 .toc-item a:hover {
     color: var(--theme-selected-color);
     text-decoration: underline;
+}
+#backBtn{
+    color: var(--theme-font-color)
+}
+#backBtn:hover{
+    color: var(--theme-selected-color)
 }
 #content img {
     display: block;

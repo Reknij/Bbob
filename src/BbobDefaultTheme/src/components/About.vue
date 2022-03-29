@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import Bbob from '../../../Bbob/JSApi/Bbob'
+import { language } from '../Languages/LanguageHelper';
 
 onMounted(() => {
     Bbob.meta.extra.prerenderNow = true;
@@ -11,19 +12,25 @@ onMounted(() => {
     <div>
         <el-card>
             <template #header>
-                <h2>I am {{ Bbob.meta.author }}</h2>
+                <h2>{{ language.description }}</h2>
             </template>
             <p>{{ Bbob.meta.description }}</p>
         </el-card>
         <el-card style="margin-top: 10px;">
             <template #header>
-                <h2>About {{ Bbob.meta.blogName }}</h2>
+                <h2>{{ language.author }}</h2>
+            </template>
+            <p>{{ Bbob.meta.author }}</p>
+        </el-card>
+         <el-card style="margin-top: 10px;">
+            <template #header>
+                <h2>{{ language.aboutBlog }}</h2>
             </template>
             <p>{{ Bbob.meta.about }}</p>
         </el-card>
         <el-card style="margin-top: 10px;">
             <template #header>
-                <h2>Blog last build</h2>
+                <h2>{{ language.lastBuild }}</h2>
             </template>
             <p>{{ Bbob.meta.lastBuild }}</p>
         </el-card>
