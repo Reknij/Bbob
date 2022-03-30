@@ -42,6 +42,10 @@ public class GitDeploy : IPlugin
                 PluginHelper.printConsole("Config save success!");
                 PluginHelper.savePluginJsonConfig<GitConfig>(config);
             }
+            else
+            {
+                PluginHelper.printConsole("Please enter config name and value!");
+            }
         });
     }
 

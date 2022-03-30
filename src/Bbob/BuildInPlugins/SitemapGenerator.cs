@@ -59,6 +59,10 @@ public class SitemapGenerator : IPlugin
                 PluginHelper.printConsole("Config save success!");
                 PluginHelper.savePluginJsonConfig<MyConfig>(myConfig);
             }
+            else
+            {
+                PluginHelper.printConsole("Please enter config name and value!");
+            }
         });
     }
     class BWAJ
