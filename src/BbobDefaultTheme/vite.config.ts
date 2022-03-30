@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import importToCDN from 'vite-plugin-cdn-import'
+import topLevelAwait from "vite-plugin-top-level-await";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -25,7 +26,8 @@ export default defineConfig({
           css: 'https://unpkg.com/element-plus@2.1.0/dist/index.css'
         },
       ]
-    })
+    }),
+    topLevelAwait()
   ],
   server: {
     host: true

@@ -8,6 +8,7 @@ function changeToDark(){
     element.style.setProperty('--theme-font-color', '#ffffff')
     element.style.setProperty('--theme-date-color', '#ffffff')
     element.style.setProperty('--theme-selected-color', '#a7a7a7')
+    element.style.setProperty('--theme-drawer-background-color', '#323232')
 }
 
 export {

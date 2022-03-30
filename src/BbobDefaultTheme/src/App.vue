@@ -105,6 +105,7 @@ function replay() {
     --theme-background-color: #ffffff99;
     --theme-border-color: #ebeef5;
     --theme-cover-min-width: 1024px;
+    --theme-drawer-background-color: #ffffff;
 }
 .app-container {
     max-width: 1024px;
@@ -152,7 +153,7 @@ body {
     --el-card-bg-color: var(--theme-background-color);
 }
 .el-drawer {
-    background-color: var(--theme-background-color);
+    background-color: var(--theme-drawer-background-color);
 }
 .el-divider__text {
     background-color: transparent;

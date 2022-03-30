@@ -17,6 +17,7 @@
     "typescript": "^4.5.4",
     "vite": "^2.8.6",
     "vite-plugin-cdn-import": "^0.3.5",
+    "vite-plugin-top-level-await": "^0.0.4",
     "vue-tsc": "^0.29.8"
   }
 }
