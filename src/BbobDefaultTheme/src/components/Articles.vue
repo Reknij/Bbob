@@ -3,6 +3,7 @@ import { onBeforeMount, onBeforeUnmount, onMounted, Ref, ref, watch } from 'vue'
 import { onBeforeRouteLeave, onBeforeRouteUpdate, useRouter } from 'vue-router';
 import Bbob, { LinkInfo } from '../../../Bbob/JSApi/Bbob';
 import { scrollToDownEventRegist, scrollToDownEventUnRegist } from '../composition/functionsRegister';
+import { language } from '../Languages/LanguageHelper';
 
 const props = defineProps({
     mode: {
@@ -79,7 +80,7 @@ onMounted(() => {
                     >{{ link.title }}</router-link>
                 </h3>
                 <el-divider v-if="link.categories" content-position="left">
-                    <el-tag effect="dark" type="warning">Categories</el-tag>
+                    <el-tag effect="dark" type="warning">{{language.categories}}</el-tag>
                 </el-divider>
                 <el-tag
                     v-if="link.categories"
@@ -90,7 +91,7 @@ onMounted(() => {
                     @click="router.push(`/filter/categories?checked=${category}`)"
                 >{{ category }}</el-tag>
                 <el-divider v-if="link.tags" content-position="left">
-                    <el-tag effect="dark" type="success">Tags</el-tag>
+                    <el-tag effect="dark" type="success">{{language.tags}}</el-tag>
                 </el-divider>
                 <el-tag
                     v-if="link.tags"

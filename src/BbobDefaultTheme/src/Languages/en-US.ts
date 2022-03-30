@@ -13,7 +13,7 @@ const language: Language = {
     author: 'Author',
     description: 'Description',
     aboutBlog: 'About Blog',
-    lastBuild: 'Blog last edit time',
+    lastBuild: 'Blog Last Modified Time',
 }
 
 export default language;

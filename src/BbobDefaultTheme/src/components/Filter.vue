@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import Bbob, { FilterSource, LinkInfo } from '../../../Bbob/JSApi/Bbob'
+import { language } from '../Languages/LanguageHelper';
 import router from '../router';
 import Articles from './Articles.vue';
 
@@ -20,17 +21,17 @@ const setSource = (linkArray: any[]) => {
 
 function changeMode(changeTo: string) {
     if (changeTo == 'categories') {
-        title.value = 'Categories'
+        title.value = language.categories;
         filterTags.value = Bbob.blog.categories;
         mode.value = 'warning';
     }
     else if (changeTo == 'tags') {
-        title.value = 'Tags'
+        title.value = language.tags;
         filterTags.value = Bbob.blog.tags;
         mode.value = 'success';
     }
     else if (changeTo == 'archives') {
-        title.value = 'Archives'
+        title.value = language.archives;
         filterTags.value = Bbob.blog.archives;
         mode.value = "";
     }
