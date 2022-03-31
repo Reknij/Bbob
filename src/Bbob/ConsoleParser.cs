@@ -278,7 +278,7 @@ class ConsoleParser
                             case Commands.Add.File:
                             case Commands.Add.FileAka:
                                 if (option != null) break;
-                                option = argument == Commands.Add.Address ? Add.Options.Address : Add.Options.File;
+                                option = argument == Commands.Add.Address || argument == Commands.Add.AddressAka ? Add.Options.Address : Add.Options.File;
                                 if (++i < length) content = arguments[i];
                                 else
                                 {
