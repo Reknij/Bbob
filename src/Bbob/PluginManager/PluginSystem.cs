@@ -127,7 +127,7 @@ public static class PluginSystem
         };
         foreach (var package in packages)
         {
-            if (!package.StartsWith("bbob-plugin-")) continue;
+            if (!package.ToUpper().StartsWith("BBOB-PLUGIN-")) continue;
             string version = getVersion(package);
             string tar = Path.Combine(version, "lib");
             if (version == string.Empty || !Directory.Exists(tar)) continue;
