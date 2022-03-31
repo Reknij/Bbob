@@ -8,7 +8,7 @@
     <SelfContained>false</SelfContained>
     <PublishSingleFile>false</PublishSingleFile>
     <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
-    <Version>1.4.4</Version>
+    <Version>1.4.5</Version>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>bbob</ToolCommandName>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -17,7 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="markdig" Version="0.27.0" />
+    <PackageReference Include="markdig" Version="0.28.1" />
     <PackageReference Include="nuglify" Version="1.17.14" />
     <PackageReference Include="sharpcompress" Version="0.30.1" />
     <PackageReference Include="sharpyaml" Version="1.8.0" />

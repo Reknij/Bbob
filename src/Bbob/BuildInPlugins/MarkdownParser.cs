@@ -13,7 +13,6 @@ using Markdig.Syntax.Inlines;
 namespace Bbob.Main.BuildInPlugin;
 public class MarkdownParser : IPlugin
 {
-    MarkdownPipelineBuilder? builder = new MarkdownPipelineBuilder();
     SharpYaml.Serialization.Serializer serializer = new SharpYaml.Serialization.Serializer(new SharpYaml.Serialization.SerializerSettings()
     {
         IgnoreUnmatchedProperties = true
@@ -21,9 +20,11 @@ public class MarkdownParser : IPlugin
     MarkdownPipeline pipeline;
     public MarkdownParser()
     {
-        builder.UseYamlFrontMatter();
-        builder.Extensions.AddIfNotAlready<InsertAttributeExtension>(new InsertAttributeExtension("bbob"));
-        pipeline = builder.Build();
+        pipeline = new MarkdownPipelineBuilder()
+        .UseYamlFrontMatter()
+        .UseAdvancedExtensions()
+        .UseMathematics()
+        .Build();
     }
     public void NewCommand(string filePath, ref string content, NewTypes types = NewTypes.blog)
     {
@@ -54,7 +55,6 @@ public class MarkdownParser : IPlugin
         using (StreamReader sr = new StreamReader(filePath))
         {
             string source = sr.ReadToEnd();
-
             var doc = Markdown.Parse(source, pipeline);
             string mdString = source;
             YamlFrontMatterBlock? yamlFrontMatterBlock = doc.Descendants<YamlFrontMatterBlock>().FirstOrDefault();
@@ -117,7 +117,7 @@ public class MarkdownParser : IPlugin
                 {
                     if (article == null) return;
                     article.toc = toc.ToHtml();
-                    article.contentParsed = $"<div id='bbob-markdown-content'>{result.ToHtml()}</div>";
+                    article.contentParsed = $"<div id='bbob-markdown-content'>{result.ToHtml(pipeline)}</div>";
                 });
             }
         }
@@ -243,46 +243,4 @@ public class MarkdownParser : IPlugin
             //all must be null when deserializing yaml, otherwise an error will be thrown.
         }
     }
-
-    private class InsertAttributeExtension : Markdig.IMarkdownExtension
-    {
-        string header;
-        public InsertAttributeExtension(string header)
-        {
-            this.header = header;
-        }
-        public void Setup(MarkdownPipelineBuilder pipeline)
-        {
-            pipeline.BlockParsers.ForEach((BlockParser blockParser) =>
-            {
-                blockParser.Closed += (BlockProcessor processor, Block block) =>
-                {
-                    switch (block)
-                    {
-                        case HeadingBlock headingBlock:
-                            headingBlock.GetAttributes().AddClass($"{header}-h{headingBlock.Level}");
-                            break;
-                        case ParagraphBlock paragraphBlock:
-                            paragraphBlock.GetAttributes().AddClass($"{header}-p");
-                            break;
-                        case ListBlock listBlock:
-                            string listName = listBlock.IsOrdered ? "ordered" : "unordered";
-                            listBlock.GetAttributes().AddClass($"{header}-list-{listName}");
-                            break;
-                        case CodeBlock codeBlock:
-                            codeBlock.GetAttributes().AddClass($"{header}-code");
-                            break;
-                        case QuoteBlock quoteBlock:
-                            quoteBlock.GetAttributes().AddClass($"{header}-quote");
-                            break;
-
-                        default: break;
-                    }
-                };
-            });
-        }
-
-        public void Setup(MarkdownPipeline pipeline, IMarkdownRenderer renderer) { }
-    }
-
 }
