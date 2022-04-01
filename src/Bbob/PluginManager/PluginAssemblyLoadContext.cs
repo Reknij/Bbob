@@ -33,7 +33,7 @@ public class PluginAssemblyLoadContext : AssemblyLoadContext
                     }
                     catch (System.Exception ex)
                     {
-                        Console.WriteLine(ex.ToString());
+                        Console.WriteLine($"Initialize plugin <{info.name}> throw error:\n{ex}");
                     }
                 }
 

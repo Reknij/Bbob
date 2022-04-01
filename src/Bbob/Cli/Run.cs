@@ -7,45 +7,72 @@ namespace Bbob.Main.Cli;
 public class Run : Command
 {
     public new static string Name => "Run";
-    public new static string Help => "Run custom command from target plugin. if [command [argument]] is null will enter to mode custom command, otherwise direct run command.\n" +
+    public new static string Help => "Run custom command from target plugin, if [command [argument]] is null will enter to mode custom command, otherwise direct run command. Or run the global command.\n" +
     "<option>:\n" +
-    "pluginName : Plugin to run custom command.\n\n" +
+    "name : Name of plugin to run custom command or global option.\n\n" +
     "Use:\n" +
-    "// run <pluginName> [command [argument]]";
+    "// run [-g|--global] <name> [command [argument]]";
 
-    string pluginName;
+    string name;
+    bool global;
     string command;
     string[] arguments;
-    public Run(string pluginName, string command, string[] arguments)
+    public Run(string name, string command, string[] arguments, bool global)
     {
-        this.pluginName = pluginName.ToUpper();
+        this.name = name.ToUpper();
         this.command = command;
         this.arguments = arguments;
+        this.global = global;
     }
 
     public override bool Process()
     {
         const string SUCCESS = "SUCCESS: ";
         const string FAILED = "FAILED: ";
+        if (global)
+        {
+            if (string.IsNullOrWhiteSpace(command))
+            {
+                System.Console.WriteLine($"{FAILED}Please enter global custom command!");
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(PluginHelperCore.customGlobalCommandKey))
+            {
+                System.Console.WriteLine($"{FAILED}No register any global commands!");
+                return false;
+            }
+            string globalCommand = command + PluginHelperCore.customGlobalCommandKey;
+            if (!PluginHelperCore.customCommands.ContainsKey(globalCommand))
+            {
+                System.Console.WriteLine($"{FAILED}Target global command is not register!");
+                return false;
+            }
+            foreach (var item in PluginHelperCore.customCommands[globalCommand])
+            {
+                item.Value(arguments);
+            }
+            System.Console.WriteLine($"{SUCCESS} Run global command done.");
+            return true;
+        }
 
-        if (!PluginHelper.isTargetPluginLoaded(pluginName))
+        if (!PluginHelper.isTargetPluginLoaded(name))
         {
             System.Console.WriteLine($"{FAILED}Target plugin is unload! Please make sure plugin is exists.");
             return false;
         }
-        if (!PluginHelper.isTargetPluginEnable(pluginName))
+        if (!PluginHelper.isTargetPluginEnable(name))
         {
             System.Console.WriteLine($"{FAILED}Target plugin is disable! Please enable to try again.");
             return false;
         }
-        if (!PluginHelperCore.customCommands.ContainsKey(pluginName))
+        if (!PluginHelperCore.customCommands.ContainsKey(name))
         {
             System.Console.WriteLine($"{FAILED}Target plugin is no register any custom command!");
             return false;
         }
         Func<string, bool> existsCommand = (cmd) =>
         {
-            if (!PluginHelperCore.customCommands[pluginName].ContainsKey(cmd))
+            if (!PluginHelperCore.customCommands[name].ContainsKey(cmd))
             {
                 System.Console.WriteLine($"{FAILED}Target plugin is no register custom command '{cmd}'.");
                 return false;
@@ -56,7 +83,7 @@ public class Run : Command
         if (!string.IsNullOrWhiteSpace(command))
         {
             if (!existsCommand(command)) return false;
-            PluginHelperCore.customCommands[pluginName][command](arguments);
+            PluginHelperCore.customCommands[name][command](arguments);
         }
         else
         {
@@ -64,7 +91,7 @@ public class Run : Command
             string? c = null;
             Action readC = () =>
             {
-                System.Console.Write($"{pluginName}: ");
+                System.Console.Write($"{name}: ");
                 c = Console.ReadLine();
             };
             readC();
@@ -83,12 +110,12 @@ public class Run : Command
                     continue;
                 }
                 Array.Copy(args, 1, arguments = new string[args.Length - 1], 0, arguments.Length);
-                PluginHelperCore.customCommands[pluginName][command](arguments);
+                PluginHelperCore.customCommands[name][command](arguments);
                 readC();
             }
             System.Console.WriteLine("Custom command mode exited.");
         }
-        System.Console.WriteLine($"{SUCCESS}Run custom command from {pluginName} done.");
+        System.Console.WriteLine($"{SUCCESS}Run custom command from {name} done.");
         return true;
     }
 }

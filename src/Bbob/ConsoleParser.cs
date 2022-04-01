@@ -356,21 +356,23 @@ class ConsoleParser
                 {
                     TurnMessageShow(TurnOption.All, false);
                     InitializeBbob.Initialize(InitializeBbob.InitializeOptions.All);
-                    string pluginName = string.Empty;
-                    string command = pluginName;
+                    string name = string.Empty;
+                    string command = name;
+                    bool isGlobal = false;
                     string[] args = Array.Empty<string>();
                     if (++i < length)
                     {
-                        pluginName = arguments[i];
+                        name = arguments[i];
+                        if (name == "-g" || name == "--global") isGlobal = true;
                         if (++i < length)
                         {
                             command = arguments[i];
                             if (++i < length) Array.Copy(arguments, i, args = new string[length - i], 0, args.Length);
                         }
-                        Run run = new Run(pluginName, command, args);
+                        Run run = new Run(name, command, args, isGlobal);
                         run.Process();
                     }
-                    else System.Console.WriteLine("Please enter plugin name!");
+                    else System.Console.WriteLine("Please enter the name!");
                     break;
                 }
             default:

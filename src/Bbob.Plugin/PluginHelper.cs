@@ -1,6 +1,7 @@
 using static Bbob.Plugin.Cores.PluginHelperCore;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using System;
 
 [assembly: InternalsVisibleTo("Bbob.Main")]
 namespace Bbob.Plugin;
@@ -438,15 +439,32 @@ public static class PluginHelper
     /// </summary>
     /// <param name="command">Command to register.</param>
     /// <param name="function">Function to execute which command called.</param>
-    public static void registerCustomCommand(string command, Action<string[]> function)
+    /// <param name="option">Option of register command</param>
+    /// <returns>True if not register then add success. Otherwise already exists and add failed.</returns>
+    public static bool registerCustomCommand(string command, Action<string[]> function, RegisterCommandOption? option = null)
     {
-        string pluginName = ExecutingPlugin.name.ToUpper();
-        if (!customCommands.ContainsKey(pluginName)) customCommands.Add(pluginName, new Dictionary<string, Action<string[]>>());
         PluginJson registerPlugin = ExecutingPlugin;
-        customCommands[pluginName].Add(command, (args) =>
+        string pluginName = ExecutingPlugin.name.ToUpper();
+        option = option ?? new RegisterCommandOption();
+        Action<string[]> registerFunction = (args) =>
         {
             executingPlugin = registerPlugin;
             function(args);
-        });
+        };
+        if (option.Global)
+        {
+            if (string.IsNullOrWhiteSpace(customGlobalCommandKey)) customGlobalCommandKey = $"globalCommand{Random.Shared.Next(131452099)}_";
+            command += customGlobalCommandKey;
+            if (!customCommands.ContainsKey(command)) customCommands.Add(command, new Dictionary<string, Action<string[]>>());
+            if (customCommands[command].ContainsKey(pluginName)) return false;
+            customCommands[command].Add(pluginName, registerFunction);
+        }
+        else
+        {
+            if (!customCommands.ContainsKey(pluginName)) customCommands.Add(pluginName, new Dictionary<string, Action<string[]>>());
+            if (customCommands[pluginName].ContainsKey(command)) return false;
+            customCommands[pluginName].Add(command, registerFunction);
+        }
+        return true;
     }
 }

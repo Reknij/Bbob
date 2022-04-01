@@ -12,6 +12,7 @@ internal static class PluginHelperCore
     internal static HashSet<string> pluginsLoaded = new HashSet<string>();
     internal static string[] pluginsLoadedOrder = Array.Empty<string>();
     internal static Dictionary<string, Dictionary<string, Action<string[]>>> customCommands = new();
+    internal static string customGlobalCommandKey = "";
     internal static ConfigJson? configBbob;
     internal static string themePath = "null";
     internal static string currentDirectory = "null";
