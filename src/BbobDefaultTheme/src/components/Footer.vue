@@ -19,7 +19,7 @@ import Bbob from '../../../Bbob/JSApi/Bbob'
 
 <style>
 .extraLink{
-    margin: 5px 0px 2px 2px;
+    margin: auto 4px;
     text-decoration: underline;
     color: var(--theme-font-color);
 }
