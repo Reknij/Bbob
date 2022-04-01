@@ -1,3 +1,5 @@
 - theme support custom icon.
 - support disable all third plugin.
 - plugin helper can read console.
+- default theme add avatar.
+- default support lightbox.
