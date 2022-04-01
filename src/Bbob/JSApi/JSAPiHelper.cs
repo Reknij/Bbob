@@ -56,9 +56,12 @@ public static class JSAPiHelper
         JSApiType.BbobMeta meta = new JSApiType.BbobMeta(config);
         meta.copyright = meta.copyright.Replace("*year", DateTime.Now.Year.ToString()).Replace("*author", config.author).Replace("*themeName", themeInfo.name);
         LoadThirdMetas(meta, buildData.Metas);
-        JsonSerializerOptions a = new JsonSerializerOptions();
-        string blogPlain = $"\nconst blog = {JsonSerializer.Serialize(buildData.blog)}";
-        string metaPlain = $"\nconst meta =  {JsonSerializer.Serialize(meta)}";
+        JsonSerializerOptions option = new JsonSerializerOptions()
+        {
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+        };
+        string blogPlain = $"\nconst blog = {JsonSerializer.Serialize(buildData.blog, option)}";
+        string metaPlain = $"\nconst meta =  {JsonSerializer.Serialize(meta, option)}";
         string globalVariable = "\nvar Bbob = { blog, meta, api }";
         string content = mjs + blogPlain + metaPlain + globalVariable;
         try
@@ -108,16 +111,11 @@ public static class JSAPiHelper
                 string name = Path.GetFileName(meta).Replace(ext, string.Empty);
                 try
                 {
-                    using (FileStream fs = File.OpenRead(meta))
-                    {
-                        object? third = JsonSerializer.Deserialize<IDictionary<string, object>>(fs);
-                        if (third == null) continue;
-                        metasJson.Add(name, third);
-                    }
+                    metasJson.Add(name, File.ReadAllText(meta));
                 }
                 catch (System.Exception ex)
                 {
-                    System.Console.WriteLine($"Get third meta from '{meta}' error:\n{ex.Message}");
+                    System.Console.WriteLine($"Read '{meta}' throw error: {ex.Message}");
                 }
             }
         }
@@ -126,13 +124,20 @@ public static class JSAPiHelper
             if (!metasJson.ContainsKey(item.Key)) metasJson.Add(item.Key, item.Value);
             else
             {
-                IDictionary<string, object> metaDict = getPropertiesToDictionary(metasJson[item.Key]);
-                IDictionary<string, object> pluginMetaDict = getPropertiesToDictionary(item.Value);
-                foreach (var pm in pluginMetaDict)
+                try
                 {
-                    if (!metaDict.ContainsKey(pm.Key)) metaDict.Add(pm.Key, pm.Value);
+                    string newMeta = (string)metasJson[item.Key];
+                    object? mergeResult;
+                    if (item.Value is JsonDocument d) mergeResult = JsonSerializer.Deserialize<object>(Shared.SharedLib.JsonHelper.Merge(null, newMeta, d));
+                    else mergeResult = JsonSerializer.Deserialize<object>(Shared.SharedLib.JsonHelper.Merge(JsonSerializer.Serialize(item.Value), newMeta));
+
+                    if (mergeResult != null) metasJson[item.Key] = mergeResult;
+                    else metasJson.Remove(item.Key);
                 }
-                metasJson[item.Key] = metaDict;
+                catch (System.Exception ex)
+                {
+                    System.Console.WriteLine($"Merge meta throw error:\n{ex}");
+                }
             }
         }
         var extra = (IDictionary<string, object>)bbobMeta.extra;

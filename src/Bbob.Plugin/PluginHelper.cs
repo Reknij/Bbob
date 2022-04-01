@@ -305,20 +305,38 @@ public static class PluginHelper
     /// Register meta with name of executing plugin.
     /// </summary>
     /// <param name="meta">Meta object</param>
-    public static void registerMeta(object meta)
-    {
-        registerMeta(ExecutingPlugin.name, meta);
-    }
+    /// <param name="option">Option of register meta</param>
+    public static void registerMeta(object meta, RegisterMetaOption? option = null) => registerMeta(ExecutingPlugin.name, meta, option);
 
     /// <summary>
     /// Register meta with target name.
     /// </summary>
     /// <param name="metaName">Name of meta</param>
     /// <param name="meta">Meta object</param>
-    public static void registerMeta(string metaName, object meta)
+    /// <param name="option">Option of register meta</param>
+    public static void registerMeta(string metaName, object meta, RegisterMetaOption? option = null)
     {
-        if (metas.ContainsKey(metaName)) metas.Remove(metaName);
-        metas.Add(metaName, meta);
+        option ??= new RegisterMetaOption();
+        if (metas.ContainsKey(metaName))
+        {
+            if (!option.Merge) metas[metaName] = meta;
+            else
+            {
+                if (meta is JsonDocument newDocument)
+                {
+                    if (metas[metaName] is JsonDocument originalDoc) metas[metaName] = JsonDocument.Parse(JsonHelper.Merge(null, null, originalDoc, newDocument));
+                    else metas[metaName] = JsonDocument.Parse(JsonHelper.Merge(JsonSerializer.Serialize(metas[metaName]), null, null, newDocument));
+                }
+                else
+                {
+                    string rmeta = JsonSerializer.Serialize(meta);
+                    if (metas[metaName] is JsonDocument originalDoc) metas[metaName] = JsonDocument.Parse(JsonHelper.Merge(null, rmeta, originalDoc));
+                    else metas[metaName] = JsonDocument.Parse(JsonHelper.Merge(JsonSerializer.Serialize(metas[metaName]), rmeta));
+                }
+
+            }
+        }
+        else metas.Add(metaName, meta);
     }
 
     /// <summary>
