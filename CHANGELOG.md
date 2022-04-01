@@ -1,6 +1,10 @@
 # 2022-4-1
 ## Bbob
 - custom command support global.
+- refactoring meta merge
+- `enable` and `disable` support control all plugin one time.
+## Bbob.Plugin
+- `PluginHelper.registerMeta` support option to merge or replace.
 
 # 2022-3-29
 ## Bbob.Plugin
