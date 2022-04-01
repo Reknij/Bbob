@@ -15,8 +15,7 @@ About usage and plugin develop, please see the [Documents](https://reknij.github
 # Why make it?
 Feel funny
 
-# Last update 2022-3-29 v1.4.5
-## Bbob
+# Last update 2022-4-1
 - load plugin from nuget packages match name now is upper
 - fix command `add -a` option can't detect
 - MarkdownParser build-in plugin now use advanced extension. etc. tables, strikethrough, task list and more.
