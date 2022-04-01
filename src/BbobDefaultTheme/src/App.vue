@@ -152,6 +152,7 @@ body {
     --el-card-border-radius: 4px;
     --el-card-padding: 20px;
     --el-card-bg-color: var(--theme-background-color);
+    color: var(--theme-font-color);
 }
 .el-drawer {
     background-color: var(--theme-drawer-background-color);
