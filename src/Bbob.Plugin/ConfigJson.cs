@@ -57,7 +57,7 @@ public class ConfigJson
     /// Domain of blog.
     /// </summary>
     /// <value>Default empty.</value>
-    public string domain {get;set;} = "";
+    public string domain { get; set; } = "";
 
     /// <summary>
     /// Base url of blog.
@@ -75,19 +75,19 @@ public class ConfigJson
     /// Enable compress file or not.
     /// </summary>
     /// <value>Default true.</value>
-    public bool compress {get;set;} = true;
+    public bool compress { get; set; } = true;
 
     /// <summary>
     /// Use hash name of file or not.
     /// </summary>
     /// <value>Default true.</value>
-    public bool useHashName {get;set;} = true;
+    public bool useHashName { get; set; } = true;
 
     /// <summary>
     /// Distribution of command to process.
     /// </summary>
     /// <value>Default './dist/'</value>
-    public string distributionPath {get;set;} = "";
+    public string distributionPath { get; set; } = "";
 
     /// <summary>
     /// Plugin disable list.
@@ -130,5 +130,23 @@ public class ConfigJson
     public bool isPluginEnable(PluginJson pluginInfo)
     {
         return isPluginEnable(pluginInfo.name);
+    }
+
+    /// <summary>
+    /// True if all build-in plugin is enable, otherwise false.
+    /// </summary>
+    /// <returns></returns>
+    public bool isAllBuildInPluginEnable()
+    {
+        return pluginsDisable.Count == 0 || pluginsDisable.First().ToUpper() != "*B";
+    }
+
+    /// <summary>
+    /// True if all third plugin is enable, otherwise false.
+    /// </summary>
+    /// <returns></returns>
+    public bool isAllThirdPluginEnable()
+    {
+        return pluginsDisable.Count == 0 || pluginsDisable.First().ToUpper() != "*T";
     }
 }

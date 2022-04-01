@@ -175,7 +175,11 @@ public static class PluginSystem
     {
         var config = Configuration.ConfigManager.MainConfig;
         buildInPlugins.Clear();
-
+        if (!config.isAllBuildInPluginEnable())
+        {
+            System.Console.WriteLine("Disable all build-in plugin!");
+            return;
+        }
         Type[] types = GetBuildInPlugins();
         foreach (var type in types)
         {
@@ -195,8 +199,13 @@ public static class PluginSystem
     }
     private static void LoadThirdPlugins()
     {
-        List<KeyValuePair<string, PluginJson>> thirdPluginsInfo = GetThirdPluginsInfo();
         var config = Configuration.ConfigManager.MainConfig;
+        if (!config.isAllThirdPluginEnable())
+        {
+            System.Console.WriteLine("Disable all third plugin!");
+            return;
+        }
+        List<KeyValuePair<string, PluginJson>> thirdPluginsInfo = GetThirdPluginsInfo();
         foreach (var third in thirdPluginsInfo)
         {
             PluginHelperCore.pluginsLoaded.Add(third.Value.name.ToUpper());
