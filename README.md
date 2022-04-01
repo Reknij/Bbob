@@ -15,13 +15,17 @@ About usage and plugin develop, please see the [Documents](https://reknij.github
 # Why make it?
 Feel funny
 
-# Last update 2022-3-29 v1.4.4
+# Last update 2022-3-29 v1.4.5
 ## Bbob
-- optimize and fix some bugs.
-- optimize build-in plugin custom command `config`.
+- load plugin from nuget packages match name now is upper
+- fix command `add -a` option can't detect
+- MarkdownParser build-in plugin now use advanced extension. etc. tables, strikethrough, task list and more.
+
 ## BbobDefaultTheme
-- supports multiple languages, see document to know what languages supports.
-- background color optimize.
+- add icons.
+- optimize color.
+- add back top button.
+- toc button refactoring.
 
 # Recommended plugins
 - [bbob-plugin-disqus](https://github.com/Reknij/bbob-plugin-disqus) Let your article have comment.
