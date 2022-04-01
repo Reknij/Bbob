@@ -2,6 +2,7 @@
 import { useRouter } from 'vue-router';
 import Bbob from '../../../Bbob/JSApi/Bbob';
 import { paths } from '../composition/routePaths'
+import { Calendar } from '@element-plus/icons-vue'
 let router = useRouter();
 
 let props = defineProps({
@@ -20,8 +21,14 @@ let props = defineProps({
   <div v-if="props.mode == 'horizontal'" class="nav-wrapper">
     <h1 class="title" @click="router.push('/')">{{ Bbob.meta.blogName }}</h1>
     <div class="nav-container">
-      <div :id="`nav-item-${p.path}`" :class="router.currentRoute.value.path == p.path?'nav-item-selected':''" class="nav-item" v-for="(p, i) in paths">
-        <router-link class="nav-item-a" :to="p.path">{{ p.name }}</router-link>
+      <div
+        :id="`nav-item-${p.path}`"
+        :class="router.currentRoute.value.path == p.path ? 'nav-item-selected' : ''"
+        class="nav-item"
+        v-for="(p, i) in paths"
+      >
+        <span style="width: 20px; height: 20px; margin: auto" v-html="p.icon"></span>
+        <router-link class="nav-item-a" style="margin-left: 5px;" :to="p.path">{{ p.name }}</router-link>
       </div>
     </div>
   </div>
@@ -31,7 +38,10 @@ let props = defineProps({
     :default-active="router.currentRoute.value.path"
     @select="props.readyClick && props.readyClick()"
   >
-    <el-menu-item v-for="(p, i) in paths" :key="i" :index="p.path">{{ p.name }}</el-menu-item>
+    <el-menu-item v-for="(p, i) in paths" :key="i" :index="p.path" style="line-height: normal;">
+      <span class="el-icon" style="width: 18px; height: 18px;" v-html="p.icon"></span>
+      {{ p.name }}
+    </el-menu-item>
   </el-menu>
 </template>
 

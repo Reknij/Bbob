@@ -4,7 +4,7 @@ import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router';
 import Bbob, { Article } from '../../../Bbob/JSApi/Bbob'
 import { normal } from '../composition/changeSize';
 import { language } from '../Languages/LanguageHelper';
-
+import { List, Calendar } from '@element-plus/icons-vue'
 let isLoading = ref(true);
 let articleLoadingMs = 300;
 const route = useRoute();
@@ -23,12 +23,12 @@ let artDate = ref('')
 onBeforeMount(async () => {
     let start = new Date().getTime();
     article.value = await Bbob.api.getArticleFromAddressAsync(address)
-    let date = `<span style="text-decoration: underline dashed;">${article.value.date}</span>`;
+    let date = `<span style="text-decoration: underline dashed; color: var(--theme-date-color);">${article.value.date}</span>`;
     if (language.postedOn.includes('${date}')) {
-        artDate.value = language.postedOn.replace('${date}', date);
+        artDate.value = ' ' + language.postedOn.replace('${date}', date);
     }
     else {
-        artDate.value = `${language.postedOn} ${date}`;
+        artDate.value = ' ' + `${language.postedOn} ${date}`;
     }
     watch(htmlContent, () => {
         if (htmlContent.value) Bbob.api.executeScriptElements(htmlContent.value as any);
@@ -65,7 +65,13 @@ let tocDrawer = ref(false)
                     <el-page-header id="backBtn" @back="router.push('/')" :title="language.back"></el-page-header>
                     <span class="articleTitle">{{ article.title }}</span>
 
-                    <span class="articleDate" v-html="artDate" />
+                    <div class="articleDate">
+                        <el-icon class="calendarIcon">
+                            <calendar />
+                        </el-icon>
+                        <span v-html="artDate" />
+                    </div>
+
                     <div style="text-align: center; margin-top: 5px;">
                         <el-tag
                             v-if="article.categories"
@@ -91,7 +97,7 @@ let tocDrawer = ref(false)
         </el-card>
 
         <el-drawer
-            :size="normal ? '50%' : '100%'"
+            :size="normal ? '30' : '75%'"
             v-if="article.toc"
             v-model="tocDrawer"
             direction="ltr"
@@ -106,9 +112,11 @@ let tocDrawer = ref(false)
             </template>
         </el-drawer>
 
-        <el-affix style="margin-left: calc(100% - 60px);" :offset="80" position="bottom">
-            <el-button @click="tocDrawer = true" type="primary">Toc</el-button>
-        </el-affix>
+        <el-button class="fix" @click="tocDrawer = true" type="primary">
+            <el-icon>
+                <list />
+            </el-icon>
+        </el-button>
     </div>
 </template>
 
@@ -154,6 +162,28 @@ let tocDrawer = ref(false)
     text-align: center;
     display: block;
     font-size: small;
-    color: var(--theme-date-color);
+}
+.calendarIcon {
+    position: relative;
+    bottom: -1px;
+}
+.fix {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    position: fixed;
+    right: max(calc(calc(100% - 1024px) / 2 + 15px), 15px);
+    bottom: 80px;
+    box-shadow: 0 0 6px rgb(0 0 0 / 30%);
+    background-color: var(--theme-background-color);
+    color: var(--theme-font-color);
+    border-width: 0px;
+}
+.fix:hover {
+    background-color: var(--theme-selected-color);
+}
+.fix:focus {
+    background-color: var(--theme-background-color);
+    color: var(--theme-font-color);
 }
 </style>

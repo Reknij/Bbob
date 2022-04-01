@@ -5,7 +5,7 @@ import { setMaxWidth, normal } from './composition/changeSize';
 import MenuSmall from './components/MenuSmall.vue';
 import { scrollToDownInvoke } from './composition/functionsRegister';
 import { changeToDark } from './composition/modeChange';
-import { onMounted, ref, VideoHTMLAttributes, watch } from 'vue';
+import { computed, onMounted, ref, VideoHTMLAttributes, watch } from 'vue';
 import Bbob from '../../Bbob/JSApi/Bbob';
 
 setMaxWidth(768);
@@ -17,12 +17,10 @@ let dt = Bbob.meta.extra.defaultTheme;
 if (dt) {
     let element = document.documentElement as HTMLElement;
     if (dt.background) {
-        hasBackground = true
+        hasBackground = true;
+        element.style.setProperty('--theme-cover-min-width', '1024px');
         source.value = dt.background.sourceH;
         if (dt.background.isVideo) isVideo = dt.background.isVideo;
-    }
-    else {
-        element.style.setProperty('--theme-cover-min-width', '100vw')
     }
     if (dt.mode) {
         if (dt.mode == 'dark') changeToDark();
@@ -94,6 +92,7 @@ function replay() {
             <Footer></Footer>
         </el-footer>
     </el-container>
+    <el-backtop :bottom="130" />
 </template>
 
 <style>
@@ -101,11 +100,13 @@ function replay() {
     --mainContentPadding: 20px;
     --theme-cover-color: rgba(255, 255, 255, 0.6);
     --theme-font-color: #313331;
+    --theme-date-color: #8a8a8a;
     --theme-selected-color: #409eff;
     --theme-background-color: #ffffff99;
     --theme-border-color: #ebeef5;
-    --theme-cover-min-width: 1024px;
+    --theme-cover-min-width: 100%;
     --theme-drawer-background-color: #ffffff;
+    --color: var(--theme-font-color);
 }
 .app-container {
     max-width: 1024px;
@@ -169,5 +170,13 @@ body {
 }
 #app {
     color: var(--theme-font-color) !important;
+}
+.el-backtop {
+    box-shadow: 0 0 6px rgb(0 0 0 / 30%);
+    background-color: var(--theme-background-color);
+    right: max(calc(calc(100% - 1024px) / 2 + 15px), 15px) !important;
+}
+.el-backtop:hover {
+    background-color: var(--theme-selected-color);
 }
 </style>

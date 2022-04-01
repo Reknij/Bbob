@@ -4,8 +4,8 @@ let normal = ref(true);
 let maxWidth: number | undefined = undefined;
 let maxHeight: number | undefined = undefined;
 const onResize = () => {
-    if ((maxWidth && window.innerWidth < maxWidth) ||
-        (maxHeight && window.innerHeight < maxHeight)) {
+    if ((maxWidth && window.outerWidth <= maxWidth) ||
+        (maxHeight && window.outerHeight <= maxHeight)) {
         normal.value = false;
     }
     else {

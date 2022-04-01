@@ -9,8 +9,8 @@ let drawer = ref(false)
 
 <template>
     <div class="container">
-        <el-drawer size="100%" v-model="drawer" direction="ltr">
-            <Menu mode="vertical" :ready-click="() => drawer = false"></Menu>
+        <el-drawer size="75%" v-model="drawer" direction="ltr">
+            <Menu style="border-right: none;" mode="vertical" :ready-click="() => drawer = false"></Menu>
         </el-drawer>
         <div class="menu-container" @click="drawer = true">
             <div class="menu"></div>

@@ -22,7 +22,13 @@ const props = defineProps({
 let router = useRouter();
 let mainLinks: Ref<any[]> = ref([]);
 if (props.defineSource) {
-    watch(() => props.source, () => mainLinks.value = props.source)
+    watch(() => props.source, () => {
+        mainLinks.value = props.source
+        if (mainLinks.value.length > 0) {
+            mainLinks.value[0].size = "large"
+            mainLinks.value[0].type = "primary"
+        }
+    })
 }
 else {
     mainLinks.value = Bbob.blog.links;
@@ -80,7 +86,7 @@ onMounted(() => {
                     >{{ link.title }}</router-link>
                 </h3>
                 <el-divider v-if="link.categories" content-position="left">
-                    <el-tag effect="dark" type="warning">{{language.categories}}</el-tag>
+                    <el-tag effect="dark" type="warning">{{ language.categories }}</el-tag>
                 </el-divider>
                 <el-tag
                     v-if="link.categories"
@@ -91,7 +97,7 @@ onMounted(() => {
                     @click="router.push(`/filter/categories?checked=${category}`)"
                 >{{ category }}</el-tag>
                 <el-divider v-if="link.tags" content-position="left">
-                    <el-tag effect="dark" type="success">{{language.tags}}</el-tag>
+                    <el-tag effect="dark" type="success">{{ language.tags }}</el-tag>
                 </el-divider>
                 <el-tag
                     v-if="link.tags"
@@ -121,9 +127,9 @@ onMounted(() => {
     color: var(--theme-selected-color);
 }
 .el-timeline {
-        padding-inline-start: 0px;
+    padding-inline-start: 0px;
 }
-.el-timeline-item__timestamp{
+.el-timeline-item__timestamp {
     color: var(--theme-date-color);
     margin-left: 15px;
 }
