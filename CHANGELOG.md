@@ -1,3 +1,7 @@
+# 2022-4-1
+## Bbob
+- custom command support global.
+
 # 2022-3-29
 ## Bbob.Plugin
 - register and get object support option.
