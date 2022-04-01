@@ -180,4 +180,13 @@ body {
 .el-backtop:hover {
     background-color: var(--theme-selected-color);
 }
+
+div,
+input,
+textarea,
+button,
+select,
+a {
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
 </style>

@@ -55,6 +55,10 @@ onBeforeRouteLeave(() => {
 });
 
 let tocDrawer = ref(false)
+function tocClick(event: Event) {
+    tocDrawer.value = true;
+    document.getElementById('tocBtn')?.blur();
+}
 </script>
 
 <template>
@@ -101,6 +105,7 @@ let tocDrawer = ref(false)
             v-if="article.toc"
             v-model="tocDrawer"
             direction="ltr"
+            :lock-scroll="false"
         >
             <template #title>
                 <h4 style="color: var(--theme-font-color);">{{ article.title }}</h4>
@@ -112,7 +117,7 @@ let tocDrawer = ref(false)
             </template>
         </el-drawer>
 
-        <el-button class="fix" @click="tocDrawer = true" type="primary">
+        <el-button id="tocBtn" class="fix" @click="tocClick" type="primary">
             <el-icon>
                 <list />
             </el-icon>
