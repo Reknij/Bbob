@@ -26,7 +26,7 @@ public static class PluginSystem
         LoadThirdPlugins();
         if (ShowLoadedMessage)
         {
-            if ((BuildInPluginCount + ThirdPluginCount) > 0) System.Console.WriteLine($"Loaded {AllPluginCount} plugins. ({BuildInPluginCount}|{ThirdPluginCount})");
+            if ((BuildInPluginCount + ThirdPluginCount) > 0) System.Console.WriteLine($"Loaded {AllPluginCount} plugins. 【{BuildInPluginCount}|{ThirdPluginCount}】");
             else System.Console.WriteLine("Warning: plugins are loaded.");
         }
         foreach (var p in buildInPlugins)
