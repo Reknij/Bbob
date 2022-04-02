@@ -296,9 +296,29 @@ public static class PluginHelper
     /// Print message to console of Bbob.
     /// </summary>
     /// <param name="msg">Message object. Will use ToString() function.</param>
-    public static void printConsole(object msg)
+    public static void printConsole(object? msg)
     {
+        msg ??= "<NULL_OBJECT>";
         System.Console.WriteLine($"[{ExecutingPlugin.name}]: {msg.ToString()}");
+    }
+
+    /// <summary>
+    /// Read message from console of Bbob.
+    /// </summary>
+    /// <returns>The next line of characters from the input stream, or null if no more lines are available.</returns>
+    public static string? readConsole()
+    {
+        return Console.ReadLine();
+    }
+
+    /// <summary>
+    /// Read key from console of Bbob.
+    /// </summary>
+    /// <param name="intercept">Determines whether to display the pressed key in the console window. true to not display the pressed key; otherwise, false.</param>
+    /// <returns></returns>
+    public static ConsoleKeyInfo readConsoleKey(bool intercept = true)
+    {
+        return Console.ReadKey(intercept);
     }
 
     /// <summary>
