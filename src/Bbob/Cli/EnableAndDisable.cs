@@ -6,7 +6,7 @@ namespace Bbob.Main.Cli;
 public class EnableAndDisable : Command
 {
     public new static string Name => "enable/disable";
-    public new static string Help => "Enable/Disable the plugin. If <pluginName> is '*b' corresponding all build-in plugin, '*t' corresponding all third plugin.\n" +
+    public new static string Help => "Enable/Disable the plugin. If <pluginName> is '*b' corresponding all build-in plugin, '*t' corresponding all third plugin, if will not affect original disable config.\n" +
     "[option]:\n" +
     "-d : direct enable or disable plugin.\n\n" +
     "Use:\n" +
