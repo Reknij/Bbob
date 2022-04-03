@@ -102,15 +102,21 @@ public class MarkdownParser : IPlugin
                 var result = Markdown.Parse(value, pipelineBuilder.Build());
                 var headingBlocks = result.Descendants<HeadingBlock>();
                 Toc toc = new Toc();
-                int tocCount = 1;
+                Dictionary<string, int> ids = new Dictionary<string, int>();
                 foreach (var headingBlock in headingBlocks)
                 {
                     if (headingBlock.Inline?.FirstChild != null && headingBlock.Inline.FirstChild is LiteralInline li)
                     {
-                        headingBlock.GetAttributes().Id = $"toc-{tocCount++}";
-                        string name = li.Content.ToString();
-                        string id = headingBlock.GetAttributes().Id ?? throw new NullReferenceException("Get toc id null!");
-                        toc.Add(headingBlock.Level, name, id);
+                        string text = li.Content.ToString();
+                        string idText = text;
+
+                        if (ids.ContainsKey(idText))
+                        {
+                            idText += $"_{++ids[idText]}";
+                        }
+                        else ids.Add(idText, 1);
+                        headingBlock.GetAttributes().Id = idText;
+                        toc.Add(headingBlock.Level, text, idText);
                     }
                 }
                 PluginHelper.modifyRegisteredObject<dynamic>("article", (ref dynamic? article) =>
