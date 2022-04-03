@@ -17,14 +17,13 @@ public class MarkdownParser : IPlugin
     {
         IgnoreUnmatchedProperties = true
     });
-    MarkdownPipeline pipeline;
+    MarkdownPipelineBuilder pipelineBuilder;
     public MarkdownParser()
     {
-        pipeline = new MarkdownPipelineBuilder()
+        pipelineBuilder = new MarkdownPipelineBuilder()
         .UseYamlFrontMatter()
         .UseAdvancedExtensions()
-        .UseMathematics()
-        .Build();
+        .UseMathematics();
     }
     public void NewCommand(string filePath, ref string content, NewTypes types = NewTypes.blog)
     {
@@ -55,7 +54,7 @@ public class MarkdownParser : IPlugin
         using (StreamReader sr = new StreamReader(filePath))
         {
             string source = sr.ReadToEnd();
-            var doc = Markdown.Parse(source, pipeline);
+            var doc = Markdown.Parse(source, new MarkdownPipelineBuilder().UseYamlFrontMatter().Build());
             string mdString = source;
             YamlFrontMatterBlock? yamlFrontMatterBlock = doc.Descendants<YamlFrontMatterBlock>().FirstOrDefault();
             if (yamlFrontMatterBlock != null)
@@ -64,6 +63,7 @@ public class MarkdownParser : IPlugin
                 mdString = source.Replace(yamlString, "");
                 mdString = mdString.Remove(0, 1); //remove first character '/n'
                 PluginHelper.registerObject("markdown", mdString);
+                PluginHelper.registerObject("markdownPipelineBuilder", pipelineBuilder);
                 yamlString = yamlString.Remove(0, 3);
                 yamlString = yamlString.Remove(yamlString.Length - 3, 3);
                 parseLinkInfo(yamlString, filePath);
@@ -99,7 +99,7 @@ public class MarkdownParser : IPlugin
         {
             if (PluginHelper.getRegisteredObject<string>("markdown", out string? value) && value != null)
             {
-                var result = Markdown.Parse(value, pipeline);
+                var result = Markdown.Parse(value, pipelineBuilder.Build());
                 var headingBlocks = result.Descendants<HeadingBlock>();
                 Toc toc = new Toc();
                 int tocCount = 1;
@@ -117,7 +117,7 @@ public class MarkdownParser : IPlugin
                 {
                     if (article == null) return;
                     article.toc = toc.ToHtml();
-                    article.contentParsed = $"<div id='bbob-markdown-content'>{result.ToHtml(pipeline)}</div>";
+                    article.contentParsed = $"<div id='bbob-markdown-content'>{result.ToHtml(pipelineBuilder.Build())}</div>";
                 });
             }
         }
