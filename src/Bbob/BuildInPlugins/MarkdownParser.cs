@@ -11,6 +11,8 @@ using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 
 namespace Bbob.Main.BuildInPlugin;
+
+[PluginJson(name = "MarkdownParser", version = "1.0.0", author = "Jinker")]
 public class MarkdownParser : IPlugin
 {
     SharpYaml.Serialization.Serializer serializer = new SharpYaml.Serialization.Serializer(new SharpYaml.Serialization.SerializerSettings()

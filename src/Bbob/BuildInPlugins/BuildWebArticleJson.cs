@@ -3,6 +3,8 @@ using System.Text.RegularExpressions;
 using Bbob.Plugin;
 
 namespace Bbob.Main.BuildInPlugin;
+
+[PluginJson(name = "BuildWebArticleJson", version = "1.0.0", author = "Jinker")]
 public class BuildWebArticleJson : IPlugin
 {
     public BuildWebArticleJson()

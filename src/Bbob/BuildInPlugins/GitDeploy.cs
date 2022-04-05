@@ -4,6 +4,7 @@ using Bbob.Plugin;
 
 namespace Bbob.Main.BuildInPlugin;
 
+[PluginJson(name = "GitDeploy", version = "1.0.0", author = "Jinker")]
 public class GitDeploy : IPlugin
 {
     static readonly string ghDirectoryName = ".deploy_git";

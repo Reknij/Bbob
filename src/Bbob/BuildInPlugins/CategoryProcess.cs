@@ -3,6 +3,7 @@ using Bbob.Plugin;
 
 namespace Bbob.Main.BuildInPlugin;
 
+[PluginJson(name = "CategoryProcess", version = "1.0.0", author = "Jinker")]
 [PluginCondition("LinkProcess", PluginOrder = PluginOrder.BeforeMe)]
 public class CategoryProcess : IPlugin
 {

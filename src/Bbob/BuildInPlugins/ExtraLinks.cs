@@ -2,6 +2,7 @@ using Bbob.Plugin;
 
 namespace Bbob.Main.BuildInPlugin;
 
+[PluginJson(name = "ExtraLinks", version = "1.0.0", author = "Jinker")]
 public class ExtraLinks: IPlugin
 {
     public void GenerateCommand(string filePath, GenerationStage stage)

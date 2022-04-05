@@ -3,6 +3,7 @@ using Bbob.Plugin;
 
 namespace Bbob.Main.BuildInPlugin;
 
+[PluginJson(name = "MarkdownStyle", version = "1.0.0", author = "Jinker")]
 [PluginCondition("MarkdownParser", PluginOrder = PluginOrder.BeforeMe, ConditionType = ConditionType.OrderCheck)]
 public class MarkdownStyle : IPlugin
 {

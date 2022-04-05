@@ -3,6 +3,7 @@ using Bbob.Plugin;
 
 namespace Bbob.Main.BuildInPlugin;
 
+[PluginJson(name = "SitemapGenerator", version = "1.0.0", author = "Jinker")]
 [PluginCondition("BuildWebArticleJson", PluginOrder = PluginOrder.BeforeMe)]
 [PluginCondition("ExtraLinks", PluginOrder = PluginOrder.AfterMe)]
 public class SitemapGenerator : IPlugin

@@ -2,6 +2,7 @@ using Bbob.Plugin;
 
 namespace Bbob.Main.BuildInPlugin;
 
+[PluginJson(name = "InitializeBbob", version = "1.0.0", author = "Jinker")]
 public class InitializeBbob: IPlugin
 {
     readonly string InitDoneFile = Path.Combine(PluginHelper.CurrentDirectory, "BbobInitDone");

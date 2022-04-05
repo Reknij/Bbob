@@ -2,6 +2,7 @@ using Bbob.Plugin;
 
 namespace Bbob.Main.BuildInPlugin;
 
+[PluginJson(name = "CopyToDist", version = "1.0.0", author = "Jinker")]
 public class CopyToDist : IPlugin
 {
     public void InitCommand()

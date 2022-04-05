@@ -2,6 +2,7 @@ using Bbob.Plugin;
 
 namespace Bbob.Main.BuildInPlugin;
 
+[PluginJson(name = "ArticleStatusDetect", version = "1.0.0", author = "Jinker")]
 [PluginCondition("*", PluginOrder = PluginOrder.AfterMe)]
 public class ArticleStatusDetect : IPlugin
 {

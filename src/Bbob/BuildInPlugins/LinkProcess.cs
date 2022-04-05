@@ -3,6 +3,7 @@ using Bbob.Plugin;
 
 namespace Bbob.Main.BuildInPlugin;
 
+[PluginJson(name = "LinkProcess", version = "1.0.0", author = "Jinker")]
 public class LinkProcess : IPlugin
 {
     List<dynamic> links = new List<dynamic>();
