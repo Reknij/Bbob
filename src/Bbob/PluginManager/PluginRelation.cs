@@ -1,4 +1,5 @@
 using Bbob.Plugin;
+using System.Reflection;
 
 namespace Bbob.Main.PluginManager;
 
@@ -78,11 +79,11 @@ public class PluginRelation
         if (getPcrFromPcrs(context, out var pcr) && pcr != null) return pcr;
         var c = new PluginContextRef(context);
         pcrs.Add(c);
-        var attrs = Attribute.GetCustomAttributes(context.main.GetType());
+        var conditions = context.main.GetType().GetCustomAttributes<PluginCondition>();
         HashSet<string> readyPluginNames = new HashSet<string>();
-        foreach (var attr in attrs)
+        foreach (var condition in conditions)
         {
-            if (attr is PluginCondition condition && (condition.ConditionType & ConditionType.OrderCheck) != 0)
+            if ((condition.ConditionType & ConditionType.OrderCheck) != 0)
             {
                 List<PluginContext> others = new List<PluginContext>();
                 if (condition.PluginName == "*")
@@ -108,11 +109,12 @@ public class PluginRelation
                         default:
                         case PluginOrder.Any: break;
                         case PluginOrder.AfterMe:
-                            if (otherPcr.nexts.Contains(c)) break;
+                            if (isAllContains(otherPcr, c, true)) break;
                             c.nexts.Add(otherPcr);
                             otherPcr.previous.Add(c);
                             break;
                         case PluginOrder.BeforeMe:
+                            if (isAllContains(otherPcr, c, false)) break;
                             if (otherPcr.previous.Contains(c)) break;
                             c.previous.Add(otherPcr);
                             otherPcr.nexts.Add(c);
@@ -124,6 +126,30 @@ public class PluginRelation
         }
 
         return c;
+    }
+
+    public bool isAllContains(PluginContextRef pcr, PluginContextRef containPcr, bool isNext)
+    {
+        if (isNext)
+        {
+            if (pcr.nexts.Count == 0) return false;
+            if (pcr.nexts.Contains(containPcr)) return true;
+            foreach (var item in pcr.nexts)
+            {
+                return isAllContains(item, containPcr, isNext);
+            }
+        }
+        else
+        {
+            if (pcr.previous.Count == 0) return false;
+            if (pcr.previous.Contains(containPcr)) return true;
+            foreach (var item in pcr.previous)
+            {
+                return isAllContains(item, containPcr, isNext);
+            }
+        }
+
+        return false;
     }
 
     private bool isTargetRequirePlugin(PluginContext targetPlugin, PluginContext requirePlugin)
