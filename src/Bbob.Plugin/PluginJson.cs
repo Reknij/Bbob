@@ -3,7 +3,8 @@ namespace Bbob.Plugin;
 /// <summary>
 /// Information object of plugin.
 /// </summary>
-public class PluginJson
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+public class PluginJson: Attribute
 {
     private string? _name;
 
@@ -42,6 +43,12 @@ public class PluginJson
     public string entry { get; set; }
 
     /// <summary>
+    /// Version of plugin. If no write will default '1.0.0'.
+    /// </summary>
+    /// <value></value>
+    public string version { get; set; }
+
+    /// <summary>
     /// Initialize information of plugin.
     /// </summary>
     public PluginJson()
@@ -49,5 +56,6 @@ public class PluginJson
         entry = "MainPlugin.dll";
         description = "No description...";
         author = "Unknown author";
+        version = "1.0.0";
     }
 }
