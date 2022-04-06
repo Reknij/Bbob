@@ -193,7 +193,6 @@ public static class PluginSystem
         Dictionary<PluginJson, Type> plugins = GetBuildInPluginsInfo();
         foreach (var plugin in plugins)
         {
-            PluginHelperCore.pluginsLoaded.Add(plugin.Key.name.ToUpper());
             if (!config.isPluginEnable(plugin.Key))
             {
                 if (ShowLoadedMessage) System.Console.WriteLine($"Disable build-in plugin <{plugin.Key.name}>");
@@ -217,7 +216,6 @@ public static class PluginSystem
         Dictionary<PluginJson, string> thirdPluginsInfo = GetThirdPluginsInfo();
         foreach (var third in thirdPluginsInfo)
         {
-            PluginHelperCore.pluginsLoaded.Add(third.Key.name.ToUpper());
             if (!config.isPluginEnable(third.Value))
             {
                 if (ShowLoadedMessage) System.Console.WriteLine($"Disable third plugin <{third.Key.name}>");
@@ -283,10 +281,10 @@ public static class PluginSystem
         PluginRelation pluginRelation = new PluginRelation(allPlugin);
         allPlugin = pluginRelation.ProcessRelation();
         int length = allPlugin.Count;
-        PluginHelperCore.pluginsLoadedOrder = new string[length];
+        PluginHelperCore.pluginsLoaded.EnsureCapacity(length);
         for (int i = 0; i < length; i++)
         {
-            PluginHelperCore.pluginsLoadedOrder[i] = allPlugin[i].info.name;
+            PluginHelperCore.pluginsLoaded.Add(allPlugin[i].info.name, allPlugin[i].info);
         }
     }
 

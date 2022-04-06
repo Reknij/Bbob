@@ -21,7 +21,15 @@ public static class PluginHelper
     /// Config of Bbob cli.
     /// </summary>
     /// <returns></returns>
-    public static ConfigJson ConfigBbob => configBbob ?? throw new NullReferenceException("Config of bbob is null!");
+    public static ConfigJson ConfigBbob
+    {
+        get => configBbob ?? throw new NullReferenceException("Config of bbob is null!");
+        set
+        {
+            if (value == null) printConsole("<Error> Can't assign to ConfigBbob because value is null!");
+            else configBbob = value;
+        }
+    }
 
     /// <summary>
     /// Information of executing plugin.
@@ -48,9 +56,9 @@ public static class PluginHelper
     public static string DistributionDirectory => Path.Combine(CurrentDirectory, ConfigBbob.distributionPath);
 
     /// <summary>
-    /// Loaded plugin order.
+    /// Loaded plugin with already order.
     /// </summary>
-    public static string[] PluginsLoadedOrder => pluginsLoadedOrder;
+    public static Dictionary<string, PluginJson> PluginsLoaded => pluginsLoaded;
 
     /// <summary>
     /// Delegates of PluginHelper.
@@ -449,7 +457,7 @@ public static class PluginHelper
     /// <returns></returns>
     public static bool isTargetPluginLoaded(string name)
     {
-        return pluginsLoaded.Contains(name.ToUpper());
+        return pluginsLoaded.ContainsKey(name.ToUpper());
     }
 
     /// <summary>
