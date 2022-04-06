@@ -68,11 +68,12 @@ public class BuildWebArticleJson : IPlugin
         //string FileLocalFolder = Path.Combine(distribution, JSApi.JSAPiHelper.bbobAssets, folder, year, month, day);
         string FileLocalFolder = Path.Combine(PluginHelper.DistributionDirectory, JSApi.JSAPiHelper.bbobAssets, folder);
         string FileLocal = Path.Combine(FileLocalFolder, targetFile);
-
+        
         if (File.Exists(FileLocal))
         {
             string name = Path.GetFileNameWithoutExtension(FileLocal);
-            int number = numbers.ContainsKey(name) ? numbers[name] : 2;
+            if (!numbers.ContainsKey(name)) numbers.Add(name, 2);
+            int number = numbers[name];
             PluginHelper.printConsole($"Already exists article json {name}, will change to other name");
             while (File.Exists(FileLocal))
             {
@@ -94,9 +95,9 @@ public class BuildWebArticleJson : IPlugin
             fs.Position = 0; //set to 0 to read.
             hash = Shared.SharedLib.HashHelper.GetContentHash(fs);
         }
-        string newName = PluginHelper.ConfigBbob.useHashName ? $"{Path.GetFileNameWithoutExtension(filePath)}-{hash.Substring(0, 9)}.json" : $"{Path.GetFileNameWithoutExtension(filePath)}.json";
+        string newName = PluginHelper.ConfigBbob.useHashName ? $"{Path.GetFileNameWithoutExtension(FileLocal)}-{hash.Substring(0, 9)}.json" : $"{Path.GetFileNameWithoutExtension(FileLocal)}.json";
         string newLocal = Path.Combine(FileLocalFolder, newName);
-        if (FileLocal != newLocal) File.Move(FileLocal, newLocal, true);
+        if (targetFile != newName) File.Move(FileLocal, newLocal, true);
         string baseUrl = PluginHelper.ConfigBbob.baseUrl;
         PluginHelper.getPluginJsonConfig<MyConfig>(out MyConfig? configPlugin);
         bool isShortAddress = configPlugin != null ? configPlugin.shortAddress : false;
