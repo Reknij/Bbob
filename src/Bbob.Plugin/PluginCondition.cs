@@ -59,9 +59,13 @@ public class PluginCondition : Attribute
     /// <summary>
     /// Initialize PluginCondition with target plugin name.
     /// </summary>
-    /// <param name="pluginName"></param>
-    public PluginCondition(string pluginName)
+    /// <param name="pluginName">Name of require plugin name.</param>
+    /// <param name="order">Order with target requrie plugin.</param>
+    /// <param name="type">Type of condition.</param>
+    public PluginCondition(string pluginName, PluginOrder order = PluginOrder.Any, ConditionType type = ConditionType.All)
     {
         this.PluginName = pluginName;
+        this.PluginOrder = order;
+        this.ConditionType = type;
     }
 }
