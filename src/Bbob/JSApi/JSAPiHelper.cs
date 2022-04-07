@@ -145,7 +145,13 @@ public static class JSAPiHelper
         {
             if (!extra.ContainsKey(item.Key))
             {
-                extra.Add(item.Key, item.Value);
+                object value;
+                if (item.Value is string)
+                {
+                    value = JsonSerializer.Deserialize<object>((string)item.Value) ?? "Deserialize meta.json failed!"; ;
+                }
+                else value = item.Value;
+                extra.Add(item.Key, value);
             }
             else
             {
