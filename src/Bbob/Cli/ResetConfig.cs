@@ -1,5 +1,6 @@
 using Bbob.Main.PluginManager;
 using Bbob.Plugin;
+using ConsoleHelper = Bbob.Shared.SharedLib.ConsoleHelper;
 
 namespace Bbob.Main.Cli;
 
@@ -27,11 +28,11 @@ public class ResetConfig : Command
                 object? value = property.GetValue(Configuration.ConfigManager.DefaultConfig);
                 property.SetValue(Configuration.ConfigManager.MainConfig, value);
                 Configuration.ConfigManager.SaveConfig(Configuration.ConfigManager.MainConfig, Configuration.ConfigManager.ConfigPath ?? throw new NullReferenceException("configPath is null"));
-                System.Console.WriteLine($"{SUCCESS}Reset '{property.Name}' to default config.");
+                ConsoleHelper.printSuccess($"{SUCCESS}Reset '{property.Name}' to default config.");
                 return true;
             }
         }
-        System.Console.WriteLine($"{FAILED}Not found property of given argument.");
+        ConsoleHelper.printError($"{FAILED}Not found property of given argument.");
         return false;
     }
 }

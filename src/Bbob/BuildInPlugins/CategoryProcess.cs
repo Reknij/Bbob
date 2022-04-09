@@ -21,22 +21,22 @@ public class CategoryProcess : IPlugin
                         var value = args[1];
                         if (value != "default" && value != "folder")
                         {
-                            PluginHelper.printConsole("mode must is 'default' or 'folder'!");
+                            PluginHelper.printConsole("mode must is 'default' or 'folder'!", ConsoleColor.Yellow);
                             return;
                         }
                         myConfig.mode = value;
                         break;
 
                     default:
-                        PluginHelper.printConsole($"Unknown config name 'args[0]'!");
+                        PluginHelper.printConsole($"Unknown config name 'args[0]'!", ConsoleColor.Red);
                         return;
                 }
-                PluginHelper.printConsole("Config save success!");
+                PluginHelper.printConsole("Config save success!", ConsoleColor.Green);
                 PluginHelper.savePluginJsonConfig<MyConfig>(myConfig);
             }
             else
             {
-                PluginHelper.printConsole("Please enter config name and value!");
+                PluginHelper.printConsole("Please enter config name and value!", ConsoleColor.Red);
             }
         });
     }
@@ -46,11 +46,11 @@ public class CategoryProcess : IPlugin
         if (!PluginHelper.isPluginJsonConfigExists())
         {
             PluginHelper.savePluginJsonConfig<MyConfig>(new MyConfig());
-            PluginHelper.printConsole("Initialize config file.");
+            PluginHelper.printConsole("Initialize config file.", ConsoleColor.Green);
         }
         else
         {
-            PluginHelper.printConsole("Already exists config.");
+            PluginHelper.printConsole("Already exists config.", ConsoleColor.Yellow);
         }
     }
 
@@ -76,7 +76,7 @@ public class CategoryProcess : IPlugin
                     break;
 
                 default:
-                    PluginHelper.printConsole($"Unknown mode '{config.mode}'!");
+                    PluginHelper.printConsole($"Unknown mode '{config.mode}'!", ConsoleColor.Red);
                     ((IDictionary<string, object>)article).Remove("categories");
                     break;
             }

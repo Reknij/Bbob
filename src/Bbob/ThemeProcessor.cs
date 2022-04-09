@@ -2,6 +2,7 @@ using System.Dynamic;
 using System.Text.Json;
 using Bbob.Plugin;
 using Bbob.Shared;
+using ConsoleHelper = Bbob.Shared.SharedLib.ConsoleHelper;
 
 namespace Bbob.Main;
 
@@ -13,7 +14,7 @@ public static class ThemeProcessor
     static Dictionary<string, Theme> themes = new Dictionary<string, Theme>();
     public static void LoadAllTheme()
     {
-        if (ShowLoadedMessage) System.Console.WriteLine("Loading Themes...");
+        if (ShowLoadedMessage) ConsoleHelper.printSuccess("Loading Themes...");
         themes.Clear();
         Directory.CreateDirectory(themesFolder);
         Directory.CreateDirectory(thirdThemesFolder);
@@ -57,7 +58,7 @@ public static class ThemeProcessor
         }
         catch (System.Exception ex)
         {
-            System.Console.WriteLine($"Compress {t.Info.index} error:\n{ex.Message}");
+            ConsoleHelper.printError($"Compress {t.Info.index} error:\n{ex.Message}");
             return false;
         }
         return true;

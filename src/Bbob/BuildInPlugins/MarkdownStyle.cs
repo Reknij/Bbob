@@ -24,22 +24,22 @@ public class MarkdownStyle : IPlugin
                         var value = args[1];
                         if (value != "light" && value != "dark")
                         {
-                            PluginHelper.printConsole("mode must is 'light' or 'dark'!");
+                            PluginHelper.printConsole("mode must is 'light' or 'dark'!", ConsoleColor.Yellow);
                             return;
                         }
                         myConfig.mode = value;
                         break;
 
                     default:
-                        PluginHelper.printConsole($"Unknown config name 'args[0]'!");
+                        PluginHelper.printConsole($"Unknown config name 'args[0]'!", ConsoleColor.Yellow);
                         return;
                 }
-                PluginHelper.printConsole("Config save success!");
+                PluginHelper.printConsole("Config save success!", ConsoleColor.Green);
                 PluginHelper.savePluginJsonConfig<MyConfig>(myConfig);
             }
             else
             {
-                PluginHelper.printConsole("Please enter config name and value!");
+                PluginHelper.printConsole("Please enter config name and value!", ConsoleColor.Red);
             }
         });
     }
@@ -48,11 +48,11 @@ public class MarkdownStyle : IPlugin
         if (!PluginHelper.isPluginJsonConfigExists())
         {
             PluginHelper.savePluginJsonConfig<MyConfig>(new MyConfig());
-            System.Console.WriteLine("Initialize config file.");
+            System.Console.WriteLine("Initialize config file.", ConsoleColor.Green);
         }
         else
         {
-            PluginHelper.printConsole("Already exists config.");
+            PluginHelper.printConsole("Already exists config.", ConsoleColor.Yellow);
         }
     }
 
@@ -86,13 +86,13 @@ public class MarkdownStyle : IPlugin
 
     public class MyConfig
     {
-        public string mode {get;set;} = "light";
+        public string mode { get; set; } = "light";
         public void Recheck()
         {
             if (mode != "light" && mode != "dark")
             {
-                PluginHelper.printConsole("Config.mode is not 'light' or 'dark'!");
-                PluginHelper.printConsole("Auto reset to 'light'");
+                PluginHelper.printConsole("Config.mode is not 'light' or 'dark'!", ConsoleColor.Yellow);
+                PluginHelper.printConsole("Auto reset to 'light'", ConsoleColor.Yellow);
                 mode = "light";
             }
         }

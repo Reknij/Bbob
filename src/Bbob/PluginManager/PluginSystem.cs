@@ -2,6 +2,7 @@ using Bbob.Plugin;
 using Bbob.Plugin.Cores;
 using System.Reflection;
 using System.Text.Json;
+using ConsoleHelper = Bbob.Shared.SharedLib.ConsoleHelper;
 
 namespace Bbob.Main.PluginManager;
 
@@ -26,8 +27,8 @@ public static class PluginSystem
         LoadThirdPlugins();
         if (ShowLoadedMessage)
         {
-            if ((BuildInPluginCount + ThirdPluginCount) > 0) System.Console.WriteLine($"Loaded {AllPluginCount} plugins. 【{BuildInPluginCount}|{ThirdPluginCount}】");
-            else System.Console.WriteLine("Warning: plugins are loaded.");
+            if ((BuildInPluginCount + ThirdPluginCount) > 0) ConsoleHelper.printSuccess($"Loaded {AllPluginCount} plugins. 【{BuildInPluginCount}|{ThirdPluginCount}】");
+            else ConsoleHelper.printWarning("Warning: plugins are loaded.");
         }
         foreach (var p in buildInPlugins)
         {
@@ -87,14 +88,14 @@ public static class PluginSystem
                     var info = JsonSerializer.Deserialize<PluginJson>(File.OpenRead(pluginJsonPath));
                     if (info == null)
                     {
-                        System.Console.WriteLine("Plugin json file can't loaded.");
+                        ConsoleHelper.printError("Plugin json file can't loaded.");
                         return;
                     }
                     else pluginInfo = info;
                 }
                 catch (System.Exception ex)
                 {
-                    System.Console.WriteLine("Load plugin json error: " + ex.Message);
+                    ConsoleHelper.printError("Load plugin json error: " + ex.Message);
                     return;
                 }
             }
@@ -187,7 +188,7 @@ public static class PluginSystem
         buildInPlugins.Clear();
         if (!config.isAllBuildInPluginEnable())
         {
-            System.Console.WriteLine("Disable all build-in plugin!");
+            ConsoleHelper.printWarning("You disable all build-in plugin!");
             return;
         }
         Dictionary<PluginJson, Type> plugins = GetBuildInPluginsInfo();
@@ -195,14 +196,24 @@ public static class PluginSystem
         {
             if (!config.isPluginEnable(plugin.Key))
             {
-                if (ShowLoadedMessage) System.Console.WriteLine($"Disable build-in plugin <{plugin.Key.name}>");
+                if (ShowLoadedMessage)
+                {
+                    ConsoleHelper.print("Disable", false, ConsoleColor.Yellow);
+                    System.Console.Write(" build-in plugin");
+                    ConsoleHelper.print($"【{plugin.Key.name}】", color: ConsoleColor.Blue);
+                }
                 continue;
             }
             InitializeExecutingPlugin(plugin.Key);
             var p = (IPlugin?)Activator.CreateInstance(plugin.Value);
             if (p == null) continue;
             buildInPlugins.Add(p);
-            if (ShowLoadedMessage) System.Console.WriteLine($"Loaded build-in plugin <{plugin.Key.name}>");
+            if (ShowLoadedMessage)
+            {
+                ConsoleHelper.print("Loaded", false, ConsoleColor.Green);
+                System.Console.Write(" build-in plugin");
+                ConsoleHelper.print($"【{plugin.Key.name}】", color: ConsoleColor.Blue);
+            }
         }
     }
     private static void LoadThirdPlugins()
@@ -210,7 +221,7 @@ public static class PluginSystem
         var config = Configuration.ConfigManager.MainConfig;
         if (!config.isAllThirdPluginEnable())
         {
-            System.Console.WriteLine("Disable all third plugin!");
+            ConsoleHelper.printWarning("You disable all third plugin!");
             return;
         }
         Dictionary<PluginJson, string> thirdPluginsInfo = GetThirdPluginsInfo();
@@ -218,7 +229,12 @@ public static class PluginSystem
         {
             if (!config.isPluginEnable(third.Value))
             {
-                if (ShowLoadedMessage) System.Console.WriteLine($"Disable third plugin <{third.Key.name}>");
+                if (ShowLoadedMessage)
+                {
+                    ConsoleHelper.print("Disable", false, ConsoleColor.Yellow);
+                    System.Console.WriteLine(" third plugin");
+                    ConsoleHelper.print($"【{third.Key.name}】", color: ConsoleColor.DarkCyan);
+                }
                 continue;
             }
             string pluginDll = Path.Combine(third.Value, third.Key.entry);
@@ -228,14 +244,19 @@ public static class PluginSystem
                 var mainPlugin = new PluginAssemblyLoadContext(pluginDll, third.Key);
                 if (mainPlugin.havePlugin && mainPlugin.Warning == string.Empty)
                 {
-                    if (ShowLoadedMessage) System.Console.WriteLine($"Loaded third plugin <{third.Key.name}>");
+                    if (ShowLoadedMessage)
+                    {
+                        ConsoleHelper.print("Loaded", false, ConsoleColor.Green);
+                        System.Console.Write(" third plugin");
+                        ConsoleHelper.print($"【{third.Key.name}】", color: ConsoleColor.DarkCyan);
+                    }
                     thirdPlugins.Add(mainPlugin);
                 }
-                if (mainPlugin.Warning != string.Empty) System.Console.WriteLine($"Warning: {mainPlugin.Warning}");
+                if (mainPlugin.Warning != string.Empty) ConsoleHelper.printWarning($"Warning: {mainPlugin.Warning}");
             }
             catch (System.Exception ex)
             {
-                System.Console.WriteLine("Load and initialize plugin has error:\n" + ex.Message);
+                ConsoleHelper.printError("Load and initialize plugin has error:\n" + ex.Message);
             }
         }
     }
@@ -257,8 +278,7 @@ public static class PluginSystem
                         {
                             if (condition.ShowWarning && !showWarningSet.Contains(info.name))
                             {
-                                System.Console.WriteLine(allPlugin.Count);
-                                System.Console.WriteLine($"Warning: Will no run <{info.name}> because require plugin <{condition.PluginName}> is no contain!");
+                                ConsoleHelper.printWarning($"Warning: Will no run <{info.name}> because require plugin <{condition.PluginName}> is no contain!");
                                 showWarningSet.Add(info.name);
                             }
                             allPlugin.RemoveAt(i);
@@ -268,7 +288,7 @@ public static class PluginSystem
                         {
                             if (condition.ShowWarning && !showWarningSet.Contains(info.name))
                             {
-                                System.Console.WriteLine($"Warning: Will no run <{info.name}> because require plugin <{condition.PluginName}> is disable.");
+                                ConsoleHelper.printWarning($"Warning: Will no run <{info.name}> because require plugin <{condition.PluginName}> is disable.");
                                 showWarningSet.Add(info.name);
                             }
                             allPlugin.RemoveAt(i);
@@ -330,8 +350,8 @@ public static class PluginSystem
                 runCount.Count++;
                 if (runCount.Count > runCount.WarningCount)
                 {
-                    System.Console.WriteLine($"Plugin <{PluginHelper.ExecutingPlugin.name}> has been run count more than {runCount.WarningCount}");
-                    System.Console.WriteLine($"Message: {PluginHelper.ExecutingCommandResult.Message}");
+                    ConsoleHelper.printWarning($"Plugin <{PluginHelper.ExecutingPlugin.name}> has been run count more than {runCount.WarningCount}");
+                    ConsoleHelper.printWarning($"Message: {PluginHelper.ExecutingCommandResult.Message}");
                     runCount.WarningCount *= 2;
                 }
             }

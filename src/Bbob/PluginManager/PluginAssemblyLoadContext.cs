@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Runtime.Loader;
 using System.Text.Json;
 using Bbob.Plugin;
+using ConsoleHelper = Bbob.Shared.SharedLib.ConsoleHelper;
 
 namespace Bbob.Main.PluginManager;
 
@@ -33,7 +34,7 @@ public class PluginAssemblyLoadContext : AssemblyLoadContext
                     }
                     catch (System.Exception ex)
                     {
-                        Console.WriteLine($"Initialize plugin <{info.name}> throw error:\n{ex}");
+                        ConsoleHelper.printError($"Initialize plugin <{info.name}> throw error:\n{ex}");
                     }
                 }
 

@@ -1,6 +1,7 @@
 using Bbob.Plugin;
 using Bbob.Plugin.Cores;
 using System.Text.RegularExpressions;
+using ConsoleHelper = Bbob.Shared.SharedLib.ConsoleHelper;
 
 namespace Bbob.Main.Cli;
 
@@ -33,48 +34,48 @@ public class Run : Command
         {
             if (string.IsNullOrWhiteSpace(command))
             {
-                System.Console.WriteLine($"{FAILED}Please enter global custom command!");
+                ConsoleHelper.printError($"{FAILED}Please enter global custom command!");
                 return false;
             }
             if (string.IsNullOrWhiteSpace(PluginHelperCore.customGlobalCommandKey))
             {
-                System.Console.WriteLine($"{FAILED}No register any global commands!");
+                ConsoleHelper.printError($"{FAILED}No register any global commands!");
                 return false;
             }
             string globalCommand = command + PluginHelperCore.customGlobalCommandKey;
             if (!PluginHelperCore.customCommands.ContainsKey(globalCommand))
             {
-                System.Console.WriteLine($"{FAILED}Target global command is not register!");
+                ConsoleHelper.printError($"{FAILED}Target global command is not register!");
                 return false;
             }
             foreach (var item in PluginHelperCore.customCommands[globalCommand])
             {
                 item.Value(arguments);
             }
-            System.Console.WriteLine($"{SUCCESS} Run global command done.");
+            ConsoleHelper.printSuccess($"{SUCCESS} Run global command done.");
             return true;
         }
 
         if (!PluginHelper.isTargetPluginLoaded(name))
         {
-            System.Console.WriteLine($"{FAILED}Target plugin is unload! Please make sure plugin is exists.");
+            ConsoleHelper.printError($"{FAILED}Target plugin is unload! Please make sure plugin is exists.");
             return false;
         }
         if (!PluginHelper.isTargetPluginEnable(name))
         {
-            System.Console.WriteLine($"{FAILED}Target plugin is disable! Please enable to try again.");
+            ConsoleHelper.printError($"{FAILED}Target plugin is disable! Please enable to try again.");
             return false;
         }
         if (!PluginHelperCore.customCommands.ContainsKey(name))
         {
-            System.Console.WriteLine($"{FAILED}Target plugin is no register any custom command!");
+            ConsoleHelper.printError($"{FAILED}Target plugin is no register any custom command!");
             return false;
         }
         Func<string, bool> existsCommand = (cmd) =>
         {
             if (!PluginHelperCore.customCommands[name].ContainsKey(cmd))
             {
-                System.Console.WriteLine($"{FAILED}Target plugin is no register custom command '{cmd}'.");
+                ConsoleHelper.printError($"{FAILED}Target plugin is no register custom command '{cmd}'.");
                 return false;
             }
             return true;
@@ -91,7 +92,7 @@ public class Run : Command
             string? c = null;
             Action readC = () =>
             {
-                System.Console.Write($"{name}: ");
+                ConsoleHelper.print($"{name}: ", false, ConsoleColor.DarkCyan);
                 c = Console.ReadLine();
             };
             readC();
@@ -113,9 +114,9 @@ public class Run : Command
                 PluginHelperCore.customCommands[name][command](arguments);
                 readC();
             }
-            System.Console.WriteLine("Custom command mode exited.");
+            ConsoleHelper.printWarning("Custom command mode exited.");
         }
-        System.Console.WriteLine($"{SUCCESS}Run custom command from {name} done.");
+        ConsoleHelper.printSuccess($"{SUCCESS}Run custom command from {name} done.");
         return true;
     }
 }

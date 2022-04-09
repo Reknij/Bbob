@@ -25,13 +25,13 @@ public class SitemapGenerator : IPlugin
             if (isShortAddress)
             {
                 if (theme.articleBaseUrlShort != null) articleBaseUrl = theme.articleBaseUrlShort;
-                else PluginHelper.printConsole("BuildWebArticleJson plugin is enable 'shortAddress' but theme does support.");
+                else PluginHelper.printConsole("BuildWebArticleJson plugin is enable 'shortAddress' but theme does support.", ConsoleColor.Yellow);
             }
             else
             {
                 if (theme.articleBaseUrl != null) articleBaseUrl = theme.articleBaseUrl;
-                else if (theme.articleBaseUrlShort != null) PluginHelper.printConsole("Theme is not support full address! Please enable 'shortAddress' in BuildWebArticleJson.config.json.");
-                else PluginHelper.printConsole("theme.articleBaseUrl and theme is null, target theme is not support.");
+                else if (theme.articleBaseUrlShort != null) PluginHelper.printConsole("Theme is not support full address! Please enable 'shortAddress' in BuildWebArticleJson.config.json.", ConsoleColor.Yellow);
+                else PluginHelper.printConsole("theme.articleBaseUrl and theme is null, target theme is not support.", ConsoleColor.Red);
             }
         }
 
@@ -47,14 +47,14 @@ public class SitemapGenerator : IPlugin
                         var value = args[1];
                         if (!bool.TryParse(value, out bool result))
                         {
-                            PluginHelper.printConsole("redirectUrl must is boolean value!");
+                            PluginHelper.printConsole("redirectUrl must is boolean value!", ConsoleColor.Yellow);
                             return;
                         }
                         myConfig.redirectUrl = result;
                         break;
 
                     default:
-                        PluginHelper.printConsole($"Unknown config name 'args[0]'!");
+                        PluginHelper.printConsole($"Unknown config name 'args[0]'!", ConsoleColor.Yellow);
                         return;
                 }
                 PluginHelper.printConsole("Config save success!");
@@ -62,7 +62,7 @@ public class SitemapGenerator : IPlugin
             }
             else
             {
-                PluginHelper.printConsole("Please enter config name and value!");
+                PluginHelper.printConsole("Please enter config name and value!", ConsoleColor.Red);
             }
         });
     }
@@ -84,11 +84,11 @@ public class SitemapGenerator : IPlugin
         if (!PluginHelper.isPluginJsonConfigExists())
         {
             PluginHelper.savePluginJsonConfig<MyConfig>(new MyConfig());
-            PluginHelper.printConsole("Initialize config file.");
+            PluginHelper.printConsole("Initialize config file.", ConsoleColor.Green);
         }
         else
         {
-            PluginHelper.printConsole("Already exists config.");
+            PluginHelper.printConsole("Already exists config.", ConsoleColor.Yellow);
         }
 
     }
@@ -125,7 +125,7 @@ public class SitemapGenerator : IPlugin
             articlesUrl.Add(new KeyValuePair<string, string>("Home", fullUrl));
             generateSitemap(distribution);
             generateRobotTxt(distribution);
-            PluginHelper.printConsole("Success generate sitemap.");
+            PluginHelper.printConsole("Success generate sitemap.", ConsoleColor.Green);
         }
 
         return null;

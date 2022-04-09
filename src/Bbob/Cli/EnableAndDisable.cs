@@ -1,5 +1,6 @@
 using Bbob.Main.PluginManager;
 using Bbob.Plugin;
+using ConsoleHelper = Bbob.Shared.SharedLib.ConsoleHelper;
 
 namespace Bbob.Main.Cli;
 
@@ -38,7 +39,7 @@ public class EnableAndDisable : Command
 
         if (!isAll(pluginName) && !direct && !PluginSystem.containPluginWithName(pluginName))
         {
-            System.Console.WriteLine($"Not exists plugin with name '{pluginName.ToUpper()}'");
+            ConsoleHelper.printWarning($"Not exists plugin with name '{pluginName.ToUpper()}'");
             return true;
         }
         switch (option)
@@ -64,17 +65,17 @@ public class EnableAndDisable : Command
 
                     Configuration.ConfigManager.SaveConfig();
                     string info = char.ToUpper(pluginName[1]) == 'B' ? "build-in" : "third";
-                    System.Console.WriteLine($"Disable all {info} plugin success");
+                    ConsoleHelper.printSuccess($"Disable all {info} plugin success");
                     return true;
                 }
                 if (!config.isPluginEnable(pluginName))
                 {
-                    System.Console.WriteLine($"Already disable <{pluginName.ToUpper()}>");
+                    ConsoleHelper.printWarning($"Already disable <{pluginName.ToUpper()}>");
                     return true;
                 }
                 config.pluginsDisable.Add(pluginName.ToUpper());
                 Configuration.ConfigManager.SaveConfig();
-                System.Console.WriteLine($"Disable <{pluginName.ToUpper()}> success");
+                ConsoleHelper.printSuccess($"Disable <{pluginName.ToUpper()}> success");
                 return true;
 
             case Options.enable:
@@ -86,17 +87,17 @@ public class EnableAndDisable : Command
                         Configuration.ConfigManager.SaveConfig();
                     }
                     string info = pluginName[1].ToString().ToUpper() == "B" ? "build-in" : "third";
-                    System.Console.WriteLine($"Enable all {info} plugin success");
+                    ConsoleHelper.printSuccess($"Enable all {info} plugin success");
                     return true;
                 }
                 if (config.isPluginEnable(pluginName, out int index))
                 {
-                    System.Console.WriteLine($"Already enable <{pluginName.ToUpper()}>");
+                    ConsoleHelper.printWarning($"Already enable <{pluginName.ToUpper()}>");
                     return true;
                 }
                 config.pluginsDisable.RemoveAt(index);
                 Configuration.ConfigManager.SaveConfig();
-                System.Console.WriteLine($"Enable <{pluginName.ToUpper()}> success");
+                ConsoleHelper.printSuccess($"Enable <{pluginName.ToUpper()}> success");
                 return true;
             default:
                 break;

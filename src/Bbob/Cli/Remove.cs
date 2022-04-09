@@ -1,4 +1,5 @@
 namespace Bbob.Main.Cli;
+using ConsoleHelper = Bbob.Shared.SharedLib.ConsoleHelper;
 
 public class Remove : Command
 {
@@ -56,17 +57,17 @@ public class Remove : Command
         string directory = Path.Combine(type == CliShared.TextType.Plugin ? DownloadPath.Plugins : DownloadPath.Themes, PluginOrTheme);
         if (type == CliShared.TextType.None)
         {
-            System.Console.WriteLine($"{FAILED}Can't remove because it not plugin or theme.");
+            ConsoleHelper.printError($"{FAILED}Can't remove because it not plugin or theme.");
             return false;
         }
         if (!Directory.Exists(directory))
         {
-            System.Console.WriteLine($"{FAILED}Can't remove because not exists!");
+            ConsoleHelper.printError($"{FAILED}Can't remove because not exists!");
             return false;
         }
         Shared.SharedLib.DirectoryHelper.DeleteDirectory(directory);
         string p = isGlobal ? "global" : "current";
-        System.Console.WriteLine($"{SUCCESS}Remove {PluginOrTheme} from {p} directory!");
+        ConsoleHelper.printSuccess($"{SUCCESS}Remove {PluginOrTheme} from {p} directory!");
         return true;
     }
 }

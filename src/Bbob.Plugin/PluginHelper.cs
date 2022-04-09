@@ -5,6 +5,7 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 using Bbob.Shared;
+using ConsoleHelper = Bbob.Shared.SharedLib.ConsoleHelper;
 
 [assembly: InternalsVisibleTo("Bbob.Main")]
 namespace Bbob.Plugin;
@@ -332,7 +333,50 @@ public static class PluginHelper
     public static void printConsole(object? msg)
     {
         msg ??= "<NULL_OBJECT>";
-        System.Console.WriteLine($"[{ExecutingPlugin.name}]: {msg.ToString()}");
+        ConsoleHelper.print($"【{ExecutingPlugin.name}】", false, ConsoleColor.DarkCyan);
+        System.Console.WriteLine($": {msg.ToString()}");
+    }
+
+    /// <summary>
+    /// Print message to console of Bbob.
+    /// </summary>
+    /// <param name="msg">Message object. Will use ToString() function.</param>
+    /// <param name="foreground">Color of foreground.</param>
+    /// <param name="background">Color of background.</param>
+    public static void printConsole(object? msg, ConsoleColor? foreground = null, ConsoleColor? background = null)
+    {
+        msg ??= "<NULL_OBJECT>";
+        ConsoleHelper.print($"【{ExecutingPlugin.name}】", false, ConsoleColor.DarkCyan);
+        if (foreground != null) Console.ForegroundColor = foreground.Value;
+        if (background != null) Console.BackgroundColor = background.Value;
+        System.Console.WriteLine($": {msg.ToString()}");
+        Console.ResetColor();
+    }
+
+    /// <summary>
+    /// Set color of foreground console.
+    /// </summary>
+    /// <param name="color">Color to set.</param>
+    public static void printSetForegroundColor(ConsoleColor color)
+    {
+        Console.ForegroundColor = color;
+    }
+
+    /// <summary>
+    /// Set color of background console.
+    /// </summary>
+    /// <param name="color">Color to set.</param>
+    public static void printSetBackgroundColor(ConsoleColor color)
+    {
+        Console.BackgroundColor = color;
+    }
+
+    /// <summary>
+    /// Sets the foreground and background console colors to their defaults.
+    /// </summary>
+    public static void printResetColor()
+    {
+        Console.ResetColor();
     }
 
     /// <summary>

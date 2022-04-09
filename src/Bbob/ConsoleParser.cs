@@ -4,6 +4,7 @@ using Bbob.Main.Cli;
 using Bbob.Main.PluginManager;
 using Bbob.Plugin;
 using static Bbob.Main.Cli.List;
+using ConsoleHelper = Bbob.Shared.SharedLib.ConsoleHelper;
 
 namespace Bbob.Main;
 
@@ -23,7 +24,7 @@ class ConsoleParser
             string configPath = arguments[length - 1];
             if (!File.Exists(configPath))
             {
-                System.Console.WriteLine("Config file is not exists!");
+                ConsoleHelper.printError("Config file is not exists!");
                 return;
             }
             Configuration.ConfigManager.ConfigPath = configPath;
@@ -36,7 +37,7 @@ class ConsoleParser
         int i = 0;
         if (length == 0)
         {
-            System.Console.WriteLine("Please enter commands!");
+            ConsoleHelper.printError("Please enter commands!");
             return;
         }
         string afp = Path.Combine(Environment.CurrentDirectory, "articles");
@@ -81,7 +82,7 @@ class ConsoleParser
                                     PreviewIt(dist, url);
                                     break;
                                 default:
-                                    System.Console.WriteLine($"Unknown option '{arguments[i]}'!");
+                                    ConsoleHelper.printWarning($"Unknown option '{arguments[i]}'!");
                                     return;
                             }
                     }
@@ -104,7 +105,7 @@ class ConsoleParser
                         default:
                             if (arguments[i].StartsWith("-"))
                             {
-                                System.Console.WriteLine($"Unknown option '{arguments[i]}'!");
+                                ConsoleHelper.printWarning($"Unknown option '{arguments[i]}'!");
                                 return;
                             }
                             else --i;
@@ -141,7 +142,7 @@ class ConsoleParser
                                 if (++i < length) url = arguments[i];
                                 else
                                 {
-                                    System.Console.WriteLine("Please enter your host value");
+                                    ConsoleHelper.printWarning("Please enter your host value");
                                     return false;
                                 }
                                 break;
@@ -185,7 +186,7 @@ class ConsoleParser
                             default:
                                 if (arguments[i].StartsWith("-"))
                                 {
-                                    System.Console.WriteLine($"Unknown option '{arguments[i]}'!");
+                                    ConsoleHelper.printWarning($"Unknown option '{arguments[i]}'!");
                                     return;
                                 }
                                 else --i;
@@ -217,7 +218,7 @@ class ConsoleParser
                             default:
                                 if (arguments[i].StartsWith("-"))
                                 {
-                                    System.Console.WriteLine($"Unknown option '{arguments[i]}'!");
+                                    ConsoleHelper.printWarning($"Unknown option '{arguments[i]}'!");
                                     return;
                                 }
                                 else --i;
@@ -246,14 +247,14 @@ class ConsoleParser
                                 type = DataType.Plugins;
                                 break;
                             default:
-                                System.Console.WriteLine($"Unknown option '{arguments[i]}'!");
+                                ConsoleHelper.printWarning($"Unknown option '{arguments[i]}'!");
                                 --i;
                                 return;
                         }
                     }
                     else
                     {
-                        System.Console.WriteLine("Please enter option!");
+                        ConsoleHelper.printError("Please enter option!");
                         return;
                     }
                     InitializeBbob.Initialize(InitializeBbob.InitializeOptions.All);
@@ -282,7 +283,7 @@ class ConsoleParser
                                 if (++i < length) content = arguments[i];
                                 else
                                 {
-                                    System.Console.WriteLine("No exists argument <content>!");
+                                    ConsoleHelper.printError("Please enter <content>!");
                                     return false;
                                 }
                                 break;
@@ -295,7 +296,7 @@ class ConsoleParser
                                 replace = true;
                                 break;
                             default:
-                                System.Console.WriteLine($"Unknown option '{argument}'!");
+                                ConsoleHelper.printWarning($"Unknown option '{argument}'!");
                                 return false;
                         }
                         return true;
@@ -306,12 +307,12 @@ class ConsoleParser
                     }
                     if (option == null)
                     {
-                        System.Console.WriteLine("Please enter option '--address' or '--file'!");
+                        ConsoleHelper.printError("Please enter option '--address' or '--file'!");
                         return;
                     }
                     if (string.IsNullOrWhiteSpace(content))
                     {
-                        System.Console.WriteLine("Please enter the <content> of your want add.");
+                        ConsoleHelper.printError("Please enter the <content> of your want add.");
                         return;
                     }
                     Add install = new Add(content, option.Value, global, replace);
@@ -344,7 +345,7 @@ class ConsoleParser
                     }
                     if (string.IsNullOrWhiteSpace(name))
                     {
-                        System.Console.WriteLine("Please enter the <name> of your want remove.");
+                        ConsoleHelper.printError("Please enter the <name> of your want remove.");
                         return;
                     }
                     Remove remove = new Remove(name, global);
@@ -372,11 +373,11 @@ class ConsoleParser
                         Run run = new Run(name, command, args, isGlobal);
                         run.Process();
                     }
-                    else System.Console.WriteLine("Please enter the name!");
+                    else ConsoleHelper.printError("Please enter the name!");
                     break;
                 }
             default:
-                System.Console.WriteLine($"Unknown command: {arguments[i]}!");
+                ConsoleHelper.printWarning($"Unknown command: {arguments[i]}!");
                 break;
         }
     }
@@ -420,7 +421,6 @@ class ConsoleParser
     private void PreviewIt(string dist, string url)
     {
         var preview = new Bbob.Main.Cli.Preview(dist, url);
-        System.Console.WriteLine("Running preview...");
         preview.Process();
     }
 

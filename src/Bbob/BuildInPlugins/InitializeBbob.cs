@@ -13,8 +13,8 @@ public class InitializeBbob: IPlugin
         if (config == null) config = new MyConfig();
 
         InitializeFiles(config);
-        if (config.IsAllEnable()) PluginHelper.printConsole("Initialize done...");
-        else if (config.IsAllDisable()) PluginHelper.printConsole("Nothing initialized, all disabled...");
+        if (config.IsAllEnable()) PluginHelper.printConsole("Initialize done...", ConsoleColor.Green);
+        else if (config.IsAllDisable()) PluginHelper.printConsole("Nothing initialized, all disabled...", ConsoleColor.Yellow);
     }
 
     public void GenerateCommand(string filePath, GenerationStage stage)
@@ -26,7 +26,7 @@ public class InitializeBbob: IPlugin
     {
         if (config.gitignore.enable)
         {
-            PluginHelper.printConsole("Initialize gitignore file.");
+            PluginHelper.printConsole("Initialize gitignore file.", ConsoleColor.Green);
             string gitignore = Path.Combine(PluginHelper.CurrentDirectory, ".gitignore");
             using (FileStream fs = File.OpenWrite(gitignore))
             {

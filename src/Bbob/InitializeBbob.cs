@@ -1,6 +1,7 @@
 using Bbob.Main.PluginManager;
 using Bbob.Plugin;
 using Bbob.Plugin.Cores;
+using ConsoleHelper = Bbob.Shared.SharedLib.ConsoleHelper;
 
 namespace Bbob.Main;
 
@@ -29,7 +30,7 @@ public static class InitializeBbob
             }
             else
             {
-                System.Console.WriteLine($"Not found theme '{Configuration.ConfigManager.MainConfig.theme}'");
+                ConsoleHelper.printWarning($"Not found theme '{Configuration.ConfigManager.MainConfig.theme}'");
                 Environment.Exit(-1);
             }
         }
@@ -45,7 +46,7 @@ public static class InitializeBbob
                 #if DEBUG
                     msg = ex.ToString();
                 #endif
-                System.Console.WriteLine($"Load plugin and create instance of plugin object error:\n{msg}");
+                ConsoleHelper.printWarning($"Load plugin and create instance of plugin object error:\n{msg}");
                 Environment.Exit(-1);
             }
         }

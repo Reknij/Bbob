@@ -8,6 +8,7 @@ using Bbob.Plugin;
 using System.Security.Cryptography;
 using System.Dynamic;
 using NUglify;
+using ConsoleHelper = Bbob.Shared.SharedLib.ConsoleHelper;
 
 namespace Bbob.Main.JSApi;
 
@@ -28,7 +29,7 @@ public static class JSAPiHelper
             string src = "";
             foreach (string jsFile in hookFiles)
             {
-                System.Console.WriteLine($"Hook {jsFile} to {indexName}");
+                ConsoleHelper.printSuccess($"Hook {jsFile} to {indexName} success.");
                 src += $"\n<script src=\"{config.baseUrl}{jsFile}\"></script>";
             }
             string pattern = @"<head>(.*)</head>";
@@ -70,7 +71,7 @@ public static class JSAPiHelper
         }
         catch (System.Exception ex)
         {
-            System.Console.WriteLine("Compress bbob.js error:\n" + ex.Message);
+            ConsoleHelper.printError("Compress bbob.js error:\n" + ex.Message);
         }
         string hash = "";
         using (FileStream fs = new FileStream(mainjsDist, FileMode.Create, FileAccess.ReadWrite))
@@ -115,7 +116,7 @@ public static class JSAPiHelper
                 }
                 catch (System.Exception ex)
                 {
-                    System.Console.WriteLine($"Read '{meta}' throw error: {ex.Message}");
+                    ConsoleHelper.printError($"Read '{meta}' throw error: {ex.Message}");
                 }
             }
         }
@@ -136,7 +137,7 @@ public static class JSAPiHelper
                 }
                 catch (System.Exception ex)
                 {
-                    System.Console.WriteLine($"Merge meta throw error:\n{ex}");
+                    ConsoleHelper.printError($"Merge meta throw error:\n{ex}");
                 }
             }
         }
@@ -155,24 +156,8 @@ public static class JSAPiHelper
             }
             else
             {
-                System.Console.WriteLine($"extra meta already contain target meta '{item.Key}'");
+                ConsoleHelper.printWarning($"extra meta already contain target meta '{item.Key}'");
             }
         }
     }
-
-    private static IDictionary<string, object> getPropertiesToDictionary(object obj)
-    {
-        if (obj is IDictionary<string, object>) return (IDictionary<string, object>)obj;
-        var properties = obj.GetType().GetProperties();
-        Dictionary<string, object> objDict = new();
-        foreach (var property in properties)
-        {
-            var value = property.GetValue(obj);
-            System.Console.WriteLine(property.Name);
-            if (value != null) objDict.Add(property.Name, value);
-        }
-        return objDict;
-    }
-
-
 }

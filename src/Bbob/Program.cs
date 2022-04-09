@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 using Bbob.Main.Cli;
+using ConsoleHelper = Bbob.Shared.SharedLib.ConsoleHelper;
+
 namespace Bbob.Main;
 
 public class Program
@@ -26,7 +28,7 @@ public class Program
                     break;
             }
         }
-        Console.WriteLine($"【Bbob v{Version}】");
+        ConsoleHelper.print($"【Bbob v{Version}】", color:ConsoleColor.Magenta);
         ConsoleParser parser = new ConsoleParser(args);
         parser.Parse();
     }

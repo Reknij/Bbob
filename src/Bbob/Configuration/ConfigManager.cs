@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using Bbob.Plugin;
 using Bbob.Plugin.Cores;
+using ConsoleHelper = Bbob.Shared.SharedLib.ConsoleHelper;
 
 namespace Bbob.Main.Configuration;
 
@@ -51,34 +52,34 @@ public static class ConfigManager
                 }
                 catch (System.Exception)
                 {
-                    System.Console.WriteLine("Error load config, reset config now? (y/n): ");
+                    ConsoleHelper.print("Error load config, reset config now? (y/n): ", false, ConsoleColor.Yellow);
                     var key = Console.ReadKey().Key;
                     System.Console.WriteLine();
                     if (key == ConsoleKey.Y)
                     {
                         MainConfig = DefaultConfig;
-                        System.Console.WriteLine("Reset to default config.");
+                        ConsoleHelper.printWarning("Reset to default config.");
                     }
                     else
                     {
-                        System.Console.WriteLine("Error config can't continue load.");
+                        ConsoleHelper.printError("Error config can't continue load.");
                         Environment.Exit(-1);
                     }
                 }
                 if (loaded)
                 {
                     ((ConfigJsonFix)MainConfig).Recheck();
-                    if (ShowLoadedMessage) System.Console.WriteLine("Loaded config file.");
+                    if (ShowLoadedMessage) ConsoleHelper.printSuccess("Loaded config file.");
                 }
                 else
                 {
-                    System.Console.WriteLine("Config can't deserialize from the file. Load default config");
+                    ConsoleHelper.printWarning("Config can't deserialize from the file. Load default config");
                 }
             }
         }
         else
         {
-            Console.WriteLine("Not found app config file. Will create and load default config.");
+            ConsoleHelper.printWarning("Not found app config file. Will create and load default config.");
         }
         SaveConfig(MainConfig, ConfigPath); //always save as the config user may be old.
     }
@@ -139,28 +140,28 @@ public static class ConfigManager
         {
             if (blogCountOneTime < 3)
             {
-                System.Console.WriteLine("Warning: config.blogCountOneTime value minimun value is 3.");
-                System.Console.WriteLine("Auto set to 3 now.");
+                ConsoleHelper.printWarning("Warning: config.blogCountOneTime value minimun value is 3.");
+                ConsoleHelper.printWarning("Auto set to 3 now.");
                 blogCountOneTime = 3;
             }
             if (allLink != "current" && allLink != "next" && allLink != "false")
             {
-                System.Console.WriteLine("Warning: config.allLink value is not `current`, `next` or 'false'.");
-                System.Console.WriteLine("Auto set to `false` now.");
+                ConsoleHelper.printWarning("Warning: config.allLink value is not `current`, `next` or 'false'.");
+                ConsoleHelper.printWarning("Auto set to `false` now.");
                 allLink = "false";
             }
             var domainMatch = Regex.Match(domain, @"^(?:\w+://)?([^/?]*)");
-            if (!domainMatch.Success) System.Console.WriteLine("Warning: config.domain is invalid!");
+            if (!domainMatch.Success) ConsoleHelper.printWarning("Warning: config.domain is invalid!");
             else if (domainMatch.Value != domain)
             {
-                System.Console.WriteLine("Warning: domain is have invalid sub url.");
+                ConsoleHelper.printWarning("Warning: domain is have invalid sub url.");
                 domain = domainMatch.Value;
-                System.Console.WriteLine($"Auto repair it to '{domain}'");
+                ConsoleHelper.printWarning($"Auto repair it to '{domain}'");
             }
             if (baseUrl == "")
             {
-                System.Console.WriteLine("Warning: config.baseUrl value is null.");
-                System.Console.WriteLine("Auto set to '/'");
+                ConsoleHelper.printWarning("Warning: config.baseUrl value is null.");
+                ConsoleHelper.printWarning("Auto set to '/'");
                 baseUrl = "/";
             }
             if (baseUrl.Last() != '/')
@@ -169,8 +170,8 @@ public static class ConfigManager
             }
             if (previewPort < 1024 || previewPort > 49151)
             {
-                System.Console.WriteLine("Warning: config.previewPort value is not 1024 - 49151");
-                System.Console.WriteLine("Auto set to default port '3000'");
+                ConsoleHelper.printWarning("Warning: config.previewPort value is not 1024 - 49151");
+                ConsoleHelper.printWarning("Auto set to default port '3000'");
                 previewPort = 3000;
             }
         }

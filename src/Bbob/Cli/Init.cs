@@ -1,5 +1,6 @@
 using Bbob.Main.PluginManager;
 using Bbob.Plugin;
+using ConsoleHelper = Bbob.Shared.SharedLib.ConsoleHelper;
 
 namespace Bbob.Main.Cli;
 
@@ -29,7 +30,7 @@ public class Init : Command
 #if DEBUG
             msg = ex.ToString();
 #endif
-            System.Console.WriteLine($"{FAILED}Error run init command plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
+            ConsoleHelper.printError($"{FAILED}Error run init command plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
             return false;
         }
         List<Action> actions = new List<Action>();
@@ -47,11 +48,11 @@ public class Init : Command
 #if DEBUG
             msg = ex.ToString();
 #endif
-            System.Console.WriteLine($"{FAILED}Error run init command complete plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
+            ConsoleHelper.printError($"{FAILED}Error run init command complete plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
             return false;
         }
         foreach (var a in actions) a();
-        System.Console.WriteLine($"{SUCCESS}Initialize has been run.");
+        ConsoleHelper.printSuccess($"{SUCCESS}Initialize has been run.");
         return true;
     }
 }

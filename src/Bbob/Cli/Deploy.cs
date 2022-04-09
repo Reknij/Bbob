@@ -1,5 +1,6 @@
 using Bbob.Main.PluginManager;
 using Bbob.Plugin;
+using ConsoleHelper = Bbob.Shared.SharedLib.ConsoleHelper;
 
 namespace Bbob.Main.Cli;
 
@@ -22,12 +23,12 @@ public class Deploy : Command
         const string FAILED = "Failed deploy: ";
         if (!Directory.Exists(distribution))
         {
-            System.Console.WriteLine($"{FAILED}Distribution not exists!");
+            ConsoleHelper.printError($"{FAILED}Distribution not exists!");
             return false;
         }
         if (Directory.GetFiles(distribution, "*", SearchOption.AllDirectories).Length == 0)
         {
-            System.Console.WriteLine($"${FAILED}Distribution is not exists any files!");
+            ConsoleHelper.printError($"${FAILED}Distribution is not exists any files!");
             return false;
         }
         try
@@ -43,7 +44,7 @@ public class Deploy : Command
 #if DEBUG
             msg = ex.ToString();
 #endif
-            System.Console.WriteLine($"{FAILED}Error run deploy command in plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
+            ConsoleHelper.printError($"{FAILED}Error run deploy command in plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
             return false;
         }
         List<Action> actions = new List<Action>();
@@ -60,11 +61,11 @@ public class Deploy : Command
 #if DEBUG
             msg = ex.ToString();
 #endif
-            System.Console.WriteLine($"{FAILED}Error run deploy command complete in plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
+            ConsoleHelper.printError($"{FAILED}Error run deploy command complete in plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
             return false;
         }
         foreach (var a in actions) a();
-        System.Console.WriteLine($"{SUCCESS}Deployment has been run");
+        ConsoleHelper.printSuccess($"{SUCCESS}Deployment has been run");
         return true;
     }
 }

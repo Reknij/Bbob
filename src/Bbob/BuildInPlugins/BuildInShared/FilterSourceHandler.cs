@@ -31,7 +31,7 @@ public static class FilterSourceHandler
             if (vFile != newPath) File.Move(vFile, newPath);
             filterSources.Add(new FilterSource(item.Key, webPath));
         }
-        PluginHelper.printConsole($"Resolve {filterSources.Count} {name}.");
+        PluginHelper.printConsole($"Resolve {filterSources.Count} {name}.", ConsoleColor.Green);
         return filterSources.ToArray();
     }
 }

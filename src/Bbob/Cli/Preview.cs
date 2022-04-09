@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
+using ConsoleHelper = Bbob.Shared.SharedLib.ConsoleHelper;
 
 namespace Bbob.Main.Cli;
 
@@ -25,7 +26,7 @@ public class Preview : Command
                 var result = Regex.Match(value, @".+\:([0-9]+)");
                 if (result.Success && int.TryParse(result.Result("$1"), out int port) && (port < 1024 || port > 49151))
                 {
-                    System.Console.WriteLine("Port in url is invalid, value must 1024 - 49151! Auto set to default port.");
+                    ConsoleHelper.printWarning("Port in url is invalid, value must 1024 - 49151! Auto set to default port.");
                     value = Regex.Replace(value, @"(.+\:)([0-9]+)", @$"$1 {CliShared.GetAvailablePort(Configuration.ConfigManager.MainConfig.previewPort)}").Replace(" ", "");
                 }
                 url = value;
@@ -33,7 +34,7 @@ public class Preview : Command
             else
             {
                 string u = $"http://localhost:{CliShared.GetAvailablePort(Configuration.ConfigManager.MainConfig.previewPort)}";
-                System.Console.WriteLine($"Host is invalid! Auto set to default url '{u}'");
+                ConsoleHelper.printWarning($"Host is invalid! Auto set to default url '{u}'");
                 url = u;
             }
             if (url.Length > 0 && url.Last() == '/') url = url.Remove(url.Length - 1, 1);
@@ -50,17 +51,18 @@ public class Preview : Command
         const string FAILED = "Failed preview: ";
         if (!Directory.Exists(distribution))
         {
-            System.Console.WriteLine($"{FAILED}Distribution not exists!");
+            ConsoleHelper.printError($"{FAILED}Distribution not exists!");
             return false;
         }
         if (Directory.GetFiles(distribution, "*", SearchOption.AllDirectories).Length == 0)
         {
-            System.Console.WriteLine($"{FAILED}Distribution is not exists any files!");
+            ConsoleHelper.printError($"{FAILED}Distribution is not exists any files!");
             return false;
         }
+        ConsoleHelper.printWarning("Starting preview server...");
         bool result = StartPreview();
-        if (result) System.Console.WriteLine($"{SUCCESS}Preview has been run.");
-        else System.Console.WriteLine($"{FAILED}Preview has stopped.");
+        if (result) ConsoleHelper.printSuccess($"{SUCCESS}Preview has been run.");
+        else ConsoleHelper.printError($"{FAILED}Preview has stopped.");
         return result;
     }
 
@@ -85,15 +87,15 @@ public class Preview : Command
             FileProvider = new PhysicalFileProvider(distribution),
 
         });
-        System.Console.WriteLine($"Preview running at {Url}{config.baseUrl}");
-        System.Console.WriteLine("Ctrl + C to stop preview.");
+        ConsoleHelper.printSuccess($"Preview running at {Url}{config.baseUrl}");
+        ConsoleHelper.print("Ctrl + C to stop preview.", color:ConsoleColor.Cyan);
         try
         {
             app.Run(Url);
         }
         catch (System.Exception ex)
         {
-            System.Console.WriteLine("Run preview error:\n" + ex.Message);
+            ConsoleHelper.printError("Run preview error:\n" + ex.Message);
             return false;
         }
         return true;

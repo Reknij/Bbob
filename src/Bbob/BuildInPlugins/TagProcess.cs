@@ -9,7 +9,15 @@ public class TagProcess : IPlugin
 {
     public void InitCommand()
     {
-        PluginHelper.savePluginJsonConfig<MyConfig>(new MyConfig());
+        if (!PluginHelper.isPluginJsonConfigExists())
+        {
+            PluginHelper.savePluginJsonConfig<MyConfig>(new MyConfig());
+            PluginHelper.printConsole("Initialize config file.", ConsoleColor.Green);
+        }
+        else
+        {
+            PluginHelper.printConsole("Already exists config.", ConsoleColor.Yellow);
+        }
     }
 
     public Action? CommandComplete(Commands command)

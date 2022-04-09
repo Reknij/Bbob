@@ -9,6 +9,7 @@ using System.Dynamic;
 using System.Text.Json;
 using System.Security.Cryptography;
 using Bbob.Plugin.Cores;
+using ConsoleHelper = Bbob.Shared.SharedLib.ConsoleHelper;
 
 namespace Bbob.Main.Cli;
 
@@ -38,9 +39,9 @@ public class Generator : Command
         {
             if (displayMessage)
             {
-                System.Console.WriteLine($"<{PluginHelper.ExecutingPlugin.name}> Skip this file.");
+                ConsoleHelper.printWarning($"<{PluginHelper.ExecutingPlugin.name}> Skip this file.");
                 if (!string.IsNullOrWhiteSpace(PluginHelper.ExecutingCommandResult.Message))
-                    System.Console.WriteLine($"Message: {PluginHelper.ExecutingCommandResult.Message}");
+                    ConsoleHelper.printWarning($"Message: {PluginHelper.ExecutingCommandResult.Message}");
             }
             return true;
         }
@@ -61,16 +62,16 @@ public class Generator : Command
         ThemeProcessor.Theme? theme = ThemeProcessor.BuildThemeToDist(config.theme, distribution);
         if (theme == null)
         {
-            System.Console.WriteLine($"{FAILED}Not found theme.");
+            ConsoleHelper.printWarning($"{FAILED}Not found theme.");
             return false;
         }
         InitializeConventionObjects();
-        if (files.Length > 0) System.Console.WriteLine($"Run generate all stage for article files in '{articlesFolderPath.Replace(Environment.CurrentDirectory, ".")}'.");
-        else System.Console.WriteLine("Nothing files to generate.");
+        if (files.Length > 0) ConsoleHelper.print($"Run generate all stage for article files in '{articlesFolderPath.Replace(Environment.CurrentDirectory, ".")}'.", color:ConsoleColor.DarkCyan);
+        else ConsoleHelper.printWarning("Nothing files to generate.");
         foreach (string file in files)
         {
             string shortFilePath = file.Replace(articlesFolderPath, "").Remove(0, 1);
-            System.Console.WriteLine($"- {shortFilePath}");
+            ConsoleHelper.print($"- {shortFilePath}", color:ConsoleColor.DarkGray);
             foreach (GenerationStage stage in Enum.GetValues<GenerationStage>())
             {
                 try
@@ -82,10 +83,10 @@ public class Generator : Command
                     if (isSkip(false)) break;
                     if (PluginHelper.ExecutingCommandResult.Operation == CommandOperation.Stop)
                     {
-                        System.Console.WriteLine($"<{PluginHelper.ExecutingPlugin.name}> Stop command execution");
+                        ConsoleHelper.printWarning($"<{PluginHelper.ExecutingPlugin.name}> Stop command execution");
                         if (!string.IsNullOrWhiteSpace(PluginHelper.ExecutingCommandResult.Message))
-                            System.Console.WriteLine($"Message: {PluginHelper.ExecutingCommandResult.Message}");
-                        System.Console.WriteLine($"{FAILED}Plugin stop execution.");
+                            ConsoleHelper.printWarning($"Message: {PluginHelper.ExecutingCommandResult.Message}");
+                        ConsoleHelper.printError($"{FAILED}Plugin stop execution.");
                         return false;
                     }
                 }
@@ -95,7 +96,7 @@ public class Generator : Command
 #if DEBUG
                     msg = ex.ToString();
 #endif
-                    System.Console.WriteLine($"{FAILED}Executing generate command of plugin <{PluginHelper.ExecutingPlugin.name}> error in stage {stage}:\n" + msg);
+                    ConsoleHelper.printError($"{FAILED}Executing generate command of plugin <{PluginHelper.ExecutingPlugin.name}> error in stage {stage}:\n" + msg);
                     return false;
                 }
             }
@@ -116,25 +117,24 @@ public class Generator : Command
 #if DEBUG
             msg = ex.ToString();
 #endif
-            System.Console.WriteLine($"{FAILED}Error run generate command complete in plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
+            ConsoleHelper.printError($"{FAILED}Error run generate command complete in plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
             return false;
         }
         string mainName = "bbob.js";
-        System.Console.WriteLine($"Building {mainName}");
+        ConsoleHelper.print($"Building {mainName}");
         string newName = JSAPiHelper.BuildBbobJS(distribution, GetBuildData(), theme.Info);
-        System.Console.WriteLine($"Hook in {mainName} to index file...");
         JSAPiHelper.Hook(distribution, theme.Info.index, newName);
         if (config.compress)
         {
-            if (ThemeProcessor.CompressHtml(distribution)) System.Console.WriteLine("Compress html success.");
-            else System.Console.WriteLine("Compress html failed.");
+            if (ThemeProcessor.CompressHtml(distribution)) ConsoleHelper.printSuccess("Compress html success.");
+            else ConsoleHelper.printError("Compress html failed.");
         }
 
         foreach (var a in actions) a();
 
         DateTime afterGenerateDateTime = DateTime.Now;
         double diff = (afterGenerateDateTime - beforeGenerateDateTime).TotalSeconds;
-        System.Console.WriteLine($"{SUCCESS} Generation has been run. ({string.Format("{0:0.00}", diff)} seconds)");
+        ConsoleHelper.printSuccess($"{SUCCESS} Generation has been run. ({string.Format("{0:0.00}", diff)} seconds)");
         return true;
     }
 
@@ -151,7 +151,7 @@ public class Generator : Command
         }
         else
         {
-            System.Console.WriteLine("'blog' is missing!");
+            ConsoleHelper.printError("'blog' is missing!");
         }
         return new BuildData(new ExpandoObject(), PluginHelperCore.metas);
     }

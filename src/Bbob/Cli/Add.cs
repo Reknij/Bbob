@@ -1,5 +1,6 @@
 using SharpCompress.Common;
 using SharpCompress.Readers;
+using ConsoleHelper = Bbob.Shared.SharedLib.ConsoleHelper;
 
 namespace Bbob.Main.Cli;
 
@@ -76,13 +77,13 @@ public class Add : Command
             }
             catch (System.Exception)
             {
-                System.Console.WriteLine($"{FAILED}Please make sure content is url!");
+                ConsoleHelper.printError($"{FAILED}Please make sure content is url!");
                 return false;
             }
             type = CliShared.isPluginOrThemeName(name, out name);
             if (type == CliShared.TextType.None)
             {
-                System.Console.WriteLine($"{FAILED}Can't add because it no theme or plugin.");
+                ConsoleHelper.printError($"{FAILED}Can't add because it no theme or plugin.");
                 return false;
             }
             tempFilePath = Path.Combine(DownloadPath.Temp, Path.GetRandomFileName());
@@ -102,8 +103,8 @@ public class Add : Command
             }
             catch (System.Exception)
             {
-                System.Console.WriteLine("Error downloading plugin!");
-                System.Console.WriteLine($"{FAILED}Please make sure it is valid address!");
+                ConsoleHelper.printError("Error downloading plugin!");
+                ConsoleHelper.printError($"{FAILED}Please make sure it is valid address!");
                 return false;
             }
         }
@@ -111,7 +112,7 @@ public class Add : Command
         {
             if (!File.Exists(Content))
             {
-                System.Console.WriteLine($"{FAILED}File is not exists!");
+                ConsoleHelper.printError($"{FAILED}File is not exists!");
                 return false;
             }
             try
@@ -121,13 +122,13 @@ public class Add : Command
                 type = CliShared.isPluginOrThemeName(name, out name);
                 if (type == CliShared.TextType.None)
                 {
-                    System.Console.WriteLine($"{FAILED}Can't add because it no theme or plugin.");
+                    ConsoleHelper.printError($"{FAILED}Can't add because it no theme or plugin.");
                     return false;
                 }
             }
             catch (System.Exception)
             {
-                System.Console.WriteLine($"{FAILED}Please make sure your enter the valid path!");
+                ConsoleHelper.printError($"{FAILED}Please make sure your enter the valid path!");
                 return false;
             }
         }
@@ -135,7 +136,7 @@ public class Add : Command
 
         if (!isValidFilePath(name))
         {
-            System.Console.WriteLine($"{FAILED}It is invalid: {name}");
+            ConsoleHelper.printError($"{FAILED}It is invalid: {name}");
             return false;
         }
         string downloadPath = Path.Combine(type == CliShared.TextType.Theme ? DownloadPath.Themes : DownloadPath.Plugins, name.ToUpper());
@@ -152,7 +153,7 @@ public class Add : Command
 
         Shared.SharedLib.DirectoryHelper.DeleteDirectory(DownloadPath.Temp);
         string p = Global ? "global" : "current";
-        System.Console.WriteLine($"{SUCCESS}{addStatus} {name} to {p} directory path.!");
+        ConsoleHelper.printSuccess($"{SUCCESS}{addStatus} {name} to {p} directory path.!");
         return true;
     }
 

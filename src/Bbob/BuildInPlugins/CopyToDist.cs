@@ -10,11 +10,11 @@ public class CopyToDist : IPlugin
         if (!PluginHelper.isPluginJsonConfigExists())
         {
             PluginHelper.savePluginJsonConfig<MyConfig>(new MyConfig());
-            PluginHelper.printConsole("Initialize config file.");
+            PluginHelper.printConsole("Initialize config file.", ConsoleColor.Green);
         }
         else
         {
-            PluginHelper.printConsole("Already exists config.");
+            PluginHelper.printConsole("Already exists config.", ConsoleColor.Yellow);
         }
     }
 
@@ -25,14 +25,14 @@ public class CopyToDist : IPlugin
         {
             PluginHelper.getPluginJsonConfig(out MyConfig? config);
             config ??= new MyConfig();
-            PluginHelper.printConsole("Exists 'public' folder, will copy all files and directories of 'public' to distribution.");
+            PluginHelper.printConsole("Exists 'public' folder, will copy all files and directories of 'public' to distribution.", ConsoleColor.Green);
             Shared.SharedLib.DirectoryHelper.CopyDirectory(publicPath, PluginHelper.DistributionDirectory, string.Empty, true, config.overwrite);
             HashSet<string> already = new HashSet<string>() { publicPath };
             foreach (var item in config.files)
             {
                 if (!already.Contains(item))
                 {
-                    PluginHelper.printConsole($"Will copy files of '{item}' too.");
+                    PluginHelper.printConsole($"Will copy files of '{item}' too.", ConsoleColor.Green);
                     Shared.SharedLib.DirectoryHelper.CopyDirectory(item, PluginHelper.DistributionDirectory, string.Empty, true, config.overwrite);
                 }
             }

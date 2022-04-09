@@ -33,19 +33,19 @@ public class GitDeploy : IPlugin
                     case "type":
                         if (value != "github")
                         {
-                            PluginHelper.printConsole("type only allow 'github'!");
+                            PluginHelper.printConsole("type only allow 'github'!", ConsoleColor.Yellow);
                             return;
                         }
                         config.type = value;
                         break;
                     default: break;
                 }
-                PluginHelper.printConsole("Config save success!");
+                PluginHelper.printConsole("Config save success!", ConsoleColor.Green);
                 PluginHelper.savePluginJsonConfig<GitConfig>(config);
             }
             else
             {
-                PluginHelper.printConsole("Please enter config name and value!");
+                PluginHelper.printConsole("Please enter config name and value!", ConsoleColor.Red);
             }
         });
     }
@@ -55,11 +55,11 @@ public class GitDeploy : IPlugin
         if (!PluginHelper.isPluginJsonConfigExists())
         {
             PluginHelper.savePluginJsonConfig<GitConfig>(new GitConfig());
-            PluginHelper.printConsole("Initialize config file.");
+            PluginHelper.printConsole("Initialize config file.", ConsoleColor.Green);
         }
         else
         {
-            PluginHelper.printConsole("Already exists config.");
+            PluginHelper.printConsole("Already exists config.", ConsoleColor.Yellow);
         }
     }
     public void DeployCommand()
@@ -69,12 +69,12 @@ public class GitDeploy : IPlugin
         {
             if (config.repos == null)
             {
-                PluginHelper.printConsole("Please enter your repository url in the config.");
+                PluginHelper.printConsole("Please enter your repository url in the config.", ConsoleColor.Red);
                 return;
             }
             if (config.branch == null) config.branch = "main";
             if (config.message == null) config.message = $"{Shared.SharedLib.DateTimeHelper.GetDateTimeNowString()} Update";
-            PluginHelper.printConsole($"Trying deploy to {config.repos}, branch {config.branch}");
+            PluginHelper.printConsole($"Trying deploy to {config.repos}, branch {config.branch}", ConsoleColor.Yellow);
             if (!Directory.Exists(ghDirectory))
             {
                 cloneReposAndCheckout(config);
@@ -83,7 +83,7 @@ public class GitDeploy : IPlugin
             {
                 if (!Regex.IsMatch(runCommand("git remote -v", ghDirectory), @$"origin\s+{config.repos}"))
                 {
-                    PluginHelper.printConsole("Exists other repository, replace it.");
+                    PluginHelper.printConsole("Exists other repository, replace it.", ConsoleColor.Yellow);
                     Shared.SharedLib.DirectoryHelper.DeleteDirectory(ghDirectory);
                     cloneReposAndCheckout(config);
                 }
@@ -97,19 +97,19 @@ public class GitDeploy : IPlugin
                 if (File.Exists(index))
                 {
                     if (!File.Exists(file404)) File.Copy(index, file404);
-                    else PluginHelper.printConsole("Distribution already exists '404.html'");
+                    else PluginHelper.printConsole("Distribution already exists '404.html'", ConsoleColor.Yellow);
                 }
-                else PluginHelper.printConsole("No exists 'index.html'");
+                else PluginHelper.printConsole("No exists 'index.html'", ConsoleColor.Red);
             }
             runCommand($"git add .", ghDirectory);
             runCommand($"git commit -m \"{config.message}\"", ghDirectory);
             PluginHelper.printConsole(runCommand($"git push -f origin {config.branch}", ghDirectory));
             updateSitemap(distribution);
-            PluginHelper.printConsole("Done..");
+            PluginHelper.printConsole("Done..", ConsoleColor.Green);
         }
         else
         {
-            PluginHelper.printConsole("Config is null, please save you config into ../configs/GitDeploy.config.json");
+            PluginHelper.printConsole("Config is null, please save you config into ../configs/GitDeploy.config.json", ConsoleColor.Red);
         }
     }
     private void updateSitemap(string distribution)
@@ -120,10 +120,10 @@ public class GitDeploy : IPlugin
             var result = Regex.Match(File.ReadAllText(robots), "Sitemap: (.*)(\n|$)", RegexOptions.Singleline);
             if (result.Success)
             {
-                PluginHelper.printConsole("Found sitemap in robots.txt file, will update sitemap if modified.");
+                PluginHelper.printConsole("Found sitemap in robots.txt file, will update sitemap if modified.", ConsoleColor.Yellow);
                 string urlOfSitemap = result.Result("$1");
                 string sitemap = urlOfSitemap.Substring(urlOfSitemap.IndexOf("sitemap."));
-                PluginHelper.printConsole($"Sitemap name: {sitemap}");
+                PluginHelper.printConsole($"Sitemap name: {sitemap}", ConsoleColor.Green);
                 string sitemapDist = Path.Combine(distribution, sitemap);
                 string sitemapRepos = Path.Combine(ghDirectory, sitemap);
                 if (File.Exists(sitemapDist))
@@ -132,11 +132,12 @@ public class GitDeploy : IPlugin
                     PluginHelper.printConsole("ping sitemap to google now.");
                     var task = client.GetAsync($"https://www.google.com/ping?sitemap={urlOfSitemap}");
                     task.Wait();
-                    PluginHelper.printConsole((task.Result.IsSuccessStatusCode ? "Success" : "Failed") + $" ping google update sitemap with url '{urlOfSitemap}'");
+                    if (task.Result.IsSuccessStatusCode) PluginHelper.printConsole($"Success ping google update sitemap with url '{urlOfSitemap}'", ConsoleColor.Green);
+                    else PluginHelper.printConsole($"Failed ping google update sitemap with url '{urlOfSitemap}'", ConsoleColor.Red);
                 }
                 else
                 {
-                    PluginHelper.printConsole($"robots.txt contain sitemap but physical path '{sitemapDist}' not exists.");
+                    PluginHelper.printConsole($"robots.txt contain sitemap but physical path '{sitemapDist}' not exists.", ConsoleColor.Red);
                 }
             }
         }

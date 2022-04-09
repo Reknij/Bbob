@@ -51,7 +51,7 @@ public class LinkProcess : IPlugin
             dynamic blog = PluginHelper.getRegisteredObjectNoNull<dynamic>("blog");
             blog.links = pack.Item1;
             blog.nextFileLinks = pack.Item2;
-            PluginHelper.printConsole($"Resolve {links.Count} files.");
+            PluginHelper.printConsole($"Resolve {links.Count} files.", ConsoleColor.Green);
         }
         return null;
     }
@@ -79,7 +79,7 @@ public class LinkProcess : IPlugin
             else if (!(a1[order] is int) || !(a2[order] is int))
             {
                 string title = (a1[order] is int) == false ? art1.title : art2.title;
-                PluginHelper.printConsole($"{order} article with title {title} is not numbers");
+                PluginHelper.printConsole($"{order} article with title {title} is not numbers", ConsoleColor.Red);
             }
             else if (art1.order > art2.order) return 1;
             else if (art1.order < art2.order) return -1;

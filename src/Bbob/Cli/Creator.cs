@@ -1,5 +1,6 @@
 using Bbob.Main.PluginManager;
 using Bbob.Plugin;
+using ConsoleHelper = Bbob.Shared.SharedLib.ConsoleHelper;
 
 namespace Bbob.Main.Cli;
 
@@ -31,7 +32,7 @@ public class Creator : Command
         string filePath = Path.Combine(articlesFolderPath, filename + ".md");
         if (File.Exists(filePath))
         {
-            System.Console.WriteLine($"{FAILED}Already exists target article.");
+            ConsoleHelper.printError($"{FAILED}Already exists target article.");
             return false;
         }
         System.Console.WriteLine($"Processing <{filename}> file content...");
@@ -45,10 +46,10 @@ public class Creator : Command
             if (PluginHelper.ExecutingCommandResult.Operation == CommandOperation.Skip ||
                 PluginHelper.ExecutingCommandResult.Operation == CommandOperation.Stop)
             {
-                System.Console.WriteLine($"<{PluginHelper.ExecutingPlugin.name}> Stop command execution");
+                ConsoleHelper.printWarning($"<{PluginHelper.ExecutingPlugin.name}> Stop command execution");
                 if (!string.IsNullOrWhiteSpace(PluginHelper.ExecutingCommandResult.Message))
-                    System.Console.WriteLine($"Message: {PluginHelper.ExecutingCommandResult.Message}");
-                System.Console.WriteLine($"{FAILED}Plugin stop execution."); ;
+                    ConsoleHelper.printWarning($"Message: {PluginHelper.ExecutingCommandResult.Message}");
+                ConsoleHelper.printError($"{FAILED}Plugin stop execution."); ;
                 return false;
             }
         }
@@ -58,7 +59,7 @@ public class Creator : Command
 #if DEBUG
             msg = ex.ToString();
 #endif
-            System.Console.WriteLine($"{FAILED}Error run new command of plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
+            ConsoleHelper.printError($"{FAILED}Error run new command of plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
             return false;
         }
         List<Action> actions = new List<Action>();
@@ -67,7 +68,7 @@ public class Creator : Command
             PluginSystem.cyclePlugins((plugin) =>
             {
                 var a = plugin.CommandComplete(Commands.NewCommand);
-                if (a != null)actions.Add(a);
+                if (a != null) actions.Add(a);
             });
             File.WriteAllText(filePath, content);
         }
@@ -77,11 +78,11 @@ public class Creator : Command
 #if DEBUG
             msg = ex.ToString();
 #endif
-            System.Console.WriteLine($"{FAILED}Error run new command complete of plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
+            ConsoleHelper.printError($"{FAILED}Error run new command complete of plugin <{PluginHelper.ExecutingPlugin.name}>:\n" + msg);
             return false;
         }
         foreach (var a in actions) a();
-        System.Console.WriteLine($"{SUCCESS}Article file in '{filePath}'");
+        ConsoleHelper.printSuccess($"{SUCCESS}Article file in '{filePath}'");
         return true;
     }
 
