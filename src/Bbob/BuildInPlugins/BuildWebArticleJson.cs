@@ -68,7 +68,7 @@ public class BuildWebArticleJson : IPlugin
         //string FileLocalFolder = Path.Combine(distribution, JSApi.JSAPiHelper.bbobAssets, folder, year, month, day);
         string FileLocalFolder = Path.Combine(PluginHelper.DistributionDirectory, JSApi.JSAPiHelper.bbobAssets, folder);
         string FileLocal = Path.Combine(FileLocalFolder, targetFile);
-        
+
         if (File.Exists(FileLocal))
         {
             string name = Path.GetFileNameWithoutExtension(FileLocal);
@@ -115,11 +115,12 @@ public class BuildWebArticleJson : IPlugin
     public Action? CommandComplete(Commands cmd)
     {
         if (cmd != Commands.GenerateCommand) return null;
-
+        PluginHelper.getPluginJsonConfig<MyConfig>(out var tar);
+        MyConfig config = tar ?? new MyConfig();
+        if (!config.shortAddress) return null;
         return () =>
         {
-            PluginHelper.getPluginJsonConfig<MyConfig>(out var tar);
-            MyConfig config = tar ?? new MyConfig();
+
             string[] files = Directory.GetFiles(PluginHelper.DistributionDirectory, "bbob*.js");
             string bbobJs = string.Empty;
             foreach (var item in files)
