@@ -5,6 +5,7 @@ import Bbob, { Article } from '../../../Bbob/JSApi/Bbob'
 import { normal } from '../composition/changeSize';
 import { language } from '../Languages/LanguageHelper';
 import { List, Calendar } from '@element-plus/icons-vue'
+
 let isLoading = ref(true);
 let articleLoadingMs = 300;
 const route = useRoute();
@@ -18,7 +19,7 @@ let article = ref<Article>({
     date: "loading article...",
     contentParsed: ""
 });
-let htmlContent = ref(null);
+let htmlContent = ref<HTMLElement | null>(null);
 let artDate = ref('')
 onBeforeMount(async () => {
     let start = new Date().getTime();
@@ -31,7 +32,11 @@ onBeforeMount(async () => {
         artDate.value = ' ' + `${language.postedOn} ${date}`;
     }
     watch(htmlContent, () => {
-        if (htmlContent.value) Bbob.api.executeScriptElements(htmlContent.value as any);
+        if (htmlContent.value) {
+            Bbob.api.executeScriptElements(htmlContent.value as any);
+            if (location.hash) location.href = location.hash;
+            else window.scrollTo(0, 0);
+        }
     })
     let diff = (new Date().getTime() - start); //milliseconds interval
     document.title = `${article.value.title} - ${Bbob.meta.blogName}`;
@@ -46,7 +51,6 @@ onBeforeMount(async () => {
     }
 
     Bbob.meta.extra.prerenderNow = true;
-    window.scrollTo(0, 0);
 })
 
 onBeforeRouteLeave(() => {
@@ -146,7 +150,7 @@ function tocClick(event: Event) {
 }
 #content img {
     display: block;
-    margin: 0px auto;
+    margin: 10px auto;
     max-width: calc(768px - var(--el-card-padding) * 2);
 }
 .tagItem {

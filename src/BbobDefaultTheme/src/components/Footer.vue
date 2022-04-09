@@ -4,7 +4,7 @@ import Bbob from '../../../Bbob/JSApi/Bbob'
 </script>
 
 <template>
-    <div style="text-align: center;">
+    <div style="text-align: center; margin-bottom: 10px;">
         <span class="copyright" v-html="Bbob.meta.copyright"></span>
         <br />
         <a

@@ -5,7 +5,7 @@ import { setMaxWidth, normal } from './composition/changeSize';
 import MenuSmall from './components/MenuSmall.vue';
 import { scrollToDownInvoke } from './composition/functionsRegister';
 import { changeToDark } from './composition/modeChange';
-import { computed, onMounted, ref, VideoHTMLAttributes, watch } from 'vue';
+import { ref, watch } from 'vue';
 import Bbob from '../../Bbob/JSApi/Bbob';
 
 setMaxWidth(768);
@@ -53,14 +53,18 @@ function replay() {
 
 <template>
     <img
-        class="background bgToCenter"
+        class="background bgToCenter unselectable"
+        draggable="false"
+        oncontextmenu="return false;"
         style="background-size: cover;"
         v-if="hasBackground && !isVideo"
         :src="source"
     />
     <video
         id="videoBg"
-        class="background bgToCenter"
+        class="background bgToCenter unselectable"
+        draggable="false"
+        oncontextmenu="return false;"
         autoplay
         muted
         loop
@@ -107,6 +111,7 @@ function replay() {
     --theme-cover-min-width: 100%;
     --theme-drawer-background-color: #ffffff;
     --color: var(--theme-font-color);
+    --theme-avatar-radius: 0%;
 }
 .app-container {
     max-width: 1024px;
@@ -188,5 +193,10 @@ button,
 select,
 a {
   -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+.unselectable {
+    -moz-user-select: -moz-none;
+    -webkit-user-select: none;
+    user-select: none;
 }
 </style>
