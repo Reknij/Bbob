@@ -5,16 +5,17 @@ namespace Bbob.Main.BuildInPlugin;
 [PluginJson(name = "ExtraLinks", version = "1.0.0", author = "Jinker")]
 public class ExtraLinks: IPlugin
 {
+    bool hasGenerate = false;
     public void GenerateCommand(string filePath, GenerationStage stage)
     {
         if (stage != GenerationStage.Initialize) return;
-
+        hasGenerate = true;
         PluginHelper.registerObject("extraLinks", new Dictionary<string, string>());
     }
 
     public Action? CommandComplete(Commands cmd)
     {
-        if (cmd != Commands.GenerateCommand) return null;
+        if (cmd != Commands.GenerateCommand || !hasGenerate) return null;
         Dictionary<string, string> extraLinks = PluginHelper.getRegisteredObjectNoNull<Dictionary<string, string>>("extraLinks");
         List<ExtraLink> e = new List<ExtraLink>();
         foreach (var item in extraLinks)
