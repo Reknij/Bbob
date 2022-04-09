@@ -1,3 +1,47 @@
+# 2022-4-9
+## Bbob
+- all message to console now has color.
+
+## Bbob.Plugin
+- `printConsole` now support color.
+
+# 2022-4-8
+## Bbob.Plugin
+- add `HashPluginsLoaded`.
+- optimize some functions.
+
+## Bbob.Shared
+- optimize `SharedLib`.
+
+# 2022-4-6
+## Bbob.Plugin
+- `PluginsLoadedOrder` change to `PluginsLoaded` and type `Dictionary<string, PluginJson>`
+- `ConfigBbob` support assign. Will ignore null value.
+- optimize `PluginCondition`.
+# 2022-4-5
+## Bbob
+- fix relation of plugins order recursion.
+## Bbob.Plugin
+- Plugin info add `version` field.
+
+# 2022-4-4
+## BbobDefaultTheme
+- background now unselectable.
+
+# 2022-4-3
+## Bbob
+- `MarkdownParser` will provide `markdownPipelineBuilder` to modify markdown parser.
+- `MarkdownParser` toc id now is based on text.
+## BbobDefaultTheme
+- fix hash of location.
+- support avatar.
+
+# 2022-4-2
+## Bbob
+- `CopyToDist` refactoring.
+## Bbob.Plugin
+- PluginHelper add `readConsole` and `readConsoleKey` functions.
+
 # 2022-4-1
 ## Bbob
 - custom command support global.
@@ -6,7 +50,7 @@
 ## Bbob.Plugin
 - `PluginHelper.registerMeta` support option to merge or replace.
 
-# 2022-3-29
+# 2022-3-29 v1.4.5
 ## Bbob.Plugin
 - register and get object support option.
 
