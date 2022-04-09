@@ -1,5 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <ItemGroup>
+    <ProjectReference Include="..\Bbob.Shared\Bbob.Shared.csproj" />
+  </ItemGroup>
+
   <PropertyGroup>
     <Description>Bbob plugin classlib.</Description>
     <TargetFramework>net6.0</TargetFramework>

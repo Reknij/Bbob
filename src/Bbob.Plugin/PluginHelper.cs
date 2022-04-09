@@ -2,6 +2,9 @@ using static Bbob.Plugin.Cores.PluginHelperCore;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System;
+using System.Security.Cryptography;
+using System.Text;
+using Bbob.Shared;
 
 [assembly: InternalsVisibleTo("Bbob.Main")]
 namespace Bbob.Plugin;
@@ -59,6 +62,28 @@ public static class PluginHelper
     /// Loaded plugin with already order.
     /// </summary>
     public static Dictionary<string, PluginJson> PluginsLoaded => pluginsLoaded;
+
+    /// <summary>
+    /// Get hash of plugins loaded.
+    /// </summary>
+    public static string HashPluginsLoaded
+    {
+        get
+        {
+            if (hashPluginsLoaded == null)
+            {
+                StringBuilder sb = new StringBuilder(hashPluginsLoaded, pluginsLoaded.Count * 30); //name `bbob-plugin-` length 12 then version `1.0.0.0` length 7. all add 11 again.
+                foreach (var l in pluginsLoaded)
+                {
+                    sb.Append(l.Value.name);
+                    sb.Append(l.Value.version);
+                }
+                var bytes = SharedLib.HashHelper.GetContentHash(sb.ToString());
+                hashPluginsLoaded = bytes;
+            }
+            return hashPluginsLoaded;
+        }
+    }
 
     /// <summary>
     /// Delegates of PluginHelper.
@@ -352,14 +377,14 @@ public static class PluginHelper
             {
                 if (meta is JsonDocument newDocument)
                 {
-                    if (metas[metaName] is JsonDocument originalDoc) metas[metaName] = JsonDocument.Parse(JsonHelper.Merge(null, null, originalDoc, newDocument));
-                    else metas[metaName] = JsonDocument.Parse(JsonHelper.Merge(JsonSerializer.Serialize(metas[metaName]), null, null, newDocument));
+                    if (metas[metaName] is JsonDocument originalDoc) metas[metaName] = JsonDocument.Parse(SharedLib.JsonHelper.Merge(null, null, originalDoc, newDocument));
+                    else metas[metaName] = JsonDocument.Parse(SharedLib.JsonHelper.Merge(JsonSerializer.Serialize(metas[metaName]), null, null, newDocument));
                 }
                 else
                 {
                     string rmeta = JsonSerializer.Serialize(meta);
-                    if (metas[metaName] is JsonDocument originalDoc) metas[metaName] = JsonDocument.Parse(JsonHelper.Merge(null, rmeta, originalDoc));
-                    else metas[metaName] = JsonDocument.Parse(JsonHelper.Merge(JsonSerializer.Serialize(metas[metaName]), rmeta));
+                    if (metas[metaName] is JsonDocument originalDoc) metas[metaName] = JsonDocument.Parse(SharedLib.JsonHelper.Merge(null, rmeta, originalDoc));
+                    else metas[metaName] = JsonDocument.Parse(SharedLib.JsonHelper.Merge(JsonSerializer.Serialize(metas[metaName]), rmeta));
                 }
 
             }
