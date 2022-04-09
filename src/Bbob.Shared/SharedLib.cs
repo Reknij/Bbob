@@ -8,11 +8,17 @@ using System.Text.RegularExpressions;
 namespace Bbob.Shared;
 public static class SharedLib
 {
-    public static string BytesToString(byte[] bytes)
+    public static class ArrayHelper
     {
-        string result = "";
-        foreach (byte b in bytes) result += b.ToString("x2");
-        return result;
+        public static class Bytes
+        {
+            public static string ToString(byte[] bytes)
+            {
+                StringBuilder sb = new StringBuilder(bytes.Length);
+                foreach (byte b in bytes) sb.Append(b.ToString("x2"));
+                return sb.ToString();
+            }
+        }
     }
     public static class DateTimeHelper
     {
@@ -35,47 +41,19 @@ public static class SharedLib
         static SHA256 sha256 = SHA256.Create();
         public static string GetFileContentHash(string filePath)
         {
-            return BytesToString(sha256.ComputeHash(File.ReadAllBytes(filePath)));
+            using var fs = File.OpenRead(filePath);
+            return ArrayHelper.Bytes.ToString(sha256.ComputeHash(fs));
         }
 
         public static string GetContentHash(string content)
         {
-            return BytesToString(sha256.ComputeHash(Encoding.UTF8.GetBytes(content)));
+            return ArrayHelper.Bytes.ToString(sha256.ComputeHash(Encoding.UTF8.GetBytes(content)));
         }
 
         public static string GetContentHash(Stream stream)
         {
-            return BytesToString(sha256.ComputeHash(stream));
+            return ArrayHelper.Bytes.ToString(sha256.ComputeHash(stream));
         }
-    }
-
-    public static class ObjectHelper
-    {
-        // public static void CopyPropertiesAndFieldsFrom(object to, object from)
-        // {
-        //     Type aType = to.GetType();
-        //     Type bType = from.GetType();
-        //     var aProperties = aType.GetProperties();
-        //     var bProperties = aType.GetProperties();
-        //     foreach (var prop in aProperties)
-        //     {
-        //         var bProp = bType.GetProperty(prop.Name);
-        //         if (bProp != null)
-        //         {
-        //             prop.SetValue(to, bProp.GetValue(from));
-        //         }
-        //     }
-        //     var aFields = aType.GetFields();
-        //     var bFields = bType.GetFields();
-        //     foreach (var field in aFields)
-        //     {
-        //         var bField = bType.GetField(field.Name);
-        //         if (bField != null)
-        //         {
-        //             field.SetValue(to, bField.GetValue(from));
-        //         }
-        //     }
-        // }
     }
 
     public static class DirectoryHelper
