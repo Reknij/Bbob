@@ -11,14 +11,14 @@ public static class CliShared
     public static TextType isPluginOrThemeName(string name, out string fixedName)
     {
         fixedName = name;
-        if (name.StartsWith("bbob-theme-")) return TextType.Theme;
-        if (name.StartsWith("bbob-plugin-")) return TextType.Plugin;
-        if (name.StartsWith("theme-"))
+        if (name.StartsWith("bbob-theme-", true, null)) return TextType.Theme;
+        if (name.StartsWith("bbob-plugin-", true, null)) return TextType.Plugin;
+        if (name.StartsWith("theme-",true, null))
         {
             fixedName = $"bbob-{name}";
             return TextType.Theme;
         }
-        if (name.StartsWith("plugin-"))
+        if (name.StartsWith("plugin-",true, null))
         {
             fixedName = $"bbob-{name}";
             return TextType.Plugin;

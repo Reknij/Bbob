@@ -25,7 +25,7 @@ public class EnableAndDisable : Command
     {
         this.option = options;
         this.pluginName = pluginName.ToUpper();
-        if (this.pluginName.StartsWith("PLUGIN-") || this.pluginName.StartsWith("THEME-")) this.pluginName = $"BBOB-{this.pluginName}";
+        if (this.pluginName.StartsWith("PLUGIN-", true, null) || this.pluginName.StartsWith("THEME-", true, null)) this.pluginName = $"BBOB-{this.pluginName}";
         this.direct = direct;
     }
     private bool isAll(string name)
@@ -47,57 +47,66 @@ public class EnableAndDisable : Command
             case Options.disable:
                 if (isAll(pluginName))
                 {
+                    bool already = false;
                     if (config.pluginsDisable.Count > 0)
                     {
                         if (isAll(config.pluginsDisable[0]))
                         {
-                            if (config.pluginsDisable[0].ToUpper() != pluginName.ToUpper())
+                            if (config.pluginsDisable[0].ToUpper() != pluginName)
                             {
                                 string i = char.ToUpper(config.pluginsDisable[0][1]) == 'B' ? "build-in" : "third";
-                                System.Console.WriteLine($"Will enable all {i} plugin.");
+                                ConsoleHelper.printWarning($"Will enable all {i} plugin.");
                                 config.pluginsDisable[0] = pluginName;
                             }
-
+                            else already = true;
                         }
                         else config.pluginsDisable.Insert(0, pluginName);
                     }
                     else config.pluginsDisable.Add(pluginName);
 
                     Configuration.ConfigManager.SaveConfig();
-                    string info = char.ToUpper(pluginName[1]) == 'B' ? "build-in" : "third";
-                    ConsoleHelper.printSuccess($"Disable all {info} plugin success");
+                    string info = pluginName[1] == 'B' ? "build-in" : "third";
+                    if (already) ConsoleHelper.printWarning($"Already disable all {info} plugin.");
+                    else ConsoleHelper.printSuccess($"Disable all {info} plugin success");
                     return true;
                 }
                 if (!config.isPluginEnable(pluginName))
                 {
-                    ConsoleHelper.printWarning($"Already disable <{pluginName.ToUpper()}>");
+                    ConsoleHelper.printWarning($"Already disable <{pluginName}>");
                     return true;
                 }
-                config.pluginsDisable.Add(pluginName.ToUpper());
+                config.pluginsDisable.Add(pluginName);
                 Configuration.ConfigManager.SaveConfig();
-                ConsoleHelper.printSuccess($"Disable <{pluginName.ToUpper()}> success");
+                ConsoleHelper.printSuccess($"Disable <{pluginName}> success");
                 return true;
 
             case Options.enable:
                 if (isAll(pluginName))
                 {
-                    if (config.pluginsDisable.Count > 0 && config.pluginsDisable.First() == "*")
+                    bool already = false;
+                    if (config.pluginsDisable.Count > 0 && isAll(config.pluginsDisable[0]))
                     {
-                        config.pluginsDisable.RemoveAt(0);
-                        Configuration.ConfigManager.SaveConfig();
+                        if (config.pluginsDisable[0].ToUpper() != pluginName) already = true;
+                        else
+                        {
+                            config.pluginsDisable.RemoveAt(0);
+                            Configuration.ConfigManager.SaveConfig();
+                        }
                     }
-                    string info = pluginName[1].ToString().ToUpper() == "B" ? "build-in" : "third";
-                    ConsoleHelper.printSuccess($"Enable all {info} plugin success");
+                    else already = true;
+                    string info = pluginName[1].ToString() == "B" ? "build-in" : "third";
+                    if (already) ConsoleHelper.printWarning($"Already enable all {info} plugin.");
+                    else ConsoleHelper.printSuccess($"Enable all {info} plugin success");
                     return true;
                 }
                 if (config.isPluginEnable(pluginName, out int index))
                 {
-                    ConsoleHelper.printWarning($"Already enable <{pluginName.ToUpper()}>");
+                    ConsoleHelper.printWarning($"Already enable <{pluginName}>");
                     return true;
                 }
                 config.pluginsDisable.RemoveAt(index);
                 Configuration.ConfigManager.SaveConfig();
-                ConsoleHelper.printSuccess($"Enable <{pluginName.ToUpper()}> success");
+                ConsoleHelper.printSuccess($"Enable <{pluginName}> success");
                 return true;
             default:
                 break;

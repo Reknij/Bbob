@@ -91,10 +91,10 @@ public class Add : Command
             try
             {
                 var t = client.GetStreamAsync(address);
-                System.Console.WriteLine("Downloading...");
+                ConsoleHelper.printWarning("Downloading...");
                 using (var s = t.Result)
                 {
-                    System.Console.WriteLine("Downloaded, installing...");
+                    ConsoleHelper.print("Downloaded, installing...", color:ConsoleColor.DarkCyan);
                     using (var f = File.OpenWrite(tempFilePath))
                     {
                         s.CopyTo(f);
@@ -180,7 +180,7 @@ public class Add : Command
         }
         catch (System.Exception ex)
         {
-            System.Console.WriteLine("Uncompress target file error:\n" + ex.Message);
+            ConsoleHelper.printError("Uncompress target file error:\n" + ex.Message);
         }
     }
 
