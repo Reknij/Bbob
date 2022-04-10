@@ -388,6 +388,7 @@ public static class PluginSystem
     {
         PluginHelperCore.executingPlugin = info;
         PluginHelper.ExecutingCommandResult = new CommandResult();
+        PluginHelper.printResetColor();
     }
 
     public static PluginJson getPluginInfo(IPlugin plugin) => getPluginInfo(plugin.GetType());

@@ -42,4 +42,14 @@ public struct CommandResult
         Message = messsage;
         Operation = operation;
     }
+
+    /// <summary>
+    /// Initialize the CommandResult.
+    /// </summary>
+    /// <param name="operation">Operation for the plugin to do.</param>
+    public CommandResult(CommandOperation operation = CommandOperation.None)
+    {
+        Message = "";
+        Operation = operation;
+    }
 }

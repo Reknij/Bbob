@@ -389,13 +389,40 @@ public static class PluginHelper
     }
 
     /// <summary>
+    /// Read message from console of Bbob.
+    /// </summary>
+    /// <param name="msg">Message to show when read. etc. Your age:</param>
+    /// <returns>The next line of characters from the input stream, or null if no more lines are available.</returns>
+    public static string? readConsole(object msg)
+    {
+        Console.Write(msg.ToString());
+        return Console.ReadLine();
+    }
+
+    /// <summary>
     /// Read key from console of Bbob.
     /// </summary>
     /// <param name="intercept">Determines whether to display the pressed key in the console window. true to not display the pressed key; otherwise, false.</param>
     /// <returns></returns>
-    public static ConsoleKeyInfo readConsoleKey(bool intercept = true)
+    public static ConsoleKeyInfo readConsoleKey(bool intercept = false)
     {
-        return Console.ReadKey(intercept);
+        var info = Console.ReadKey(intercept);
+        Console.WriteLine();
+        return info;
+    }
+
+    /// <summary>
+    /// Read key from console of Bbob.
+    /// </summary>
+    /// <param name="msg">Message to show when read. etc. Your age:</param>
+    /// <param name="intercept">Determines whether to display the pressed key in the console window. true to not display the pressed key; otherwise, false.</param>
+    /// <returns></returns>
+    public static ConsoleKeyInfo readConsoleKey(object msg, bool intercept = false)
+    {
+        Console.Write(msg.ToString());
+        var info = Console.ReadKey(intercept);
+        Console.WriteLine();
+        return info;
     }
 
     /// <summary>
