@@ -27,7 +27,7 @@ public static class PluginSystem
         LoadThirdPlugins();
         if (ShowLoadedMessage)
         {
-            if ((BuildInPluginCount + ThirdPluginCount) > 0) ConsoleHelper.printSuccess($"Loaded {AllPluginCount} plugins. 【{BuildInPluginCount}|{ThirdPluginCount}】");
+            if ((BuildInPluginCount + ThirdPluginCount) > 0) ConsoleHelper.printSuccess($"Loaded {AllPluginCount} plugins. 【{BuildInPluginCount}|{ThirdPluginCount}】\n");
             else ConsoleHelper.printWarning("Warning: plugins are loaded.");
         }
         foreach (var p in buildInPlugins)

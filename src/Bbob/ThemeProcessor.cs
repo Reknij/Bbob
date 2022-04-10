@@ -14,7 +14,6 @@ public static class ThemeProcessor
     static Dictionary<string, Theme> themes = new Dictionary<string, Theme>();
     public static void LoadAllTheme()
     {
-        if (ShowLoadedMessage) ConsoleHelper.printSuccess("Loading Themes...");
         themes.Clear();
         Directory.CreateDirectory(themesFolder);
         Directory.CreateDirectory(thirdThemesFolder);
@@ -28,6 +27,7 @@ public static class ThemeProcessor
                 themes.Add(themeInfo.name, new Theme(themeInfo, dir));
             }
         }
+        if (ShowLoadedMessage) ConsoleHelper.printSuccess("Loaded theme success.");
     }
 
     public static Theme? BuildThemeToDist(string themeName, string dist)

@@ -65,6 +65,10 @@ public class Generator : Command
             ConsoleHelper.printWarning($"{FAILED}Not found theme.");
             return false;
         }
+        ConsoleHelper.print($"Using theme <{theme.Info.name}>", color:ConsoleColor.Blue);
+        ConsoleHelper.print($"Author: {theme.Info.author}", color:ConsoleColor.DarkCyan);
+        ConsoleHelper.print($"Description: {theme.Info.description}\n", color:ConsoleColor.DarkCyan);
+
         InitializeConventionObjects();
         if (files.Length > 0) ConsoleHelper.print($"Run generate all stage for article files in '{articlesFolderPath.Replace(Environment.CurrentDirectory, ".")}'.", color:ConsoleColor.DarkCyan);
         else ConsoleHelper.printWarning("Nothing files to generate.");
