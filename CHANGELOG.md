@@ -1,3 +1,7 @@
+# 2022-4-10
+## Bbob
+- `ArticleStatusDetect` add new status `notice`. If has `notice` in article. Will print the `notice` then ask user continue generate it or not.
+
 # 2022-4-9
 ## Bbob
 - all message to console now has color.
