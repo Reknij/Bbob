@@ -13,8 +13,8 @@ public class Remove : Command
     private string _pluginOrTheme = string.Empty;
     public string PluginOrTheme
     {
-        get=> _pluginOrTheme;
-        set=> _pluginOrTheme = value.ToUpper();
+        get => _pluginOrTheme;
+        set => _pluginOrTheme = value.ToUpper();
     }
     private bool isGlobal = false;
     public bool Global
@@ -67,7 +67,8 @@ public class Remove : Command
         }
         Shared.SharedLib.DirectoryHelper.DeleteDirectory(directory);
         string p = isGlobal ? "global" : "current";
-        ConsoleHelper.printSuccess($"{SUCCESS}Remove {PluginOrTheme} from {p} directory!");
+        string top = type == CliShared.TextType.Theme ? "theme" : "plugin";
+        ConsoleHelper.printSuccess($"{SUCCESS}Remove {top} {PluginOrTheme} from {p} directory!");
         return true;
     }
 }

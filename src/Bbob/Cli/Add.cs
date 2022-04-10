@@ -153,7 +153,8 @@ public class Add : Command
 
         Shared.SharedLib.DirectoryHelper.DeleteDirectory(DownloadPath.Temp);
         string p = Global ? "global" : "current";
-        ConsoleHelper.printSuccess($"{SUCCESS}{addStatus} {name} to {p} directory path.!");
+        string top = type == CliShared.TextType.Theme ? "theme" : "plugin";
+        ConsoleHelper.printSuccess($"{SUCCESS}{addStatus} {top} {name} to {p} directory path.!");
         return true;
     }
 
