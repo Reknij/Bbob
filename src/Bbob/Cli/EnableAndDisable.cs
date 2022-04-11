@@ -28,10 +28,13 @@ public class EnableAndDisable : Command
         if (this.pluginName.StartsWith("PLUGIN-", true, null) || this.pluginName.StartsWith("THEME-", true, null)) this.pluginName = $"BBOB-{this.pluginName}";
         this.direct = direct;
     }
-    private bool isAll(string name)
+    private static bool isAll(HashSet<string> pluginsDisable)
     {
-        if (name.ToUpper() == "*B" || name.ToUpper() == "*T") return true;
-        return false;
+        return pluginsDisable.Contains("*b") || pluginsDisable.Contains("*t");
+    }
+    public bool isAll(string name)
+    {
+        return name.ToUpper() == "*B" || name.ToUpper() == "*T";
     }
     public override bool Process()
     {
@@ -50,17 +53,14 @@ public class EnableAndDisable : Command
                     bool already = false;
                     if (config.pluginsDisable.Count > 0)
                     {
-                        if (isAll(config.pluginsDisable[0]))
+                        string other = pluginName == "*B" ? "*T" : "*B";
+                        if (config.pluginsDisable.Contains(other))
                         {
-                            if (config.pluginsDisable[0].ToUpper() != pluginName)
-                            {
-                                string i = char.ToUpper(config.pluginsDisable[0][1]) == 'B' ? "build-in" : "third";
-                                ConsoleHelper.printWarning($"Will enable all {i} plugin.");
-                                config.pluginsDisable[0] = pluginName;
-                            }
-                            else already = true;
+                            string i = other[1] == 'B' ? "build-in" : "third";
+                            ConsoleHelper.printWarning($"Will enable all {i} plugin.");
+                            config.pluginsDisable.Remove(other);
                         }
-                        else config.pluginsDisable.Insert(0, pluginName);
+                        already = !config.pluginsDisable.Add(pluginName);
                     }
                     else config.pluginsDisable.Add(pluginName);
 
@@ -84,12 +84,12 @@ public class EnableAndDisable : Command
                 if (isAll(pluginName))
                 {
                     bool already = false;
-                    if (config.pluginsDisable.Count > 0 && isAll(config.pluginsDisable[0]))
+                    if (config.pluginsDisable.Count > 0 && !isAll(config.pluginsDisable))
                     {
-                        if (config.pluginsDisable[0].ToUpper() != pluginName) already = true;
+                        if (!config.pluginsDisable.Contains(pluginName)) already = true;
                         else
                         {
-                            config.pluginsDisable.RemoveAt(0);
+                            config.pluginsDisable.Remove(pluginName);
                             Configuration.ConfigManager.SaveConfig();
                         }
                     }
@@ -99,12 +99,12 @@ public class EnableAndDisable : Command
                     else ConsoleHelper.printSuccess($"Enable all {info} plugin success");
                     return true;
                 }
-                if (config.isPluginEnable(pluginName, out int index))
+                if (config.isPluginEnable(pluginName))
                 {
                     ConsoleHelper.printWarning($"Already enable <{pluginName}>");
                     return true;
                 }
-                config.pluginsDisable.RemoveAt(index);
+                config.pluginsDisable.Remove(pluginName);
                 Configuration.ConfigManager.SaveConfig();
                 ConsoleHelper.printSuccess($"Enable <{pluginName}> success");
                 return true;

@@ -119,7 +119,7 @@ public static class ConfigManager
             previewPort = 3000;
             var main = Assembly.GetExecutingAssembly();
             var types = main?.GetTypes();
-            pluginsDisable = new List<string>();
+            pluginsDisable = new HashSet<string>();
             distributionPath = "./dist";
         }
 

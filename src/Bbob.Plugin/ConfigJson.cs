@@ -93,33 +93,16 @@ public class ConfigJson
     /// Plugin disable list.
     /// </summary>
     /// <returns></returns>
-    public List<string> pluginsDisable { get; set; } = new List<string>();
-
-    /// <summary>
-    /// Check target plugin is enable or not.
-    /// </summary>
-    /// <param name="pluginName">Name of target plugin</param>
-    /// <returns>True if enable, otherwise false.</returns>
-    public bool isPluginEnable(string pluginName) => isPluginEnable(pluginName, out int i);
+    public HashSet<string> pluginsDisable { get; set; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// Check target plugin is enable or not, and get index of plugin disable list.
     /// </summary>
     /// <param name="pluginName">Name of target plugin</param>
-    /// <param name="index">Index of target plugin in plugin disable list.</param>
     /// <returns></returns>
-    public bool isPluginEnable(string pluginName, out int index)
+    public bool isPluginEnable(string pluginName)
     {
-        index = -1;
-        for (int i = 0; i < pluginsDisable.Count; i++)
-        {
-            if (pluginsDisable[i].ToUpper() == pluginName.ToUpper())
-            {
-                index = i;
-                return false;
-            }
-        }
-        return true;
+        return !pluginsDisable.Contains(pluginName);
     }
 
     /// <summary>
@@ -127,10 +110,7 @@ public class ConfigJson
     /// </summary>
     /// <param name="pluginInfo">Information of target plugin.</param>
     /// <returns></returns>
-    public bool isPluginEnable(PluginJson pluginInfo)
-    {
-        return isPluginEnable(pluginInfo.name);
-    }
+    public bool isPluginEnable(PluginJson pluginInfo) => isPluginEnable(pluginInfo.name);
 
     /// <summary>
     /// True if all build-in plugin is enable, otherwise false.
@@ -138,7 +118,7 @@ public class ConfigJson
     /// <returns></returns>
     public bool isAllBuildInPluginEnable()
     {
-        return pluginsDisable.Count == 0 || pluginsDisable.First().ToUpper() != "*B";
+        return !pluginsDisable.Contains("*B");
     }
 
     /// <summary>
@@ -147,6 +127,6 @@ public class ConfigJson
     /// <returns></returns>
     public bool isAllThirdPluginEnable()
     {
-        return pluginsDisable.Count == 0 || pluginsDisable.First().ToUpper() != "*T";
+        return !pluginsDisable.Contains("*T");
     }
 }
