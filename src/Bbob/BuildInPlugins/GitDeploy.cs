@@ -89,7 +89,7 @@ public class GitDeploy : IPlugin
                 }
             }
             DeleteAll();
-            Shared.SharedLib.DirectoryHelper.CopyDirectory(distribution, ghDirectory);
+            Shared.SharedLib.DirectoryHelper.CopyDirectory(distribution, ghDirectory, overwrite:true);
             if (config.type == "github")
             {
                 string index = Path.Combine(ghDirectory, "index.html");
@@ -154,12 +154,13 @@ public class GitDeploy : IPlugin
         string[] files = Directory.GetFiles(ghDirectory);
         foreach (string file in files)
         {
+            File.SetAttributes(file, FileAttributes.Normal);
             File.Delete(file);
         }
         foreach (string directory in directories)
         {
             if (directory == Path.Combine(ghDirectory, ".git")) continue;
-            Directory.Delete(directory, true);
+            Shared.SharedLib.DirectoryHelper.DeleteDirectory(directory);
         }
     }
     static string? WorkingDirectoryGlobal = null;
