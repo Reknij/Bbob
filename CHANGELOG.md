@@ -1,4 +1,4 @@
-# 2022-4-10
+# 2022-4-10 v1.5.0
 ## Bbob
 - `ArticleStatusDetect` add new status `notice`. If has `notice` in article. Will print the `notice` then ask user continue generate it or not.
 
@@ -22,6 +22,7 @@
 - `PluginsLoadedOrder` change to `PluginsLoaded` and type `Dictionary<string, PluginJson>`
 - `ConfigBbob` support assign. Will ignore null value.
 - optimize `PluginCondition`.
+
 # 2022-4-5
 ## Bbob
 - fix relation of plugins order recursion.
