@@ -81,6 +81,8 @@ public class Run : Command
             return true;
         };
 
+        name = PluginHelper.PluginsLoaded[name].name; //get real name from pluginsLoaded.
+
         if (!string.IsNullOrWhiteSpace(command))
         {
             if (!existsCommand(command)) return false;
@@ -94,7 +96,17 @@ public class Run : Command
             {
                 ConsoleHelper.print($"{name}: ", false, ConsoleColor.DarkCyan);
                 c = Console.ReadLine();
+                if (c == null)
+                {
+                    c = "exit";
+                    System.Console.WriteLine();
+                }
             };
+            Console.CancelKeyPress += (sender, e) =>
+            {
+                e.Cancel = true;
+            };
+
             readC();
             while (c != "exit")
             {
@@ -103,7 +115,7 @@ public class Run : Command
                     readC();
                     continue;
                 }
-                string[] args = Regex.Replace(c, @"\s+", "").Split(' ');
+                string[] args = Regex.Replace(c, @"\s+", " ").Split(' ');
                 command = args[0];
                 if (!existsCommand(command))
                 {
