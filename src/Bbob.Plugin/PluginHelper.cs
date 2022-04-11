@@ -553,7 +553,7 @@ public static class PluginHelper
     /// <returns></returns>
     public static bool isTargetPluginLoaded(string name)
     {
-        return pluginsLoaded.ContainsKey(name.ToUpper());
+        return pluginsLoaded.ContainsKey(name);
     }
 
     /// <summary>

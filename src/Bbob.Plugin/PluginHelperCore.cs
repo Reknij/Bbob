@@ -9,9 +9,9 @@ internal static class PluginHelperCore
     internal static Dictionary<string, object?> pluginsObject = new Dictionary<string, object?>();
     internal static Dictionary<string, object> metas = new Dictionary<string, object>();
     internal static HashSet<string> pluginsDone = new HashSet<string>();
-    internal static Dictionary<string, PluginJson> pluginsLoaded = new();
+    internal static Dictionary<string, PluginJson> pluginsLoaded = new(StringComparer.OrdinalIgnoreCase);
     internal static string? hashPluginsLoaded = null;
-    internal static Dictionary<string, Dictionary<string, Action<string[]>>> customCommands = new();
+    internal static Dictionary<string, Dictionary<string, Action<string[]>>> customCommands = new(StringComparer.OrdinalIgnoreCase);
     internal static string customGlobalCommandKey = "";
     internal static ConfigJson? configBbob;
     internal static string themePath = "null";
