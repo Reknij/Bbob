@@ -1,4 +1,4 @@
-[![Nuget](https://img.shields.io/nuget/v/bbob?label=Bbob&style=flat-square)](https://www.nuget.org/packages/Bbob/)![Nuget](https://img.shields.io/nuget/dt/bbob?style=flat-square)  [![Nuget](https://img.shields.io/nuget/v/bbob.plugin?label=Bbob.Plugin&style=flat-square)](https://www.nuget.org/packages/Bbob.Plugin/)![Nuget](https://img.shields.io/nuget/dt/bbob.plugin?style=flat-square) [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/JinkerLeong?country.x=MY&locale.x=en_US)
+[![Nuget](https://img.shields.io/nuget/v/bbob?label=Bbob&style=flat-square)](https://www.nuget.org/packages/Bbob/)[![Nuget](https://img.shields.io/nuget/dt/bbob?style=flat-square)](https://www.nuget.org/packages/Bbob/)  [![Nuget](https://img.shields.io/nuget/v/bbob.plugin?label=Bbob.Plugin&style=flat-square)](https://www.nuget.org/packages/Bbob.Plugin/)[![Nuget](https://img.shields.io/nuget/dt/bbob.plugin?style=flat-square)](https://www.nuget.org/packages/Bbob/)  [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/JinkerLeong?country.x=MY&locale.x=en_US)
 
 # Bbob 
 One serverless blog framework.
