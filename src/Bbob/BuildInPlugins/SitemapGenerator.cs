@@ -12,7 +12,7 @@ public class SitemapGenerator : IPlugin
     string fullUrl = Shared.SharedLib.UrlHelper.UrlCombine(PluginHelper.ConfigBbob.domain, PluginHelper.ConfigBbob.baseUrl);
 
     MyConfig config;
-    string? articleBaseUrl;
+    BuildInShared.ThemeInfoSupport themeInfoSupport = new BuildInShared.ThemeInfoSupport();
     public SitemapGenerator()
     {
         PluginHelper.getPluginJsonConfig<MyConfig>(out MyConfig? tar);
@@ -24,12 +24,12 @@ public class SitemapGenerator : IPlugin
         {
             if (isShortAddress)
             {
-                if (theme.articleBaseUrlShort != null) articleBaseUrl = theme.articleBaseUrlShort;
+                if (theme.articleBaseUrlShort != null) themeInfoSupport.articleBaseUrl = theme.articleBaseUrlShort;
                 else PluginHelper.printConsole("BuildWebArticleJson plugin is enable 'shortAddress' but theme does support.", ConsoleColor.Yellow);
             }
             else
             {
-                if (theme.articleBaseUrl != null) articleBaseUrl = theme.articleBaseUrl;
+                if (theme.articleBaseUrl != null) themeInfoSupport.articleBaseUrl = theme.articleBaseUrl;
                 else if (theme.articleBaseUrlShort != null) PluginHelper.printConsole("Theme is not support full address! Please enable 'shortAddress' in BuildWebArticleJson.config.json.", ConsoleColor.Yellow);
                 else PluginHelper.printConsole("theme.articleBaseUrl and theme is null, target theme is not support.", ConsoleColor.Red);
             }
@@ -100,12 +100,12 @@ public class SitemapGenerator : IPlugin
                 if (PluginHelper.getRegisteredObject<dynamic>("article", out dynamic? value))
                 {
                     if (value == null) return;
-                    if (articleBaseUrl != null)
+                    if (themeInfoSupport.articleBaseUrl != null)
                     {
-                        string address = value.address;
-                        string remake = articleBaseUrl.Replace("&", "~and~").Replace('?', '&');
-                        string redirectUrl = $"{fullUrl}?{remake}{address}";
-                        string normalUrl = $"{fullUrl.Remove(fullUrl.Length - 1)}{articleBaseUrl}{address}";
+                        string articleUrl = themeInfoSupport.buildArticleUrl(value.address);
+                        string remake = articleUrl.Replace("&", "~and~").Replace('?', '&');
+                        string redirectUrl = $"{fullUrl}?{remake}";
+                        string normalUrl = $"{fullUrl.Remove(fullUrl.Length - 1)}{articleUrl}";
                         articlesUrl.Add(new KeyValuePair<string, string>(value.title, config.redirectUrl ? redirectUrl : normalUrl));
                     }
                 }

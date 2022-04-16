@@ -101,9 +101,9 @@ public class BuildWebArticleJson : IPlugin
         string baseUrl = PluginHelper.ConfigBbob.baseUrl;
         PluginHelper.getPluginJsonConfig<MyConfig>(out MyConfig? configPlugin);
         bool isShortAddress = configPlugin != null ? configPlugin.shortAddress : false;
-        bool shortAddressEndWithSlash = configPlugin != null ? configPlugin.shortAddressEndWithSlash : false;
+        //bool shortAddressEndWithSlash = configPlugin != null ? configPlugin.shortAddressEndWithSlash : false;
         article.address = isShortAddress ? Path.GetFileNameWithoutExtension(newName) : $"{baseUrl}{JSApi.JSAPiHelper.bbobAssets}/{folder}/{newName}";
-        if (shortAddressEndWithSlash) article.address += '/';
+        //if (shortAddressEndWithSlash) article.address += '/';
         article.contentHash = hash;
         if (isShortAddress)
         {
@@ -139,7 +139,7 @@ public class BuildWebArticleJson : IPlugin
             }
             string bbobJsString = File.ReadAllText(bbobJs);
             string code = "$1=meta.extra.shortAddress.startOfAddress+$1+meta.extra.shortAddress.endOfAddress;";
-            if (config.shortAddressEndWithSlash) code = "let l=$1.length;if(l>1&&$1[l-1]=='/'){$1=$1.slice(0, -1);}" + code;
+            //if (config.shortAddressEndWithSlash) code = "let l=$1.length;if(l>1&&$1[l-1]=='/'){$1=$1.slice(0, -1);}" + code;
             bbobJsString = Regex.Replace(bbobJsString, @"getArticleFromAddress\(([A-Za-z0-9_]+),\s*([A-Za-z0-9_]+)\)\s*{", "getArticleFromAddress($1,$2){" + code, RegexOptions.Singleline);
             bbobJsString = Regex.Replace(bbobJsString, @"getArticleFromAddressAsync\(([A-Za-z0-9_]+)\)\s*{", "getArticleFromAddressAsync($1){" + code, RegexOptions.Singleline);
             File.WriteAllText(bbobJs, bbobJsString);
@@ -149,7 +149,7 @@ public class BuildWebArticleJson : IPlugin
     public class MyConfig
     {
         public bool shortAddress { get; set; } = false;
-        public bool shortAddressEndWithSlash { get; set; } = false;
+        //public bool shortAddressEndWithSlash { get; set; } = false;
     }
     public record class Meta(string startOfAddress, string endOfAddress);
 
