@@ -13,7 +13,8 @@ public static class InitializeBbob
         Theme = 2,
         Config = 4,
         Plugin = 8,
-        All = Theme | Config | Plugin
+        ThemePlugin = 10,
+        All = Theme | Config | Plugin | ThemePlugin
     }
     public static void Initialize(InitializeOptions options)
     {
@@ -36,21 +37,22 @@ public static class InitializeBbob
         }
         if ((options & InitializeOptions.Plugin) != 0)
         {
+            string themePlugins = "";
+            if ((options & InitializeOptions.ThemePlugin) != 0) themePlugins = Path.Combine(PluginHelper.ThemePath, "plugins");
             try
             {
-                PluginSystem.LoadAllPlugins();
+                PluginSystem.LoadAllPlugins(themePlugins);
             }
             catch (System.Exception ex)
             {
                 string msg = ex.Message;
-                #if DEBUG
-                    msg = ex.ToString();
-                #endif
+#if DEBUG
+                msg = ex.ToString();
+#endif
                 ConsoleHelper.printWarning($"Load plugin and create instance of plugin object error:\n{msg}");
                 Environment.Exit(-1);
             }
         }
-
     }
 
     public static void registerDataAgain()

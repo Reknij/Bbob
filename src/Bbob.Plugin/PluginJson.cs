@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Bbob.Plugin;
 
 /// <summary>
@@ -47,6 +49,12 @@ public class PluginJson: Attribute
     /// </summary>
     /// <value></value>
     public string version { get; set; }
+
+    /// <summary>
+    /// Is theme plugin or third.
+    /// </summary>
+    [JsonIgnore]
+    public bool themePlugin = false;
 
     /// <summary>
     /// Initialize information of plugin.

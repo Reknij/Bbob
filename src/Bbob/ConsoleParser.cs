@@ -130,7 +130,7 @@ class ConsoleParser
             case Commands.Preview.CurrentAka:
                 if (isHelp(printHelp<Preview>)) return;
                 TurnMessageShow(TurnOption.Plugin | TurnOption.Theme, false);
-                InitializeBbob.Initialize(InitializeBbob.InitializeOptions.All);
+                InitializeBbob.Initialize(InitializeBbob.InitializeOptions.Config);
                 {
                     string url = $"http://localhost:{CliShared.GetAvailablePort(Configuration.ConfigManager.MainConfig.previewPort)}";
                     Func<bool> check = () =>

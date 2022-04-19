@@ -16,7 +16,7 @@ public static class PluginSystem
     static List<PluginContext> allPlugin = new List<PluginContext>();
 
     public static bool ShowLoadedMessage { get; set; } = true;
-    public static void LoadAllPlugins()
+    public static void LoadAllPlugins(string themePlugin = "")
     {
         Directory.CreateDirectory(configsFolder);
         if (ShowLoadedMessage) System.Console.WriteLine("Loading Plugin System...");
@@ -24,7 +24,7 @@ public static class PluginSystem
         PluginHelperCore.baseDirectory = AppContext.BaseDirectory;
         PluginHelperCore.pluginsLoaded.Clear();
         LoadBuildInPlugins();
-        LoadThirdPlugins();
+        LoadThirdPlugins(themePlugin);
         if (ShowLoadedMessage)
         {
             if ((BuildInPluginCount + ThirdPluginCount) > 0) ConsoleHelper.printSuccess($"Loaded {AllPluginCount} plugins. 【{BuildInPluginCount}|{ThirdPluginCount}】\n");
@@ -72,7 +72,8 @@ public static class PluginSystem
         }
         return bip;
     }
-    private static Dictionary<PluginJson, string> GetThirdPluginsInfo()
+    
+    private static Dictionary<PluginJson, string> GetThirdPluginsInfo(string themePlugins = "")
     {
         Dictionary<string, PluginJson> addedPlugins = new();
         Dictionary<PluginJson, string> infos = new();
@@ -179,6 +180,16 @@ public static class PluginSystem
             addInfo(folder);
         }
 
+        if (Directory.Exists(themePlugins)) 
+        {
+            string[] plugins = Directory.GetDirectories(themePlugins);
+            foreach (var folder in plugins)
+            {
+                addInfo(folder);
+                infos.Last().Key.themePlugin = true;
+            }
+        }
+
         return infos;
     }
 
@@ -216,7 +227,7 @@ public static class PluginSystem
             }
         }
     }
-    private static void LoadThirdPlugins()
+    private static void LoadThirdPlugins(string themePlugins)
     {
         var config = Configuration.ConfigManager.MainConfig;
         if (!config.isAllThirdPluginEnable())
@@ -224,7 +235,7 @@ public static class PluginSystem
             ConsoleHelper.printWarning("You disable all third plugin!");
             return;
         }
-        Dictionary<PluginJson, string> thirdPluginsInfo = GetThirdPluginsInfo();
+        Dictionary<PluginJson, string> thirdPluginsInfo = GetThirdPluginsInfo(themePlugins);
         foreach (var third in thirdPluginsInfo)
         {
             if (!config.isPluginEnable(third.Value))
@@ -247,7 +258,12 @@ public static class PluginSystem
                     if (ShowLoadedMessage)
                     {
                         ConsoleHelper.print("Loaded", false, ConsoleColor.Green);
-                        System.Console.Write(" third plugin");
+                        if (third.Key.themePlugin)
+                        {
+                            ConsoleHelper.print(" theme build-in", false, ConsoleColor.Blue);
+                            System.Console.Write(" plugin");
+                        }
+                        else System.Console.Write(" third plugin");
                         ConsoleHelper.print($"【{third.Key.name}】", color: ConsoleColor.DarkCyan);
                     }
                     thirdPlugins.Add(mainPlugin);
