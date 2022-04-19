@@ -15,7 +15,7 @@ public class PluginAssemblyLoadContext : AssemblyLoadContext
     public string Warning = string.Empty;
 
     public PluginJson PluginInfo { get; protected set; }
-    public PluginAssemblyLoadContext(string pluginPath, PluginJson info) : base(isCollectible: false)
+    public PluginAssemblyLoadContext(string pluginPath, PluginJson info) : base(isCollectible: false, name: info.name)
     {
         resolver = new AssemblyDependencyResolver(pluginPath);
         PluginInfo = info;
@@ -55,12 +55,13 @@ public class PluginAssemblyLoadContext : AssemblyLoadContext
                 if (tar.Major > now.Major || (tar.Major == now.Major && tar.Minor > now.Minor))
                 {
                     Warning = $"Plugin <{PluginInfo.name}> interface version is newer than version now. Please update Bbob-Cli first, otherwise plugin will not working.";
+                    if (assemblyPath != null) return LoadFromAssemblyPath(assemblyPath);
                 }
                 else if (tar.Major < now.Major || (tar.Major == now.Major && tar.Minor < now.Minor))
                 {
                     Warning = $"Plugin <{PluginInfo.name}> interface version is older than version now. Please update plugin first, otherwise plugin will not working.";
+                    if (assemblyPath != null) return LoadFromAssemblyPath(assemblyPath);
                 }
-                if (assemblyPath != null) return LoadFromAssemblyPath(assemblyPath);
             }
             return null;
         }

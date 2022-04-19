@@ -6,6 +6,8 @@ using System.Security.Cryptography;
 using System.Text;
 using Bbob.Shared;
 using ConsoleHelper = Bbob.Shared.SharedLib.ConsoleHelper;
+using System.Reflection;
+using System.Runtime.Loader;
 
 [assembly: InternalsVisibleTo("Bbob.Main")]
 namespace Bbob.Plugin;
@@ -27,11 +29,20 @@ public static class PluginHelper
     /// <returns></returns>
     public static ConfigJson ConfigBbob
     {
-        get => configBbob ?? throw new NullReferenceException("Config of bbob is null!");
+        get
+        {
+            lock (SafeLocks.ConfigBbob)
+            {
+                return configBbob ?? throw new NullReferenceException("Config of bbob is null!");
+            }
+        }
         set
         {
-            if (value == null) printConsole("<Error> Can't assign to ConfigBbob because value is null!");
-            else configBbob = value;
+            lock (SafeLocks.ConfigBbob)
+            {
+                if (value == null) printConsole("<Error> Can't assign to ConfigBbob because value is null!");
+                else configBbob = value;
+            }
         }
     }
 
@@ -73,14 +84,19 @@ public static class PluginHelper
         {
             if (hashPluginsLoaded == null)
             {
-                StringBuilder sb = new StringBuilder(hashPluginsLoaded, pluginsLoaded.Count * 30); //name `bbob-plugin-` length 12 then version `1.0.0.0` length 7. all add 11 again.
-                foreach (var l in pluginsLoaded)
+                lock (SafeLocks.HashPluginsLoaded)
                 {
-                    sb.Append(l.Value.name);
-                    sb.Append(l.Value.version);
+                    if (hashPluginsLoaded != null) return hashPluginsLoaded;
+
+                    StringBuilder sb = new StringBuilder(hashPluginsLoaded, pluginsLoaded.Count * 30); //name `bbob-plugin-` length 12 then version `1.0.0.0` length 7. all add 11 again.
+                    foreach (var l in pluginsLoaded)
+                    {
+                        sb.Append(l.Value.name);
+                        sb.Append(l.Value.version);
+                    }
+                    var bytes = SharedLib.HashHelper.GetContentHash(sb.ToString());
+                    hashPluginsLoaded = bytes;
                 }
-                var bytes = SharedLib.HashHelper.GetContentHash(sb.ToString());
-                hashPluginsLoaded = bytes;
             }
             return hashPluginsLoaded;
         }
@@ -108,8 +124,11 @@ public static class PluginHelper
     public static void registerObject(string name, object? obj, RegisterObjectOption? option = null)
     {
         if (option != null) option.Process(ref name);
-        if (pluginsObject.ContainsKey(name)) pluginsObject[name] = obj;
-        else pluginsObject.Add(name, obj);
+        lock (SafeLocks.registerAndGetObject)
+        {
+            if (pluginsObject.ContainsKey(name)) pluginsObject[name] = obj;
+            else pluginsObject.TryAdd(name, obj);
+        }
     }
 
     /// <summary>
@@ -121,7 +140,10 @@ public static class PluginHelper
     public static bool existsObject(string name, RegisterObjectOption? option = null)
     {
         if (option != null) option.Process(ref name);
-        return pluginsObject.ContainsKey(name);
+        lock (SafeLocks.registerAndGetObject)
+        {
+            return pluginsObject.ContainsKey(name);
+        }
     }
 
     /// <summary>
@@ -133,7 +155,10 @@ public static class PluginHelper
     public static bool existsObjectNoNull(string name, RegisterObjectOption? option = null)
     {
         if (option != null) option.Process(ref name);
-        return pluginsObject.ContainsKey(name) && pluginsObject[name] != null;
+        lock (SafeLocks.registerAndGetObject)
+        {
+            return pluginsObject.ContainsKey(name) && pluginsObject[name] != null;
+        }
     }
 
     /// <summary>
@@ -146,7 +171,10 @@ public static class PluginHelper
     public static bool existsObjectNoNull<T>(string name, RegisterObjectOption? option = null)
     {
         if (option != null) option.Process(ref name);
-        return pluginsObject.ContainsKey(name) && pluginsObject[name]?.GetType() == typeof(T);
+        lock (SafeLocks.registerAndGetObject)
+        {
+            return pluginsObject.ContainsKey(name) && pluginsObject[name]?.GetType() == typeof(T);
+        }
     }
 
     /// <summary>
@@ -160,13 +188,16 @@ public static class PluginHelper
     public static bool getRegisteredObject<T>(string name, out T? value, RegisterObjectOption? option = null)
     {
         if (option != null) option.Process(ref name);
-        if (pluginsObject.TryGetValue(name, out object? v) && v is T)
+        lock (SafeLocks.registerAndGetObject)
         {
-            value = (T)v;
-            return true;
+            if (pluginsObject.TryGetValue(name, out object? v) && v is T)
+            {
+                value = (T)v;
+                return true;
+            }
+            value = default(T);
+            return false;
         }
-        value = default(T);
-        return false;
     }
 
     /// <summary>
@@ -179,12 +210,15 @@ public static class PluginHelper
     public static T getRegisteredObjectNoNull<T>(string name, RegisterObjectOption? option = null)
     {
         if (option != null) option.Process(ref name);
-        bool exists = getRegisteredObject<T>(name, out T? a);
-        if (exists && a != null)
+        lock (SafeLocks.registerAndGetObject)
         {
-            return a;
+            bool exists = getRegisteredObject<T>(name, out T? a);
+            if (exists && a != null)
+            {
+                return a;
+            }
+            throw new KeyNotFoundException($"Object name {name} " + (!exists ? "is not exists!" : "value is null!"));
         }
-        throw new KeyNotFoundException($"Object name {name} " + (!exists ? "is not exists!" : "value is null!"));
     }
 
     /// <summary>
@@ -192,7 +226,10 @@ public static class PluginHelper
     /// </summary>
     public static void clearAllObject()
     {
-        pluginsObject.Clear();
+        lock (SafeLocks.registerAndGetObject)
+        {
+            pluginsObject.Clear();
+        }
     }
 
     /// <summary>
@@ -206,15 +243,18 @@ public static class PluginHelper
     public static bool modifyRegisteredObject<T>(string name, HelperDelegates.ModifyObjectDelegate<T> modifyObjectDelegate, RegisterObjectOption? option = null)
     {
         if (option != null) option.Process(ref name);
-        if (pluginsObject.TryGetValue(name, out object? value) && value is T)
+        lock (SafeLocks.registerAndGetObject)
         {
-            T? obj = (T?)value;
-            modifyObjectDelegate?.Invoke(ref obj);
-            pluginsObject[name] = obj;
+            if (pluginsObject.TryGetValue(name, out object? value) && value is T)
+            {
+                T? obj = (T?)value;
+                modifyObjectDelegate?.Invoke(ref obj);
+                pluginsObject[name] = obj;
 
-            return true;
+                return true;
+            }
+            return false;
         }
-        return false;
     }
 
     /// <summary>
@@ -226,7 +266,10 @@ public static class PluginHelper
     public static bool unregisterObject(string name, RegisterObjectOption? option = null)
     {
         if (option != null) option.Process(ref name);
-        return pluginsObject.Remove(name);
+        lock (SafeLocks.registerAndGetObject)
+        {
+            return pluginsObject.Remove(name);
+        }
     }
 
     /// <summary>
@@ -238,18 +281,22 @@ public static class PluginHelper
     /// <returns>True if success get config, otherwise false.</returns>
     public static bool getPluginJsonConfig<T>(string pluginName, out T? config)
     {
-        string configsDirectory = Path.Combine(CurrentDirectory, "configs");
-
-        string pluginConfigJson = Path.Combine(configsDirectory, $"{pluginName}.config.json");
+        string pluginConfigJson = Path.Combine(CurrentDirectory, "configs", $"{pluginName}.config.json");
         if (File.Exists(pluginConfigJson))
         {
             try
             {
-                using (FileStream fs = new FileStream(pluginConfigJson, FileMode.Open, FileAccess.Read))
+                bool found = pluginConfigCaches.TryGetValue(pluginConfigJson, out JsonCache? cache);
+                DateTime lastModified = File.GetLastWriteTimeUtc(pluginConfigJson);
+                if (cache == null || cache.lastModified < lastModified)
                 {
-                    config = JsonSerializer.Deserialize<T>(fs);
-                    return true;
+                    cache = new(File.ReadAllText(pluginConfigJson), lastModified);
+                    if (found) pluginConfigCaches[pluginConfigJson] = cache;
+                    else pluginConfigCaches.TryAdd(pluginConfigJson, cache);
                 }
+
+                config = JsonSerializer.Deserialize<T>(cache.content);
+                return true;
             }
             catch (System.Exception ex)
             {
@@ -333,8 +380,13 @@ public static class PluginHelper
     public static void printConsole(object? msg)
     {
         msg ??= "<NULL_OBJECT>";
-        ConsoleHelper.print($"【{ExecutingPlugin.name}】", false, ConsoleColor.DarkCyan);
-        System.Console.WriteLine($": {msg.ToString()}");
+        lock (SafeLocks.printConsole)
+        {
+            var currentContext = AssemblyLoadContext.GetLoadContext(Assembly.GetCallingAssembly());
+            string name = currentContext == AssemblyLoadContext.Default ? ExecutingPlugin.name : currentContext?.Name ?? "UnknownContext";
+            ConsoleHelper.print($"【{name}】", false, ConsoleColor.DarkCyan);
+            System.Console.WriteLine($": {msg.ToString()}");
+        }
     }
 
     /// <summary>
@@ -346,11 +398,17 @@ public static class PluginHelper
     public static void printConsole(object? msg, ConsoleColor? foreground = null, ConsoleColor? background = null)
     {
         msg ??= "<NULL_OBJECT>";
-        ConsoleHelper.print($"【{ExecutingPlugin.name}】", false, ConsoleColor.DarkCyan);
-        if (foreground != null) Console.ForegroundColor = foreground.Value;
-        if (background != null) Console.BackgroundColor = background.Value;
-        System.Console.WriteLine($": {msg.ToString()}");
-        Console.ResetColor();
+
+        lock (SafeLocks.printConsole)
+        {
+            var currentContext = AssemblyLoadContext.GetLoadContext(Assembly.GetCallingAssembly());
+            string name = currentContext == AssemblyLoadContext.Default ? ExecutingPlugin.name : currentContext?.Name ?? "UnknownContext";
+            ConsoleHelper.print($"【{name}】", false, ConsoleColor.DarkCyan);
+            if (foreground != null) Console.ForegroundColor = foreground.Value;
+            if (background != null) Console.BackgroundColor = background.Value;
+            System.Console.WriteLine($": {msg.ToString()}");
+            Console.ResetColor();
+        }
     }
 
     /// <summary>
@@ -385,7 +443,10 @@ public static class PluginHelper
     /// <returns>The next line of characters from the input stream, or null if no more lines are available.</returns>
     public static string? readConsole()
     {
-        return Console.ReadLine();
+        lock (SafeLocks.readConsole)
+        {
+            return Console.ReadLine();
+        }
     }
 
     /// <summary>
@@ -395,8 +456,11 @@ public static class PluginHelper
     /// <returns>The next line of characters from the input stream, or null if no more lines are available.</returns>
     public static string? readConsole(object msg)
     {
-        Console.Write(msg.ToString());
-        return Console.ReadLine();
+        lock (SafeLocks.readConsole)
+        {
+            Console.Write(msg.ToString());
+            return Console.ReadLine();
+        }
     }
 
     /// <summary>
@@ -406,9 +470,12 @@ public static class PluginHelper
     /// <returns></returns>
     public static ConsoleKeyInfo readConsoleKey(bool intercept = false)
     {
-        var info = Console.ReadKey(intercept);
-        Console.WriteLine();
-        return info;
+        lock (SafeLocks.readConsole)
+        {
+            var info = Console.ReadKey(intercept);
+            Console.WriteLine();
+            return info;
+        }
     }
 
     /// <summary>
@@ -419,10 +486,13 @@ public static class PluginHelper
     /// <returns></returns>
     public static ConsoleKeyInfo readConsoleKey(object msg, bool intercept = false)
     {
-        Console.Write(msg.ToString());
-        var info = Console.ReadKey(intercept);
-        Console.WriteLine();
-        return info;
+        lock (SafeLocks.readConsole)
+        {
+            Console.Write(msg.ToString());
+            var info = Console.ReadKey(intercept);
+            Console.WriteLine();
+            return info;
+        }
     }
 
     /// <summary>
@@ -441,26 +511,29 @@ public static class PluginHelper
     public static void registerMeta(string metaName, object meta, RegisterMetaOption? option = null)
     {
         option ??= new RegisterMetaOption();
-        if (metas.ContainsKey(metaName))
+        lock (SafeLocks.registerAndGetMeta)
         {
-            if (!option.Merge) metas[metaName] = meta;
-            else
+            if (metas.ContainsKey(metaName))
             {
-                if (meta is JsonDocument newDocument)
-                {
-                    if (metas[metaName] is JsonDocument originalDoc) metas[metaName] = JsonDocument.Parse(SharedLib.JsonHelper.Merge(null, null, originalDoc, newDocument));
-                    else metas[metaName] = JsonDocument.Parse(SharedLib.JsonHelper.Merge(JsonSerializer.Serialize(metas[metaName]), null, null, newDocument));
-                }
+                if (!option.Merge) metas[metaName] = meta;
                 else
                 {
-                    string rmeta = JsonSerializer.Serialize(meta);
-                    if (metas[metaName] is JsonDocument originalDoc) metas[metaName] = JsonDocument.Parse(SharedLib.JsonHelper.Merge(null, rmeta, originalDoc));
-                    else metas[metaName] = JsonDocument.Parse(SharedLib.JsonHelper.Merge(JsonSerializer.Serialize(metas[metaName]), rmeta));
-                }
+                    if (meta is JsonDocument newDocument)
+                    {
+                        if (metas[metaName] is JsonDocument originalDoc) metas[metaName] = JsonDocument.Parse(SharedLib.JsonHelper.Merge(null, null, originalDoc, newDocument));
+                        else metas[metaName] = JsonDocument.Parse(SharedLib.JsonHelper.Merge(JsonSerializer.Serialize(metas[metaName]), null, null, newDocument));
+                    }
+                    else
+                    {
+                        string rmeta = JsonSerializer.Serialize(meta);
+                        if (metas[metaName] is JsonDocument originalDoc) metas[metaName] = JsonDocument.Parse(SharedLib.JsonHelper.Merge(null, rmeta, originalDoc));
+                        else metas[metaName] = JsonDocument.Parse(SharedLib.JsonHelper.Merge(JsonSerializer.Serialize(metas[metaName]), rmeta));
+                    }
 
+                }
             }
+            else metas.Add(metaName, meta);
         }
-        else metas.Add(metaName, meta);
     }
 
     /// <summary>
@@ -476,12 +549,15 @@ public static class PluginHelper
     /// <returns>True if exists and removed, otherwise false.</returns>
     public static bool unregisterMeta(string metaName)
     {
-        if (metas.ContainsKey(metaName))
+        lock (SafeLocks.registerAndGetMeta)
         {
-            metas.Remove(metaName);
-            return true;
+            if (metas.ContainsKey(metaName))
+            {
+                metas.Remove(metaName);
+                return true;
+            }
+            return false;
         }
-        return false;
     }
 
     /// <summary>
@@ -491,12 +567,15 @@ public static class PluginHelper
     /// <returns>Type instance of theme.json.</returns>
     public static T? getThemeInfo<T>()
     {
+        string path = Path.Combine(ThemePath, "theme.json");
         try
         {
-            using (FileStream fs = File.OpenRead(Path.Combine(ThemePath, "theme.json")))
+            DateTime lastModified = File.GetLastWriteTimeUtc(path);
+            if (themeInfoCache == null || themeInfoCache.lastModified < lastModified)
             {
-                return JsonSerializer.Deserialize<T>(fs);
+                themeInfoCache = new JsonCache(File.ReadAllText(path), lastModified);
             }
+            return JsonSerializer.Deserialize<T>(themeInfoCache.content);
         }
         catch (System.Exception ex)
         {
@@ -593,20 +672,23 @@ public static class PluginHelper
             executingPlugin = registerPlugin;
             function(args);
         };
-        if (option.Global)
+        lock (SafeLocks.registerCustomCommand)
         {
-            if (string.IsNullOrWhiteSpace(customGlobalCommandKey)) customGlobalCommandKey = $"globalCommand{Random.Shared.Next(131452099)}_";
-            command += customGlobalCommandKey;
-            if (!customCommands.ContainsKey(command)) customCommands.Add(command, new Dictionary<string, Action<string[]>>());
-            if (customCommands[command].ContainsKey(pluginName)) return false;
-            customCommands[command].Add(pluginName, registerFunction);
+            if (option.Global)
+            {
+                if (string.IsNullOrWhiteSpace(customGlobalCommandKey)) customGlobalCommandKey = $"globalCommand{Random.Shared.Next(131452099)}_";
+                command += customGlobalCommandKey;
+                if (!customCommands.ContainsKey(command)) customCommands.Add(command, new Dictionary<string, Action<string[]>>());
+                if (customCommands[command].ContainsKey(pluginName)) return false;
+                customCommands[command].Add(pluginName, registerFunction);
+            }
+            else
+            {
+                if (!customCommands.ContainsKey(pluginName)) customCommands.Add(pluginName, new Dictionary<string, Action<string[]>>());
+                if (customCommands[pluginName].ContainsKey(command)) return false;
+                customCommands[pluginName].Add(command, registerFunction);
+            }
+            return true;
         }
-        else
-        {
-            if (!customCommands.ContainsKey(pluginName)) customCommands.Add(pluginName, new Dictionary<string, Action<string[]>>());
-            if (customCommands[pluginName].ContainsKey(command)) return false;
-            customCommands[pluginName].Add(command, registerFunction);
-        }
-        return true;
     }
 }

@@ -117,6 +117,7 @@ public static class SharedLib
 
     public static class ConsoleHelper
     {
+        static readonly object safeLock = new();
         public static void printDividingLine() => printDividingLine('-');
         public static void printDividingLine(char dividing) => printDividingLine(dividing.ToString());
         public static void printDividingLine(string dividing)
@@ -136,19 +137,22 @@ public static class SharedLib
         /// <param name="foreOrBack">Is color of message foreground or background. Default true, foreground.</param>
         public static void print(object msg, bool newLine = true, ConsoleColor? color = null, bool foreOrBack = true)
         {
-            if (color != null)
+            lock (safeLock)
             {
-                if (foreOrBack) Console.ForegroundColor = color.Value;
-                else Console.BackgroundColor = color.Value;
+                if (color != null)
+                {
+                    if (foreOrBack) Console.ForegroundColor = color.Value;
+                    else Console.BackgroundColor = color.Value;
+                }
+                if (newLine) System.Console.WriteLine(msg.ToString());
+                else System.Console.Write(msg.ToString());
+                Console.ResetColor();
             }
-            if (newLine) System.Console.WriteLine(msg.ToString());
-            else System.Console.Write(msg.ToString());
-            Console.ResetColor();
         }
 
-        public static void printSuccess(object msg) => print(msg, color:ConsoleColor.Green);
-        public static void printError(object msg) => print(msg, color:ConsoleColor.Red);
-        public static void printWarning(object msg) => print(msg, color:ConsoleColor.Yellow);
+        public static void printSuccess(object msg) => print(msg, color: ConsoleColor.Green);
+        public static void printError(object msg) => print(msg, color: ConsoleColor.Red);
+        public static void printWarning(object msg) => print(msg, color: ConsoleColor.Yellow);
     }
 
     public static class UrlHelper
