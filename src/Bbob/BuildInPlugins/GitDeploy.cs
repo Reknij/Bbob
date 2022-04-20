@@ -89,7 +89,7 @@ public class GitDeploy : IPlugin
                 }
             }
             DeleteAll();
-            Shared.SharedLib.DirectoryHelper.CopyDirectory(distribution, ghDirectory, overwrite:true);
+            Shared.SharedLib.DirectoryHelper.CopyDirectory(distribution, ghDirectory, overwrite: true);
             if (config.type == "github")
             {
                 string index = Path.Combine(ghDirectory, "index.html");
@@ -104,7 +104,10 @@ public class GitDeploy : IPlugin
             runCommand($"git add .", ghDirectory);
             runCommand($"git commit -m \"{config.message}\"", ghDirectory);
             PluginHelper.printConsole(runCommand($"git push -f origin {config.branch}", ghDirectory));
-            updateSitemap(distribution);
+            if (config.ping)
+            {
+                updateSitemap(distribution);
+            }
             PluginHelper.printConsole("Done..", ConsoleColor.Green);
         }
         else
@@ -126,22 +129,29 @@ public class GitDeploy : IPlugin
                 PluginHelper.printConsole($"Sitemap name: {sitemap}", ConsoleColor.Green);
                 string sitemapDist = Path.Combine(distribution, sitemap);
                 string sitemapRepos = Path.Combine(ghDirectory, sitemap);
-                if (File.Exists(sitemapDist))
-                {
-                    HttpClient client = new HttpClient();
-                    PluginHelper.printConsole("ping sitemap to google now.");
-                    var task = client.GetAsync($"https://www.google.com/ping?sitemap={urlOfSitemap}");
-                    task.Wait();
-                    if (task.Result.IsSuccessStatusCode) PluginHelper.printConsole($"Success ping google update sitemap with url '{urlOfSitemap}'", ConsoleColor.Green);
-                    else PluginHelper.printConsole($"Failed ping google update sitemap with url '{urlOfSitemap}'", ConsoleColor.Red);
-                }
-                else
-                {
-                    PluginHelper.printConsole($"robots.txt contain sitemap but physical path '{sitemapDist}' not exists.", ConsoleColor.Red);
-                }
+                if (File.Exists(sitemapDist)) pingSitemap(urlOfSitemap);
+                else PluginHelper.printConsole($"robots.txt contain sitemap but physical path '{sitemapDist}' not exists.", ConsoleColor.Red);
             }
         }
     }
+
+    private void pingSitemap(string sitemapUrl)
+    {
+        HttpClient client = new HttpClient();
+        PluginHelper.printConsole($"ping sitemap to google and bing now.");
+
+        var google = client.GetAsync($"https://www.google.com/ping?sitemap={sitemapUrl}");
+        var bing = client.GetAsync($"https://bing.com/webmaster/ping.aspx?sitemap={sitemapUrl}");
+
+        google.Wait();
+        if (google.Result.IsSuccessStatusCode) PluginHelper.printConsole($"Success ping google update sitemap with url '{sitemapUrl}'", ConsoleColor.Green);
+        else PluginHelper.printConsole($"Failed ping google update sitemap with url '{sitemapUrl}'", ConsoleColor.Red);
+
+        bing.Wait();
+        if (bing.Result.IsSuccessStatusCode) PluginHelper.printConsole($"Success ping bing update sitemap with url '{sitemapUrl}'", ConsoleColor.Green);
+        else PluginHelper.printConsole($"Failed ping bing update sitemap with url '{sitemapUrl}'", ConsoleColor.Red);
+    }
+
     private void cloneReposAndCheckout(GitConfig config)
     {
         PluginHelper.printConsole(runCommand($"git clone {config.repos} {ghDirectoryName}", PluginHelper.CurrentDirectory));
@@ -195,5 +205,6 @@ public class GitDeploy : IPlugin
         public string? branch { get; set; }
         public string? message { get; set; }
         public string? type { get; set; }
+        public bool ping { get; set; } = false;
     }
 }
