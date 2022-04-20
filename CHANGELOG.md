@@ -1,3 +1,19 @@
+# 2022-4-20
+## Bbob
+- `GitDeploy` now default will no ping sitemap.
+- `GitDeploy` ping sitemap support `Bing` search engine.
+
+# 2022-4-19
+## Bbob.Plugin
+- fix `printConsole` no newline in multithreading.
+- will cache plugin config and theme info to optimize get speed.
+- theme support include plugins.
+
+# 2022-4-16
+## Bbob
+- `BuildWebArticleJson` remove `shortAddressEndWithSlash` config option.
+- `BuildWebArticleJson` and `SitemapGenerator` refactoring `articleBaseUrl` of theme info.
+
 # 2022-4-10 v1.5.0
 ## Bbob
 - `ArticleStatusDetect` add new status `notice`. If has `notice` in article. Will print the `notice` then ask user continue generate it or not.
