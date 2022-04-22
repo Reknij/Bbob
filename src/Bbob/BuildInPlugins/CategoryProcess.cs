@@ -112,7 +112,7 @@ public class CategoryProcess : IPlugin
                 }
                 var list = all.ToList();
                 sort(list);
-                dynamic blog = PluginHelper.getRegisteredObjectNoNull<dynamic>("blog");
+                dynamic blog = PluginHelper.getRegisteredObjectNotNull<dynamic>("blog");
                 blog.categories = FilterSourceHandler.BuildFilterFile(list, PluginHelper.DistributionDirectory, "categories");
             }
         }

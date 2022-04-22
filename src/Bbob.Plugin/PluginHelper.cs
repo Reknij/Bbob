@@ -110,9 +110,16 @@ public static class PluginHelper
         /// <summary>
         /// Delegate of modify object function.
         /// </summary>
-        /// <param name="obj"></param>
-        /// <typeparam name="T"></typeparam>
+        /// <param name="obj">Object to modify. Is nullable</param>
+        /// <typeparam name="T">Type of object</typeparam>
         public delegate void ModifyObjectDelegate<T>(ref T? obj);
+
+        /// <summary>
+        /// Delegate of modify object not null function.
+        /// </summary>
+        /// <param name="obj">Object to modify.</param>
+        /// <typeparam name="T">Type of object</typeparam>
+        public delegate void ModifyObjectDelegateNotNull<T>(ref T obj);
     }
 
     /// <summary>
@@ -152,7 +159,7 @@ public static class PluginHelper
     /// <param name="name">Name of object</param>
     /// <returns>True if exists and not null, otherwise false.</returns>
     /// <param name="option">Option of register object</param>
-    public static bool existsObjectNoNull(string name, RegisterObjectOption? option = null)
+    public static bool existsObjectNotNull(string name, RegisterObjectOption? option = null)
     {
         if (option != null) option.Process(ref name);
         lock (SafeLocks.registerAndGetObject)
@@ -168,7 +175,7 @@ public static class PluginHelper
     /// <typeparam name="T">Type of object</typeparam>
     /// <returns>True if exists and not null, otherwise false.</returns>
     /// <param name="option">Option of register object</param>
-    public static bool existsObjectNoNull<T>(string name, RegisterObjectOption? option = null)
+    public static bool existsObjectNotNull<T>(string name, RegisterObjectOption? option = null)
     {
         if (option != null) option.Process(ref name);
         lock (SafeLocks.registerAndGetObject)
@@ -207,7 +214,7 @@ public static class PluginHelper
     /// <typeparam name="T">Type of object</typeparam>
     /// <returns>Object instance</returns>
     /// <param name="option">Option of register object</param>
-    public static T getRegisteredObjectNoNull<T>(string name, RegisterObjectOption? option = null)
+    public static T getRegisteredObjectNotNull<T>(string name, RegisterObjectOption? option = null)
     {
         if (option != null) option.Process(ref name);
         lock (SafeLocks.registerAndGetObject)
@@ -249,6 +256,31 @@ public static class PluginHelper
             {
                 T? obj = (T?)value;
                 modifyObjectDelegate?.Invoke(ref obj);
+                pluginsObject[name] = obj;
+
+                return true;
+            }
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Get the target register object not null from PluginHelper to modify.
+    /// </summary>
+    /// <param name="name">Name of target object</param>
+    /// <param name="modifyObjectDelegate">Function to modify object.</param>
+    /// <typeparam name="T">Type of target object</typeparam>
+    /// <returns>True if found object, otherwise false.</returns>
+    /// <param name="option">Option of register object</param>
+    public static bool modifyRegisteredObjectNotNull<T>(string name, HelperDelegates.ModifyObjectDelegateNotNull<T> modifyObjectDelegate, RegisterObjectOption? option = null)
+    {
+        if (option != null) option.Process(ref name);
+        lock (SafeLocks.registerAndGetObject)
+        {
+            if (pluginsObject.TryGetValue(name, out object? value) && value is T)
+            {
+                T? obj = (T?)value;
+                if (obj != null) modifyObjectDelegate?.Invoke(ref obj);
                 pluginsObject[name] = obj;
 
                 return true;

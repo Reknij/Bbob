@@ -50,7 +50,7 @@ public class TagProcess : IPlugin
 
                 var list = all.ToList();
                 sort(list);
-                dynamic blog = PluginHelper.getRegisteredObjectNoNull<dynamic>("blog");
+                dynamic blog = PluginHelper.getRegisteredObjectNotNull<dynamic>("blog");
                 blog.tags = FilterSourceHandler.BuildFilterFile(list, PluginHelper.DistributionDirectory, "tags");
             }
         }

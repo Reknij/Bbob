@@ -33,7 +33,7 @@ public class ArchiveProcess : IPlugin
                     if (int.Parse(v1.Key) < int.Parse(v2.Key)) return 1;
                     return 0;
                 });
-                dynamic blog = PluginHelper.getRegisteredObjectNoNull<dynamic>("blog");
+                dynamic blog = PluginHelper.getRegisteredObjectNotNull<dynamic>("blog");
                 blog.archives = FilterSourceHandler.BuildFilterFile(a, PluginHelper.DistributionDirectory, "archives");
             }
         }

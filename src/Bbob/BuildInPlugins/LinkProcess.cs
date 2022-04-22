@@ -48,7 +48,7 @@ public class LinkProcess : IPlugin
             sort(links);
             PluginHelper.registerObject("links", links);
             var pack = getLinkInfos(links, PluginHelper.DistributionDirectory);
-            dynamic blog = PluginHelper.getRegisteredObjectNoNull<dynamic>("blog");
+            dynamic blog = PluginHelper.getRegisteredObjectNotNull<dynamic>("blog");
             blog.links = pack.Item1;
             blog.nextFileLinks = pack.Item2;
             PluginHelper.printConsole($"Resolve {links.Count} files.", ConsoleColor.Green);

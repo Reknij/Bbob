@@ -16,7 +16,7 @@ public class ExtraLinks: IPlugin
     public Action? CommandComplete(Commands cmd)
     {
         if (cmd != Commands.GenerateCommand || !hasGenerate) return null;
-        Dictionary<string, string> extraLinks = PluginHelper.getRegisteredObjectNoNull<Dictionary<string, string>>("extraLinks");
+        Dictionary<string, string> extraLinks = PluginHelper.getRegisteredObjectNotNull<Dictionary<string, string>>("extraLinks");
         List<ExtraLink> e = new List<ExtraLink>();
         foreach (var item in extraLinks)
         {

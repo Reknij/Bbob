@@ -174,7 +174,7 @@ public class SitemapGenerator : IPlugin
         }
         string html = $"<!DOCTYPE html><html lang=\"en\"><head>{metas}<title>Sitemap Html</title>{style}</head><body>{unsortedList}</body></html>";
         File.WriteAllText(sitemap, html);
-        PluginHelper.getRegisteredObjectNoNull<Dictionary<string, string>>("extraLinks").Add("Sitemap", "/sitemap-html.html");
+        PluginHelper.getRegisteredObjectNotNull<Dictionary<string, string>>("extraLinks").Add("Sitemap", "/sitemap-html.html");
     }
 
     class SitemapXml
