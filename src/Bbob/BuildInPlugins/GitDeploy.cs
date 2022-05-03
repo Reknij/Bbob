@@ -74,21 +74,13 @@ public class GitDeploy : IPlugin
             }
             if (config.branch == null) config.branch = "main";
             if (config.message == null) config.message = $"{Shared.SharedLib.DateTimeHelper.GetDateTimeNowString()} Update";
-            PluginHelper.printConsole($"Trying deploy to {config.repos}, branch {config.branch}", ConsoleColor.Yellow);
+            PluginHelper.printConsole($"Initialize deploy action...", ConsoleColor.Yellow);
             if (!Directory.Exists(ghDirectory))
             {
                 cloneReposAndCheckout(config);
             }
-            else
-            {
-                if (!Regex.IsMatch(runCommand("git remote -v", ghDirectory), @$"origin\s+{config.repos}"))
-                {
-                    PluginHelper.printConsole("Exists other repository, replace it.", ConsoleColor.Yellow);
-                    Shared.SharedLib.DirectoryHelper.DeleteDirectory(ghDirectory);
-                    cloneReposAndCheckout(config);
-                }
-            }
-            DeleteAll();
+            else Shared.SharedLib.DirectoryHelper.DeleteDirectory(ghDirectory);
+
             Shared.SharedLib.DirectoryHelper.CopyDirectory(distribution, ghDirectory, overwrite: true);
             if (config.type == "github")
             {
@@ -101,9 +93,12 @@ public class GitDeploy : IPlugin
                 }
                 else PluginHelper.printConsole("No exists 'index.html'", ConsoleColor.Red);
             }
-            runCommand($"git add .", ghDirectory);
-            runCommand($"git commit -m \"{config.message}\"", ghDirectory);
-            PluginHelper.printConsole(runCommand($"git push -f origin {config.branch}", ghDirectory));
+            CommandRunner git = new CommandRunner("git", ghDirectory);
+            PluginHelper.printConsole($"Adding all \"./dist\" files...", ConsoleColor.Yellow);
+            git.Run($"add .");
+            PluginHelper.printConsole($"Trying deploy to {config.repos}, branch {config.branch}", ConsoleColor.Yellow);
+            git.Run($"commit -m \"{config.message}\"");
+            PluginHelper.printConsole(git.Run($"push -f origin {config.branch}"));
             if (config.ping)
             {
                 updateSitemap(distribution);
@@ -140,63 +135,66 @@ public class GitDeploy : IPlugin
         HttpClient client = new HttpClient();
         PluginHelper.printConsole($"ping sitemap to google and bing now.");
 
-        var google = client.GetAsync($"https://www.google.com/ping?sitemap={sitemapUrl}");
-        var bing = client.GetAsync($"https://bing.com/webmaster/ping.aspx?sitemap={sitemapUrl}");
+        string[] enginesName =
+        {
+            "Google",
+            "Bing",
+        };
+        var searchEngines = new Task<HttpResponseMessage>[]
+        {
+            client.GetAsync($"https://www.google.com/ping?sitemap={sitemapUrl}"), //google
+            client.GetAsync($"https://bing.com/webmaster/ping.aspx?sitemap={sitemapUrl}"), //bing
+        };
 
-        google.Wait();
-        if (google.Result.IsSuccessStatusCode) PluginHelper.printConsole($"Success ping google update sitemap with url '{sitemapUrl}'", ConsoleColor.Green);
-        else PluginHelper.printConsole($"Failed ping google update sitemap with url '{sitemapUrl}'", ConsoleColor.Red);
-
-        bing.Wait();
-        if (bing.Result.IsSuccessStatusCode) PluginHelper.printConsole($"Success ping bing update sitemap with url '{sitemapUrl}'", ConsoleColor.Green);
-        else PluginHelper.printConsole($"Failed ping bing update sitemap with url '{sitemapUrl}'", ConsoleColor.Red);
+        Task.WaitAll(searchEngines);
+        for (int i = 0; i < enginesName.Length; i++)
+        {
+            if (searchEngines[i].Result.IsSuccessStatusCode) PluginHelper.printConsole($"Success ping {enginesName[i]} to update sitemap with url '{sitemapUrl}'", ConsoleColor.Green);
+            else PluginHelper.printConsole($"Failed ping {enginesName[i]} to update sitemap with url '{sitemapUrl}'", ConsoleColor.Red);
+        }
     }
 
     private void cloneReposAndCheckout(GitConfig config)
     {
-        PluginHelper.printConsole(runCommand($"git clone {config.repos} {ghDirectoryName}", PluginHelper.CurrentDirectory));
-        if (runCommand($"git checkout -b {config.branch}", ghDirectory).Contains("already exists")) runCommand($"git checkout {config.branch}", ghDirectory);
+        CommandRunner git = new CommandRunner("git", ghDirectory);
+        PluginHelper.printConsole(git.Run($"clone {config.repos} {ghDirectoryName}"));
+        if (git.Run($"checkout -b {config.branch}").Contains("already exists")) git.Run($"checkout {config.branch}");
     }
 
-    private void DeleteAll()
+    class CommandRunner
     {
-        string[] directories = Directory.GetDirectories(ghDirectory);
-        string[] files = Directory.GetFiles(ghDirectory);
-        foreach (string file in files)
+        readonly string Command;
+        readonly string WorkingDirectory;
+        public CommandRunner(string command, string workingDirectory)
         {
-            File.SetAttributes(file, FileAttributes.Normal);
-            File.Delete(file);
+            Command = command;
+            WorkingDirectory = workingDirectory;
         }
-        foreach (string directory in directories)
+
+        public string Run(string argument = "")
         {
-            if (directory == Path.Combine(ghDirectory, ".git")) continue;
-            Shared.SharedLib.DirectoryHelper.DeleteDirectory(directory);
+            Process p = new Process();
+            p.StartInfo.FileName = "cmd.exe";
+            p.StartInfo.Arguments = $"/c {Command}";
+            if (OperatingSystem.IsLinux())
+            {
+                p.StartInfo.FileName = "/bin/bash";
+                p.StartInfo.Arguments = $"-c {Command}";
+            }
+            p.StartInfo.UseShellExecute = false;
+            p.StartInfo.CreateNoWindow = true;
+            p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.RedirectStandardError = true;
+            p.EnableRaisingEvents = true;
+            p.StartInfo.WorkingDirectory = WorkingDirectory;
+            p.Start();
+            string output = p.StandardOutput.ReadToEnd();
+            using (StreamReader s = p.StandardError)
+            {
+                output += s.ReadToEnd();
+            }
+            return output;
         }
-    }
-    static string? WorkingDirectoryGlobal = null;
-    private string runCommand(string command, string? workingDirectory = null)
-    {
-        Process p = new Process();
-        p.StartInfo.FileName = "cmd.exe";
-        p.StartInfo.Arguments = $"/c {command}";
-        if (OperatingSystem.IsLinux())
-        {
-            p.StartInfo.FileName = "/bin/bash";
-            p.StartInfo.Arguments = $"-c {command}";
-        }
-        p.StartInfo.UseShellExecute = false;
-        p.StartInfo.CreateNoWindow = true;
-        p.StartInfo.RedirectStandardOutput = true;
-        p.StartInfo.RedirectStandardError = true;
-        p.EnableRaisingEvents = true;
-        p.StartInfo.WorkingDirectory = workingDirectory == null ? WorkingDirectoryGlobal : workingDirectory;
-        p.Start();
-        string output = p.StandardOutput.ReadToEnd();
-        using (StreamReader s = p.StandardError)
-        {
-            output += s.ReadToEnd();
-        }
-        return output;
     }
 
     public class GitConfig
