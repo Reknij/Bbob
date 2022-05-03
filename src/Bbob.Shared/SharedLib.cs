@@ -58,9 +58,13 @@ public static class SharedLib
 
     public static class DirectoryHelper
     {
-        public static void CopyDirectory(string sourceDir, string destinationDir, string ignores = "", bool recursive = true, bool overwrite = false)
+        public static void CopyDirectory(string sourceDir, string destinationDir, string _ignores = "", bool recursive = true, bool overwrite = false)
         {
-            string[] ignoresArray = ignores.Split(';');
+            CopyDirectory(sourceDir, destinationDir, _ignores.Split(';').ToHashSet(),recursive, overwrite);
+        }
+
+        public static void CopyDirectory(string sourceDir, string destinationDir, HashSet<string> ignores, bool recursive = true, bool overwrite = false)
+        {
             // Get information about the source directory
             var dir = new DirectoryInfo(sourceDir);
 
@@ -77,7 +81,7 @@ public static class SharedLib
             // Get the files in the source directory and copy to the destination directory
             foreach (FileInfo file in dir.GetFiles())
             {
-                if (ignoresArray.Contains(file.Name)) continue;
+                if (ignores.Contains(file.Name)) continue;
 
                 string targetFilePath = Path.Combine(destinationDir, file.Name);
                 file.CopyTo(targetFilePath, overwrite);
@@ -88,7 +92,7 @@ public static class SharedLib
             {
                 foreach (DirectoryInfo subDir in dirs)
                 {
-                    if (ignoresArray.Contains(subDir.Name)) continue;
+                    if (ignores.Contains(subDir.Name)) continue;
                     string newDestinationDir = Path.Combine(destinationDir, subDir.Name);
                     CopyDirectory(subDir.FullName, newDestinationDir, ignores, recursive, overwrite);
                 }
