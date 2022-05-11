@@ -27,7 +27,7 @@ public static class PluginSystem
         LoadThirdPlugins(themePlugin);
         if (ShowLoadedMessage)
         {
-            if ((BuildInPluginCount + ThirdPluginCount) > 0) ConsoleHelper.printSuccess($"Loaded {AllPluginCount} plugins. 【{BuildInPluginCount}|{ThirdPluginCount}】\n");
+            if ((BuildInPluginCount + ThirdPluginCount) > 0) ConsoleHelper.printSuccess($"Loaded {AllPluginCount} plugins. [{BuildInPluginCount}|{ThirdPluginCount}]\n");
             else ConsoleHelper.printWarning("Warning: plugins are not loaded.");
         }
         foreach (var p in buildInPlugins)
@@ -211,7 +211,7 @@ public static class PluginSystem
                 {
                     ConsoleHelper.print("Disable", false, ConsoleColor.Yellow);
                     System.Console.Write(" build-in plugin");
-                    ConsoleHelper.print($"【{plugin.Key.name}】", color: ConsoleColor.Blue);
+                    ConsoleHelper.print($"[{plugin.Key.name}]", color: ConsoleColor.Blue);
                 }
                 continue;
             }
@@ -223,7 +223,7 @@ public static class PluginSystem
             {
                 ConsoleHelper.print("Loaded", false, ConsoleColor.Green);
                 System.Console.Write(" build-in plugin");
-                ConsoleHelper.print($"【{plugin.Key.name}】", color: ConsoleColor.Blue);
+                ConsoleHelper.print($"[{plugin.Key.name}]", color: ConsoleColor.Blue);
             }
         }
     }
@@ -244,7 +244,7 @@ public static class PluginSystem
                 {
                     ConsoleHelper.print("Disable", false, ConsoleColor.Yellow);
                     System.Console.WriteLine(" third plugin");
-                    ConsoleHelper.print($"【{third.Key.name}】", color: ConsoleColor.DarkCyan);
+                    ConsoleHelper.print($"[{third.Key.name}]", color: ConsoleColor.DarkCyan);
                 }
                 continue;
             }
@@ -264,7 +264,7 @@ public static class PluginSystem
                             System.Console.Write(" plugin");
                         }
                         else System.Console.Write(" third plugin");
-                        ConsoleHelper.print($"【{third.Key.name}】", color: ConsoleColor.DarkCyan);
+                        ConsoleHelper.print($"[{third.Key.name}]", color: ConsoleColor.DarkCyan);
                     }
                     thirdPlugins.Add(mainPlugin);
                 }

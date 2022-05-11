@@ -416,7 +416,7 @@ public static class PluginHelper
         {
             var currentContext = AssemblyLoadContext.GetLoadContext(Assembly.GetCallingAssembly());
             string name = currentContext == AssemblyLoadContext.Default ? ExecutingPlugin.name : currentContext?.Name ?? "UnknownContext";
-            ConsoleHelper.print($"【{name}】", false, ConsoleColor.DarkCyan);
+            ConsoleHelper.print($"[{name}]", false, ConsoleColor.DarkCyan);
             System.Console.WriteLine($": {msg.ToString()}");
         }
     }
@@ -435,7 +435,7 @@ public static class PluginHelper
         {
             var currentContext = AssemblyLoadContext.GetLoadContext(Assembly.GetCallingAssembly());
             string name = currentContext == AssemblyLoadContext.Default ? ExecutingPlugin.name : currentContext?.Name ?? "UnknownContext";
-            ConsoleHelper.print($"【{name}】", false, ConsoleColor.DarkCyan);
+            ConsoleHelper.print($"[{name}]", false, ConsoleColor.DarkCyan);
             if (foreground != null) Console.ForegroundColor = foreground.Value;
             if (background != null) Console.BackgroundColor = background.Value;
             System.Console.WriteLine($": {msg.ToString()}");

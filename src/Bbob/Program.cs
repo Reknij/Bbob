@@ -28,7 +28,7 @@ public class Program
                     break;
             }
         }
-        ConsoleHelper.print($"【Bbob v{Version}】", color:ConsoleColor.Magenta);
+        ConsoleHelper.print($">>> Bbob v{Version} <<<", color:ConsoleColor.Magenta);
         ConsoleParser parser = new ConsoleParser(args);
         parser.Parse();
     }
