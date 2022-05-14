@@ -1,3 +1,13 @@
+# 2022-5-11
+## Bbob
+- Replace all unknown characters.
+## Bbob.Plugin
+- Replace all unknown characters.
+
+# 2022-5-3
+## Bbob
+- `GitDeploy` refactoring some codes
+
 # 2022-4-20
 ## Bbob
 - `GitDeploy` now default will no ping sitemap.
