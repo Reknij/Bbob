@@ -79,8 +79,17 @@ public class GitDeploy : IPlugin
             {
                 cloneReposAndCheckout(config);
             }
-            else Shared.SharedLib.DirectoryHelper.DeleteDirectory(ghDirectory);
-
+            else
+            {
+                if (!Regex.IsMatch(new CommandRunner("git", ghDirectory).Run("remote -v"), @$"origin\s+{config.repos}"))
+                {
+                    PluginHelper.printConsole("Exists other repository, replace it.", ConsoleColor.Yellow);
+                    Shared.SharedLib.DirectoryHelper.DeleteDirectory(ghDirectory);
+                    cloneReposAndCheckout(config);
+                }
+            }
+            CommandRunner git = new CommandRunner("git", ghDirectory);
+            git.Run("rm .");
             Shared.SharedLib.DirectoryHelper.CopyDirectory(distribution, ghDirectory, overwrite: true);
             if (config.type == "github")
             {
@@ -93,9 +102,8 @@ public class GitDeploy : IPlugin
                 }
                 else PluginHelper.printConsole("No exists 'index.html'", ConsoleColor.Red);
             }
-            CommandRunner git = new CommandRunner("git", ghDirectory);
             PluginHelper.printConsole($"Adding all \"./dist\" files...", ConsoleColor.Yellow);
-            git.Run($"add .");
+            git.Run("add .");
             PluginHelper.printConsole($"Trying deploy to {config.repos}, branch {config.branch}", ConsoleColor.Yellow);
             git.Run($"commit -m \"{config.message}\"");
             PluginHelper.printConsole(git.Run($"push -f origin {config.branch}"));
@@ -156,7 +164,7 @@ public class GitDeploy : IPlugin
 
     private void cloneReposAndCheckout(GitConfig config)
     {
-        CommandRunner git = new CommandRunner("git", ghDirectory);
+        CommandRunner git = new CommandRunner("git", PluginHelper.CurrentDirectory);
         PluginHelper.printConsole(git.Run($"clone {config.repos} {ghDirectoryName}"));
         if (git.Run($"checkout -b {config.branch}").Contains("already exists")) git.Run($"checkout {config.branch}");
     }
@@ -175,11 +183,11 @@ public class GitDeploy : IPlugin
         {
             Process p = new Process();
             p.StartInfo.FileName = "cmd.exe";
-            p.StartInfo.Arguments = $"/c {Command}";
+            p.StartInfo.Arguments = $"/c {Command} {argument}";
             if (OperatingSystem.IsLinux())
             {
                 p.StartInfo.FileName = "/bin/bash";
-                p.StartInfo.Arguments = $"-c {Command}";
+                p.StartInfo.Arguments = $"-c {Command} {argument}";
             }
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
