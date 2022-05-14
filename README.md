@@ -17,7 +17,11 @@ About usage and plugin develop, please see the [Documents](https://reknij.github
 # Why make it?
 Feel funny
 
-# Last update 2022-5-14 v1.5.1
+# Last update 2022-5-14 v1.5.1.1
+# 2022-5-14
+## Bbob
+- fix `GitDeploy`.
+
 # 2022-5-11
 ## Bbob
 - Replace all unknown characters.

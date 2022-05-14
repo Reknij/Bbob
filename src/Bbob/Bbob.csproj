@@ -8,7 +8,7 @@
     <Nullable>enable</Nullable>
     <SelfContained>false</SelfContained>
     <PublishSingleFile>false</PublishSingleFile>
-    <Version>1.5.1</Version>
+    <Version>1.5.1.1</Version>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>bbob</ToolCommandName>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

@@ -1,4 +1,8 @@
-# 2022-5-11
+# 2022-5-11 v1.5.1.1
+## Bbob
+- fix `GitDeploy`.
+
+# 2022-5-11 v1.5.1
 ## Bbob
 - Replace all unknown characters.
 ## Bbob.Plugin
