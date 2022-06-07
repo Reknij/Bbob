@@ -75,20 +75,26 @@ public class GitDeploy : IPlugin
             if (config.branch == null) config.branch = "main";
             if (config.message == null) config.message = $"{Shared.SharedLib.DateTimeHelper.GetDateTimeNowString()} Update";
             PluginHelper.printConsole($"Initialize deploy action...", ConsoleColor.Yellow);
+            CommandRunner git = new CommandRunner("git", ghDirectory);
+
+            if (!git.Run("--version").Contains("git version")) {
+                PluginHelper.printConsole("Git is not installed. Please install git then try again.", ConsoleColor.Red);
+                return;
+            }
+
             if (!Directory.Exists(ghDirectory))
             {
                 cloneReposAndCheckout(config);
             }
             else
             {
-                if (!Regex.IsMatch(new CommandRunner("git", ghDirectory).Run("remote -v"), @$"origin\s+{config.repos}"))
+                if (!Regex.IsMatch(git.Run("remote -v"), @$"origin\s+{config.repos}"))
                 {
                     PluginHelper.printConsole("Exists other repository, replace it.", ConsoleColor.Yellow);
                     Shared.SharedLib.DirectoryHelper.DeleteDirectory(ghDirectory);
                     cloneReposAndCheckout(config);
                 }
             }
-            CommandRunner git = new CommandRunner("git", ghDirectory);
             git.Run("rm .");
             Shared.SharedLib.DirectoryHelper.CopyDirectory(distribution, ghDirectory, overwrite: true);
             if (config.type == "github")
