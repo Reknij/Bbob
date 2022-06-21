@@ -151,7 +151,7 @@ function tocClick(event: Event) {
 #content img {
     display: block;
     margin: 10px auto;
-    max-width: calc(768px - var(--el-card-padding) * 2);
+    max-width: calc(100% - var(--el-card-padding));
 }
 .tagItem {
     margin-left: 5px;
