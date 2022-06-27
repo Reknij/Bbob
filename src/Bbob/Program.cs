@@ -29,9 +29,14 @@ public class Program
             }
         }
         ConsoleHelper.print($">>> Bbob v{Version} <<<", color:ConsoleColor.Magenta);
+        Console.CancelKeyPress += (sender, e) =>
+        {
+            ConsoleHelper.print($"Bbob has been exited by user.", color:ConsoleColor.Yellow);
+        };
         ConsoleParser parser = new ConsoleParser(args);
         parser.Parse();
     }
+
     private static void PrintCommandsHelp()
     {
         const string Cli = "Bbob.Main.Cli.";
