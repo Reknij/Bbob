@@ -39,6 +39,12 @@ public static class PluginSystem
             allPlugin.Add(new PluginContext(p.Plugin, p.PluginInfo));
         }
         processPlugins();
+        Console.CancelKeyPress += (sender, e) => PluginHelper.Events.InvokeEvent(sender, new PluginHelper.Events.ProgramExitedEventArgs(), PluginHelper.Events.EventName.Exited);
+    }
+
+    public static void ProgramExited()
+    {
+        PluginHelper.Events.InvokeEvent(null, new PluginHelper.Events.ProgramExitedEventArgs(), PluginHelper.Events.EventName.Exited);
     }
 
     public static void printAllPlugin()
@@ -72,7 +78,7 @@ public static class PluginSystem
         }
         return bip;
     }
-    
+
     private static Dictionary<PluginJson, string> GetThirdPluginsInfo(string themePlugins = "")
     {
         Dictionary<string, PluginJson> addedPlugins = new();
@@ -180,7 +186,7 @@ public static class PluginSystem
             addInfo(folder);
         }
 
-        if (Directory.Exists(themePlugins)) 
+        if (Directory.Exists(themePlugins))
         {
             string[] plugins = Directory.GetDirectories(themePlugins);
             foreach (var folder in plugins)

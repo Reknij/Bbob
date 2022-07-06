@@ -15,7 +15,7 @@ namespace Bbob.Plugin;
 /// <summary>
 /// To help your plugin to develop.
 /// </summary>
-public static class PluginHelper
+public static partial class PluginHelper
 {
     /// <summary>
     /// Path of target theme folder.

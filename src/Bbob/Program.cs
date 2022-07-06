@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 using Bbob.Main.Cli;
+using Bbob.Main.PluginManager;
 using ConsoleHelper = Bbob.Shared.SharedLib.ConsoleHelper;
 
 namespace Bbob.Main;
@@ -35,6 +36,7 @@ public class Program
         };
         ConsoleParser parser = new ConsoleParser(args);
         parser.Parse();
+        PluginSystem.ProgramExited();
     }
 
     private static void PrintCommandsHelp()
