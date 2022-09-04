@@ -81,22 +81,11 @@ function tocClick(event: Event) {
                     </div>
 
                     <div style="text-align: center; margin-top: 5px;">
-                        <el-tag
-                            v-if="article.categories"
-                            class="tagItem"
-                            v-for="(category, index) in article.categories"
-                            :key="index"
-                            type="warning"
-                            @click="router.push(`/filter/categories?checked=${category}`)"
-                        >{{ category }}</el-tag>
-                        <el-tag
-                            v-if="article.tags"
-                            class="tagItem"
-                            v-for="(tag, index) in article.tags"
-                            :key="index"
-                            type="success"
-                            @click="router.push(`/filter/tags?checked=${tag}`)"
-                        >{{ tag }}</el-tag>
+                        <el-tag v-if="article.categories" class="tagItem"
+                            v-for="(category, index) in article.categories" :key="index" type="warning"
+                            @click="router.push(`/filter/categories?checked=${category}`)">{{ category }}</el-tag>
+                        <el-tag v-if="article.tags" class="tagItem" v-for="(tag, index) in article.tags" :key="index"
+                            type="success" @click="router.push(`/filter/tags?checked=${tag}`)">{{ tag }}</el-tag>
                     </div>
                     <el-divider></el-divider>
                     <span ref="htmlContent" v-html="article.contentParsed"></span>
@@ -104,13 +93,34 @@ function tocClick(event: Event) {
             </el-skeleton>
         </el-card>
 
-        <el-drawer
-            :size="normal ? '30' : '75%'"
-            v-if="article.toc"
-            v-model="tocDrawer"
-            direction="ltr"
-            :lock-scroll="false"
-        >
+        <el-card id="relativeCard">
+            <a v-if="article.nextArticle"
+                :href="Bbob.meta.extra.shortAddress ? `/article/${article.nextArticle.address}/` : `/article?address=${article.nextArticle.address}`">
+                <p>
+                    {{
+                            language.nextArticle
+                    }}:
+                    {{
+                            article.nextArticle.title
+                    }}
+                </p>
+            </a>
+            <el-divider v-if="article.nextArticle"></el-divider>
+            <a v-if="article.previousArticle"
+                :href="Bbob.meta.extra.shortAddress ? `/article/${article.previousArticle.address}/` : `/article?address=${article.previousArticle.address}`">
+                <p>
+                    {{
+                            language.previousArticle
+                    }}:
+                    {{
+                            article.previousArticle.title
+                    }}
+                </p>
+            </a>
+        </el-card>
+
+        <el-drawer :size="normal ? '30' : '75%'" v-if="article.toc" v-model="tocDrawer" direction="ltr"
+            :lock-scroll="false">
             <template #title>
                 <h4 style="color: var(--theme-font-color);">{{ article.title }}</h4>
             </template>
@@ -134,32 +144,40 @@ function tocClick(event: Event) {
     margin-left: auto;
     margin-right: auto;
 }
+
 .toc-item a {
     color: var(--theme-font-color);
     text-decoration: none;
 }
+
 .toc-item a:hover {
     color: var(--theme-selected-color);
     text-decoration: underline;
 }
+
 #backBtn {
     color: var(--theme-font-color);
 }
+
 #backBtn:hover {
     color: var(--theme-selected-color);
 }
+
 #content img {
     display: block;
     margin: 10px auto;
     max-width: calc(100% - var(--el-card-padding));
 }
+
 .tagItem {
     margin-left: 5px;
     cursor: pointer;
 }
+
 .toc-number {
     display: none;
 }
+
 .articleTitle {
     text-align: center;
     display: block;
@@ -167,15 +185,18 @@ function tocClick(event: Event) {
     font-weight: bold;
     color: var(--theme-font-color);
 }
+
 .articleDate {
     text-align: center;
     display: block;
     font-size: small;
 }
+
 .calendarIcon {
     position: relative;
     bottom: -1px;
 }
+
 .fix {
     border-radius: 50%;
     width: 40px;
@@ -188,11 +209,27 @@ function tocClick(event: Event) {
     color: var(--theme-font-color);
     border-width: 0px;
 }
+
 .fix:hover {
     background-color: var(--theme-selected-color);
 }
+
 .fix:focus {
     background-color: var(--theme-background-color);
     color: var(--theme-font-color);
+}
+
+#relativeCard {
+    margin-top: 10px;
+}
+
+#relativeCard a {
+    color: var(--theme-font-color);
+    text-decoration: none;
+}
+
+#relativeCard a:hover {
+    color: var(--theme-selected-color);
+    text-decoration: underline;
 }
 </style>

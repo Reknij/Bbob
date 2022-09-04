@@ -11,5 +11,7 @@ export interface Language{
     author: string,
     description: string,
     aboutBlog: string,
-    lastBuild: string
+    lastBuild: string,
+    nextArticle: string,
+    previousArticle: string,
 }

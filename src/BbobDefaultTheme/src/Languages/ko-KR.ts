@@ -14,6 +14,8 @@ const language: Language = {
     description: '설명',
     aboutBlog: '블로그 소개',
     lastBuild: '블로그 마지막 수정 시간',
+    nextArticle: '다음',
+    previousArticle: '이전의'
 }
 
 export default language;

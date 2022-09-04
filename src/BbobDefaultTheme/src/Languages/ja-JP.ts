@@ -14,6 +14,8 @@ const language: Language = {
     description: '序章',
     aboutBlog: 'ブログについて',
     lastBuild: 'ブログ最終編集',
+    nextArticle: '次',
+    previousArticle: '前',
 }
 
 export default language;

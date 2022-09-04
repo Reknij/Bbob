@@ -14,6 +14,8 @@ const language: Language = {
     description: '簡介',
     aboutBlog: '關於博客',
     lastBuild: '博客最後一次編輯',
+    nextArticle: '下一篇',
+    previousArticle: '上一篇',
 }
 
 export default language;

@@ -14,6 +14,8 @@ const language: Language = {
     description: 'وصف',
     aboutBlog: 'حول المدونة',
     lastBuild: 'وقت آخر تعديل للمدونة',
+    nextArticle: 'التالي',
+    previousArticle: 'سابق',
 }
 
 export default language;

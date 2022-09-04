@@ -14,6 +14,8 @@ const language: Language = {
     description: 'Beschreibung',
     aboutBlog: 'Über Blog',
     lastBuild: 'Zeitpunkt der letzten Änderung des Blogs',
+    nextArticle: 'Nächste',
+    previousArticle: 'Vorherige',
 }
 
 export default language;
