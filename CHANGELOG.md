@@ -1,3 +1,16 @@
+# 2022-8-3 v1.5.2
+## Bbob
+- `BuildWebArticleJson` will add information relative between articles now.
+- fix `LinkProcess` will add content hash code to `bbob.js`.
+- `LinkProcess` will add hash code of content to article json now. 
+- `LinkProcess` registered object `links` now is now modified. It will also fix article property changed bug.
+
+## Bbob.Plugin
+- Plugin can register event program exited now.
+
+## BbobDefaultTheme
+- article page have relative article address 'next' and 'previous'.
+
 # 2022-5-11 v1.5.1.1
 ## Bbob
 - fix `GitDeploy`.
