@@ -11,7 +11,9 @@ export interface Article {
     categories?: string[],
     tags?: string[],
     contentParsed?: string
-    toc?: string
+    toc?: string,
+    nextArticle?: LinkInfo,
+    previousArticle?: LinkInfo
 }
 export interface FilterSource {
     text: string,
