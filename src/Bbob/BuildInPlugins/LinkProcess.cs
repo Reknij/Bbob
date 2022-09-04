@@ -1,3 +1,4 @@
+using System.Dynamic;
 using System.Text.Json;
 using Bbob.Plugin;
 
@@ -10,7 +11,8 @@ public class LinkProcess : IPlugin
     readonly string[] ignoreAttributes =
     {
         "contentParsed",
-        "toc"
+        "toc",
+        "contentHash",
     };
     public void GenerateCommand(string filePath, GenerationStage stage)
     {
@@ -37,21 +39,26 @@ public class LinkProcess : IPlugin
     {
         if (command == Commands.GenerateCommand)
         {
+            List<dynamic> pureLinks = new List<dynamic>();
+            sort(links);
             foreach (var link in links)
             {
-                var tar = (IDictionary<string, object>)link;
-                foreach (var ignore in ignoreAttributes)
+                var pure = new ExpandoObject();
+                var pureDict = pure as IDictionary<string, object>;
+                var tar = ((IDictionary<string, object>)link);
+                foreach (var t in tar)
                 {
-                    tar.Remove(ignore);
+                    if (!ignoreAttributes.Contains(t.Key)) pureDict.Add(t);
                 }
+                pureLinks.Add(pure);
             }
-            sort(links);
             PluginHelper.registerObject("links", links);
-            var pack = getLinkInfos(links, PluginHelper.DistributionDirectory);
+            PluginHelper.registerObject("pureLinks", pureLinks);
+            var pack = getLinkInfos(pureLinks, PluginHelper.DistributionDirectory);
             dynamic blog = PluginHelper.getRegisteredObjectNotNull<dynamic>("blog");
             blog.links = pack.Item1;
             blog.nextFileLinks = pack.Item2;
-            PluginHelper.printConsole($"Resolve {links.Count} files.", ConsoleColor.Green);
+            PluginHelper.printConsole($"Resolve {pureLinks.Count} files.", ConsoleColor.Green);
         }
         return null;
     }

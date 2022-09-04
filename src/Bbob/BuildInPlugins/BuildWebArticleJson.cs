@@ -5,6 +5,7 @@ using Bbob.Plugin;
 namespace Bbob.Main.BuildInPlugin;
 
 [PluginJson(name = "BuildWebArticleJson", version = "1.0.0", author = "Jinker")]
+[PluginCondition("LinkProcess", PluginOrder.BeforeMe)]
 public class BuildWebArticleJson : IPlugin
 {
     public BuildWebArticleJson()
@@ -53,6 +54,7 @@ public class BuildWebArticleJson : IPlugin
         }
     }
     Dictionary<string, int> numbers = new Dictionary<string, int>();
+    Dictionary<string, ArticleData> articlesToCreate = new Dictionary<string, ArticleData>();
     public void GenerateCommand(string filePath, GenerationStage stage)
     {
         if (stage != GenerationStage.Confirm) return;
@@ -85,24 +87,19 @@ public class BuildWebArticleJson : IPlugin
 
         Directory.CreateDirectory(FileLocalFolder);
         string hash = "";
-        using (FileStream fs = new FileStream(FileLocal, FileMode.Create, FileAccess.ReadWrite))
+        hash = Shared.SharedLib.HashHelper.GetContentHash(JsonSerializer.SerializeToUtf8Bytes(article));
+
+        if (PluginHelper.ConfigBbob.useHashName)
         {
-            JsonSerializer.Serialize(fs, article, new JsonSerializerOptions()
-            {
-                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-            });
-            fs.Flush(); //If not flush now, hash can't compute
-            fs.Position = 0; //set to 0 to read.
-            hash = Shared.SharedLib.HashHelper.GetContentHash(fs);
+            FileLocal = Path.Combine(FileLocalFolder, $"{Path.GetFileNameWithoutExtension(FileLocal)}-{hash.Substring(0, 9)}.json");
         }
-        string newName = PluginHelper.ConfigBbob.useHashName ? $"{Path.GetFileNameWithoutExtension(FileLocal)}-{hash.Substring(0, 9)}.json" : $"{Path.GetFileNameWithoutExtension(FileLocal)}.json";
-        string newLocal = Path.Combine(FileLocalFolder, newName);
-        if (targetFile != newName) File.Move(FileLocal, newLocal, true);
+
         string baseUrl = PluginHelper.ConfigBbob.baseUrl;
         PluginHelper.getPluginJsonConfig<MyConfig>(out MyConfig? configPlugin);
         bool isShortAddress = configPlugin != null ? configPlugin.shortAddress : false;
         //bool shortAddressEndWithSlash = configPlugin != null ? configPlugin.shortAddressEndWithSlash : false;
-        article.address = isShortAddress ? Path.GetFileNameWithoutExtension(newName) : $"{baseUrl}{JSApi.JSAPiHelper.bbobAssets}/{folder}/{newName}";
+        string addressName = Path.GetFileNameWithoutExtension(FileLocal);
+        article.address = isShortAddress ? addressName : $"{baseUrl}{JSApi.JSAPiHelper.bbobAssets}/{folder}/{addressName}.json";
         //if (shortAddressEndWithSlash) article.address += '/';
         article.contentHash = hash;
         if (isShortAddress)
@@ -110,6 +107,7 @@ public class BuildWebArticleJson : IPlugin
             Meta meta = new Meta($"{baseUrl}{JSApi.JSAPiHelper.bbobAssets}/{folder}/", ".json");
             PluginHelper.registerMeta("shortAddress", meta);
         }
+        articlesToCreate.Add(article.address, new ArticleData(article, FileLocal)); //add to list to create file.
     }
 
     public Action? CommandComplete(Commands cmd)
@@ -117,6 +115,10 @@ public class BuildWebArticleJson : IPlugin
         if (cmd != Commands.GenerateCommand) return null;
         PluginHelper.getPluginJsonConfig<MyConfig>(out var tar);
         MyConfig config = tar ?? new MyConfig();
+
+        processRelative(); //set next and previous article data of any article.
+        createArticles(); //finally create article json files.
+
         if (!config.shortAddress) return null;
         return () =>
         {
@@ -144,6 +146,43 @@ public class BuildWebArticleJson : IPlugin
             bbobJsString = Regex.Replace(bbobJsString, @"getArticleFromAddressAsync\(([A-Za-z0-9_]+)\)\s*{", "getArticleFromAddressAsync($1){" + code, RegexOptions.Singleline);
             File.WriteAllText(bbobJs, bbobJsString);
         };
+    }
+
+    private void processRelative()
+    {
+        dynamic links = PluginHelper.getRegisteredObjectNotNull<dynamic>("pureLinks");
+        for (int i = 0; i < links.Count; i++)
+        {
+            var current = articlesToCreate[links[i].address];
+            if (i > 0) current.data.nextArticle = links[i - 1];
+            if (i < articlesToCreate.Count - 1) current.data.previousArticle = links[i + 1];
+        }
+    }
+
+    private void createArticles()
+    {
+        foreach (var ad in articlesToCreate)
+        {
+            using (FileStream fs = new FileStream(ad.Value.path, FileMode.Create, FileAccess.Write))
+            {
+                JsonSerializer.Serialize(fs, ad.Value.data, new JsonSerializerOptions()
+                {
+                    DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+                });
+            }
+        }
+    }
+
+    private struct ArticleData
+    {
+        public dynamic data { get; set; }
+        public string path { get; set; }
+
+        public ArticleData(dynamic data, string path)
+        {
+            this.data = data;
+            this.path = path;
+        }
     }
 
     public class MyConfig
