@@ -54,6 +54,11 @@ public static class SharedLib
         {
             return ArrayHelper.Bytes.ToString(sha256.ComputeHash(stream));
         }
+
+        public static string GetContentHash(byte[] bytes)
+        {
+            return ArrayHelper.Bytes.ToString(sha256.ComputeHash(bytes));
+        }
     }
 
     public static class DirectoryHelper
