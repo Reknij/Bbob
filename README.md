@@ -22,19 +22,18 @@ Feel funny
 ## Bbob
 - fix `GitDeploy`.
 
-# 2022-5-11
+# 2022-8-3 v1.5.2
 ## Bbob
-- Replace all unknown characters.
-- `GitDeploy` refactoring some codes
-- `GitDeploy` now default will no ping sitemap.
-- `GitDeploy` ping sitemap support `Bing` search engine.
-- `BuildWebArticleJson` remove `shortAddressEndWithSlash` config option.
-- `BuildWebArticleJson` and `SitemapGenerator` refactoring `articleBaseUrl` of theme info.
+- `BuildWebArticleJson` will add information relative between articles now.
+- fix `LinkProcess` will add content hash code to `bbob.js`.
+- `LinkProcess` will add hash code of content to article json now. 
+- `LinkProcess` registered object `links` now is now modified. It will also fix article property changed bug.
+
 ## Bbob.Plugin
-- Replace all unknown characters.
-- fix `printConsole` no newline in multithreading.
-- will cache plugin config and theme info to optimize get speed.
-- theme support include plugins.
+- Plugin can register event program exited now.
+
+## BbobDefaultTheme
+- article page have relative article address 'next' and 'previous'.
 
 # Recommended plugins
 - [bbob-plugin-disqus](https://github.com/Reknij/bbob-plugin-disqus) Let your article have comment.
