@@ -17,23 +17,17 @@ About usage and plugin develop, please see the [Documents](https://reknij.github
 # Why make it?
 Feel funny
 
-# Last update 2022-5-14 v1.5.1.1
-# 2022-5-14
+# Last update 2023-2-3 v1.6.0
 ## Bbob
-- fix `GitDeploy`.
-
-# 2022-8-3 v1.5.2
-## Bbob
-- `BuildWebArticleJson` will add information relative between articles now.
-- fix `LinkProcess` will add content hash code to `bbob.js`.
-- `LinkProcess` will add hash code of content to article json now. 
-- `LinkProcess` registered object `links` now is now modified. It will also fix article property changed bug.
-
-## Bbob.Plugin
-- Plugin can register event program exited now.
+- Add `dev` command to generate files for development.
+- bbob.js api add drawHtmlToElement function to easy draw html from string to target element and execute script.
+- fix `GitDeploy` bugs.
+- `add` command support add from list file `./addlist.txt`
+- `remove` command support remove all plugin or theme(except `default`).
+- `BuildWebArticleJson` plugin now remove config support.
 
 ## BbobDefaultTheme
-- article page have relative article address 'next' and 'previous'.
+- remove `articleBaseUrlShort` data from theme info. Now get article through the `id` instead `address`.
 
 # Recommended plugins
 - [bbob-plugin-disqus](https://github.com/Reknij/bbob-plugin-disqus) Let your article have comment.
