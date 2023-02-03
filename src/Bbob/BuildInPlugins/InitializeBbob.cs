@@ -37,6 +37,8 @@ public class InitializeBbob: IPlugin
                 sw.WriteLine(".deploy_git/");
                 sw.WriteLine("plugins/");
                 sw.WriteLine("BbobInitDone");
+                sw.WriteLine("dist_dev/");
+                sw.WriteLine("articles_dev/");
                 WriteBbob(sw);
                 if (config.gitignore.onlyDataFiles)
                 {

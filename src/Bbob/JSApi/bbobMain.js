@@ -22,11 +22,14 @@ const api = {
             return r;
         }
     },
-    getArticleFromAddress(address, callback) {
-        ajaxRequest({ url: address }).then(callback).catch(callback);
+    getArticleFileAddressById(id) {
+        return `${meta.baseUrl}bbob-assets/articles/${id}.json`;
     },
-    async getArticleFromAddressAsync(address) {
-        return await ajaxRequest({ url: address });
+    getArticleById(id, callback) {
+        ajaxRequest({ url: this.getArticleFileAddressById(id) }).then(callback).catch(callback);
+    },
+    async getArticleByIdAsync(id) {
+        return await ajaxRequest({ url: this.getArticleFileAddressById(id) });
     },
     getLinkInfosWithAddress(address, callback) {
         ajaxRequest({ url: address }).then(callback).catch(callback);
@@ -48,6 +51,16 @@ const api = {
 
             scriptElement.parentNode.replaceChild(clonedElement, scriptElement);
         });
+    },
+    drawHtmlToElement(target, toDraw) {
+        let htmlContent = document.querySelector(target);
+        if (htmlContent) {
+            htmlContent.innerHTML = toDraw;
+            this.executeScriptElements(htmlContent);
+            return true;
+        }
+
+        return false;
     }
 }
 

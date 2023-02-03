@@ -82,7 +82,7 @@ onMounted(() => {
                 <h3>
                     <router-link
                         class="articlesTitle"
-                        :to="Bbob.meta.extra.shortAddress ? `/article/${link.address}/` : `/article?address=${link.address}`"
+                        :to="`/article/${link.id}/`"
                     >{{ link.title }}</router-link>
                 </h3>
                 <el-divider v-if="link.categories" content-position="left">

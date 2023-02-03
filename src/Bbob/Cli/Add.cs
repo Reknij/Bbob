@@ -11,13 +11,15 @@ public class Add : Command
     "<option>:\n" +
     "--address | -a : Add from address. <content> is address.\n" +
     "--file | -f : Add from local path. <content> is local file path.\n" +
+    "--list | -l : Add from list file `addlist.txt` in current path.\n" +
     "--global | -g : Add <content> to global directory.\n" +
     "--replace | -r : Replace <content> no overwrite.\n\n" +
     "Use:\n" +
-    "// add <option> <content>";
+    "// add <option> [content]";
 
-    public string Content { get; set; } = "";
+    public List<string> Contents { get; set; } = new();
     public bool Replace { get; set; } = false;
+    private bool isList { get; set; } = false;
     private bool isGlobal = false;
     public bool Global
     {
@@ -49,12 +51,23 @@ public class Add : Command
         File
     }
     public Options Option { get; set; } = Options.Address;
-    public Add(string content, Options option, bool Global, bool Replace = false) : base(false)
+    public Add(string content, Options option, bool Global, bool Replace, bool isList) : base(false)
     {
-        this.Content = content;
         this.Replace = Replace;
         this.Option = option;
         this.Global = Global;
+        this.isList = isList;
+
+        var addlistPath = Path.Combine(Environment.CurrentDirectory, "addlist.txt");
+        if (this.isList)
+        {
+            if (File.Exists(addlistPath)) this.Contents = File.ReadAllLines(addlistPath).ToList();
+            for (int i = 0; i < this.Contents.Count; i++)
+            {
+                if (string.IsNullOrWhiteSpace(this.Contents[i])) this.Contents.RemoveAt(i);
+            }
+        }
+        else this.Contents.Add(content);
     }
 
     public override bool Process()
@@ -67,98 +80,108 @@ public class Add : Command
         string tempFilePath = "";
         string addStatus = "Added";
         CliShared.TextType type;
-        if (Option == Options.Address)
+
+        if (Contents.Count == 0)
         {
-            Uri address;
-            try
-            {
-                address = new Uri(Content);
-                name = Path.GetFileNameWithoutExtension(address.LocalPath);
-            }
-            catch (System.Exception)
-            {
-                ConsoleHelper.printError($"{FAILED}Please make sure content is url!");
-                return false;
-            }
-            type = CliShared.isPluginOrThemeName(name, out name);
-            if (type == CliShared.TextType.None)
-            {
-                ConsoleHelper.printError($"{FAILED}Can't add because it no theme or plugin.");
-                return false;
-            }
-            tempFilePath = Path.Combine(DownloadPath.Temp, Path.GetRandomFileName());
-            HttpClient client = new HttpClient();
-            try
-            {
-                var t = client.GetStreamAsync(address);
-                ConsoleHelper.printWarning("Downloading...");
-                using (var s = t.Result)
-                {
-                    ConsoleHelper.print("Downloaded, installing...", color:ConsoleColor.DarkCyan);
-                    using (var f = File.OpenWrite(tempFilePath))
-                    {
-                        s.CopyTo(f);
-                    }
-                }
-            }
-            catch (System.Exception)
-            {
-                ConsoleHelper.printError("Error downloading plugin!");
-                ConsoleHelper.printError($"{FAILED}Please make sure it is valid address!");
-                return false;
-            }
+            ConsoleHelper.printError($"{FAILED}Please make sure `addlist.txt` is exists! You are using `addlist.txt` file to add from list.");
+            return false;
         }
-        else if (Option == Options.File)
+
+        foreach (var content in Contents)
         {
-            if (!File.Exists(Content))
+            if (Option == Options.Address)
             {
-                ConsoleHelper.printError($"{FAILED}File is not exists!");
-                return false;
-            }
-            try
-            {
-                name = Path.GetFileNameWithoutExtension(Content);
-                tempFilePath = Content;
-                type = CliShared.isPluginOrThemeName(name, out name);
+                Uri address;
+                string? filename = null;
+                try
+                {
+                    address = new Uri(content);
+                    filename = Path.GetFileNameWithoutExtension(address.LocalPath);
+                }
+                catch (System.Exception)
+                {
+                    ConsoleHelper.printError($"{FAILED}Please make sure content is url!");
+                    return false;
+                }
+                type = CliShared.isPluginOrThemeName(filename, out name);
                 if (type == CliShared.TextType.None)
                 {
                     ConsoleHelper.printError($"{FAILED}Can't add because it no theme or plugin.");
                     return false;
                 }
+                tempFilePath = Path.Combine(DownloadPath.Temp, filename + Path.GetRandomFileName());
+                HttpClient client = new HttpClient();
+                try
+                {
+                    var t = client.GetStreamAsync(address);
+                    ConsoleHelper.print($"Downloading {name}", color: ConsoleColor.DarkCyan);
+                    using (var s = t.Result)
+                    {
+                        using (var f = File.OpenWrite(tempFilePath))
+                        {
+                            s.CopyTo(f);
+                        }
+                    }
+                }
+                catch (System.Exception)
+                {
+                    ConsoleHelper.printError("Error downloading plugin!");
+                    ConsoleHelper.printError($"{FAILED}Please make sure it is valid address!");
+                    return false;
+                }
             }
-            catch (System.Exception)
+            else if (Option == Options.File)
             {
-                ConsoleHelper.printError($"{FAILED}Please make sure your enter the valid path!");
+                if (!File.Exists(content))
+                {
+                    ConsoleHelper.printError($"{FAILED}File is not exists!");
+                    return false;
+                }
+                try
+                {
+                    name = Path.GetFileNameWithoutExtension(content);
+                    tempFilePath = content;
+                    type = CliShared.isPluginOrThemeName(name, out name);
+                    if (type == CliShared.TextType.None)
+                    {
+                        ConsoleHelper.printError($"{FAILED}Can't add because it no theme or plugin.");
+                        return false;
+                    }
+                }
+                catch (System.Exception)
+                {
+                    ConsoleHelper.printError($"{FAILED}Please make sure your enter the valid path!");
+                    return false;
+                }
+            }
+            else return false;
+
+            if (!isValidFilePath(name))
+            {
+                ConsoleHelper.printError($"{FAILED}It is invalid: {name}");
                 return false;
             }
-        }
-        else return false;
-
-        if (!isValidFilePath(name))
-        {
-            ConsoleHelper.printError($"{FAILED}It is invalid: {name}");
-            return false;
-        }
-        string downloadPath = Path.Combine(type == CliShared.TextType.Theme ? DownloadPath.Themes : DownloadPath.Plugins, name.ToUpper());
-        if (Directory.Exists(downloadPath))
-        {
-            if (Replace)
+            string downloadPath = Path.Combine(type == CliShared.TextType.Theme ? DownloadPath.Themes : DownloadPath.Plugins, name.ToUpper());
+            if (Directory.Exists(downloadPath))
             {
-                Shared.SharedLib.DirectoryHelper.DeleteDirectory(downloadPath);
-                addStatus = "Replace";
+                if (Replace)
+                {
+                    Shared.SharedLib.DirectoryHelper.DeleteDirectory(downloadPath);
+                    addStatus = "Replace";
+                }
+                else addStatus = "Overwrite";
             }
-            else addStatus = "Overwrite";
-        }
-        getContentFromFile(tempFilePath, downloadPath, false);
+            getcontentFromFile(tempFilePath, downloadPath, false);
 
+            string p = Global ? "global" : "current";
+            string top = type == CliShared.TextType.Theme ? "theme" : "plugin";
+            ConsoleHelper.printSuccess($"{SUCCESS}{addStatus} {top} {name} to {p} directory path.");
+        }
         Shared.SharedLib.DirectoryHelper.DeleteDirectory(DownloadPath.Temp);
-        string p = Global ? "global" : "current";
-        string top = type == CliShared.TextType.Theme ? "theme" : "plugin";
-        ConsoleHelper.printSuccess($"{SUCCESS}{addStatus} {top} {name} to {p} directory path.!");
         return true;
     }
 
-    private void getContentFromFile(string tempFilePath, string downloadPath, bool overrideIt)
+    private void getcontentFromFile(string tempFilePath, string downloadPath, bool overrideIt)
     {
         try
         {

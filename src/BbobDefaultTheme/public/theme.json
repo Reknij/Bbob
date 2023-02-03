@@ -2,8 +2,7 @@
     "name": "default",
     "description": "Bbob default theme.",
     "author": "Jinker",
-    "articleBaseUrl": "/article?address=",
-    "articleBaseUrlShort": "/article/",
+    "articleBaseUrl": "/article/",
     "prerender": {
         "enable": true,
         "otherUrls":[

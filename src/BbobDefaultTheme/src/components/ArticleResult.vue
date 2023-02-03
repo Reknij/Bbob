@@ -10,10 +10,7 @@ let isLoading = ref(true);
 let articleLoadingMs = 300;
 const route = useRoute();
 const router = useRouter();
-let address = route.params.address ? route.params.address as string : '';
-if (!Bbob.meta.extra.shortAddress) {
-    address = route.query.address as string;
-}
+let articleId = route.params.articleId ? route.params.articleId as string : '';
 let article = ref<Article>({
     title: "loading article...",
     date: "loading article...",
@@ -23,7 +20,7 @@ let htmlContent = ref<HTMLElement | null>(null);
 let artDate = ref('')
 onBeforeMount(async () => {
     let start = new Date().getTime();
-    article.value = await Bbob.api.getArticleFromAddressAsync(address)
+    article.value = await Bbob.api.getArticleByIdAsync(articleId)
     let date = `<span style="text-decoration: underline dashed; color: var(--theme-date-color);">${article.value.date}</span>`;
     if (language.postedOn.includes('${date}')) {
         artDate.value = ' ' + language.postedOn.replace('${date}', date);
@@ -95,7 +92,7 @@ function tocClick(event: Event) {
 
         <el-card id="relativeCard">
             <a v-if="article.nextArticle"
-                :href="Bbob.meta.extra.shortAddress ? `/article/${article.nextArticle.address}/` : `/article?address=${article.nextArticle.address}`">
+                :href="Bbob.meta.extra.shortAddress ? `/article/${article.nextArticle.id}/` : `/article?address=${article.nextArticle.id}`">
                 <p>
                     {{
                             language.nextArticle
@@ -107,7 +104,7 @@ function tocClick(event: Event) {
             </a>
             <el-divider v-if="article.nextArticle"></el-divider>
             <a v-if="article.previousArticle"
-                :href="Bbob.meta.extra.shortAddress ? `/article/${article.previousArticle.address}/` : `/article?address=${article.previousArticle.address}`">
+                :href="Bbob.meta.extra.shortAddress ? `/article/${article.previousArticle.id}/` : `/article?address=${article.previousArticle.id}`">
                 <p>
                     {{
                             language.previousArticle

@@ -78,6 +78,11 @@ public static class ThemeProcessor
         return false;
     }
 
+    public static Theme[] GetThemes()
+    {
+        return themes.Values.ToArray();
+    }
+
     private static bool IsTheme(string dir, out ThemeInfo themeInfo)
     {
         string themeJson = Path.Combine(dir, "theme.json");

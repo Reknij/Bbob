@@ -3,7 +3,7 @@ export interface LinkInfo {
     date: string,
     categories?: string[],
     tags?: string[]
-    address: string
+    id: string
 }
 export interface Article {
     title: string,
@@ -51,11 +51,13 @@ export interface BbobJSApi {
         resetNextLinkInfosOffset(new_offset: number): void,
         nextLinkInfos(callback: LinkInfoArrayProcessCallBack): void,
         nextLinkInfosAsync(): Promise<LinkInfo[]>,
-        getArticleFromAddress(address: string, callback: ArticleProcessCallBack): void,
-        getArticleFromAddressAsync(address: string): Promise<Article>,
+        getArticleFileAddressById(id: string): string,
+        getArticleById(id: string, callback: ArticleProcessCallBack): void,
+        getArticleByIdAsync(id: string): Promise<Article>,
         getLinkInfosWithAddress(address: string, callback: LinkInfoArrayProcessCallBack): void,
         getLinkInfosWithAddressAsync(address: string): Promise<LinkInfo[]>,
-        executeScriptElements(containerElement: Element): void
+        executeScriptElements(containerElement: Element): void,
+        drawHtmlToElement(targetCss: string, toDraw: string): boolean,
     }
 }
 

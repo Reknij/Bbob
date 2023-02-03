@@ -18,21 +18,10 @@ public class SitemapGenerator : IPlugin
         PluginHelper.getPluginJsonConfig<MyConfig>(out MyConfig? tar);
         config = tar ?? new MyConfig();
         var theme = PluginHelper.getThemeInfo<Theme>();
-        PluginHelper.getPluginJsonConfig<BWAJ>("BuildWebArticleJson", out var bwajConfig);
-        bool isShortAddress = bwajConfig?.shortAddress ?? false;
         if (theme != null)
         {
-            if (isShortAddress)
-            {
-                if (theme.articleBaseUrlShort != null) themeInfoSupport.articleBaseUrl = theme.articleBaseUrlShort;
-                else PluginHelper.printConsole("BuildWebArticleJson plugin is enable 'shortAddress' but theme does support.", ConsoleColor.Yellow);
-            }
-            else
-            {
-                if (theme.articleBaseUrl != null) themeInfoSupport.articleBaseUrl = theme.articleBaseUrl;
-                else if (theme.articleBaseUrlShort != null) PluginHelper.printConsole("Theme is not support full address! Please enable 'shortAddress' in BuildWebArticleJson.config.json.", ConsoleColor.Yellow);
-                else PluginHelper.printConsole("theme.articleBaseUrl and theme is null, target theme is not support.", ConsoleColor.Red);
-            }
+            if (theme.articleBaseUrl != null) themeInfoSupport.articleBaseUrl = theme.articleBaseUrl;
+            else PluginHelper.printConsole("theme.articleBaseUrl is null, target theme is not support.", ConsoleColor.Red);
         }
 
         PluginHelper.registerCustomCommand("config", (args) =>
@@ -66,14 +55,9 @@ public class SitemapGenerator : IPlugin
             }
         });
     }
-    class BWAJ
-    {
-        public bool shortAddress { get; set; }
-    }
     class Theme
     {
         public string? articleBaseUrl { get; set; }
-        public string? articleBaseUrlShort { get; set; }
     }
     class MyConfig
     {
@@ -102,7 +86,7 @@ public class SitemapGenerator : IPlugin
                     if (value == null) return;
                     if (themeInfoSupport.articleBaseUrl != null)
                     {
-                        string articleUrl = themeInfoSupport.buildArticleUrl(value.address);
+                        string articleUrl = themeInfoSupport.buildArticleUrl(value.id);
                         string remake = articleUrl.Replace("&", "~and~").Replace('?', '&');
                         string redirectUrl = $"{fullUrl}?{remake}";
                         string normalUrl = $"{fullUrl.Remove(fullUrl.Length - 1)}{articleUrl}";

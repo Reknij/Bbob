@@ -1,3 +1,16 @@
+
+# Last changes
+## Bbob
+- Add `dev` command to generate files for development.
+- bbob.js api add drawHtmlToElement function to easy draw html from string to target element and execute script.
+- fix `GitDeploy` bugs.
+- `add` command support add from list file `./addlist.txt`
+- `remove` command support remove all plugin or theme(except `default`).
+- `BuildWebArticleJson` plugin now remove config support.
+
+## BbobDefaultTheme
+- remove `articleBaseUrlShort` data from theme info. Now get article through the `id` instead `address`.
+
 # 2022-8-3 v1.5.2
 ## Bbob
 - `BuildWebArticleJson` will add information relative between articles now.

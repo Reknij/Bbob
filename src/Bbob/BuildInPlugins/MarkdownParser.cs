@@ -226,29 +226,4 @@ public class MarkdownParser : IPlugin
             }
         }
     }
-
-    public class LinkInfo
-    {
-        public string? title { get; set; }
-        public string? date { get; set; }
-
-        public string[]? categories { get; set; }
-        public string[]? tags { get; set; }
-        public string? address { get; set; }
-        public LinkInfo(string filePath, string? title = null, string? date = null, string[]? categories = null, string[]? tags = null, string? address = null)
-        {
-            this.title = title;
-            this.date = date;
-            this.categories = categories;
-            this.tags = tags;
-            this.address = address;
-        }
-
-        public LinkInfo()
-        {
-            title = date = address = null;
-            this.categories = this.tags = null;
-            //all must be null when deserializing yaml, otherwise an error will be thrown.
-        }
-    }
 }

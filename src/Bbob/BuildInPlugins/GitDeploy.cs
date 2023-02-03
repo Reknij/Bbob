@@ -75,13 +75,14 @@ public class GitDeploy : IPlugin
             if (config.branch == null) config.branch = "main";
             if (config.message == null) config.message = $"{Shared.SharedLib.DateTimeHelper.GetDateTimeNowString()} Update";
             PluginHelper.printConsole($"Initialize deploy action...", ConsoleColor.Yellow);
-            CommandRunner git = new CommandRunner("git", ghDirectory);
 
-            if (!git.Run("--version").Contains("git version")) {
+            if (!CommandRunner.RunAlone("git", "--version").Contains("git version"))
+            {
                 PluginHelper.printConsole("Git is not installed. Please install git then try again.", ConsoleColor.Red);
                 return;
             }
 
+            CommandRunner git = new CommandRunner("git", ghDirectory);
             if (!Directory.Exists(ghDirectory))
             {
                 cloneReposAndCheckout(config);
@@ -95,7 +96,7 @@ public class GitDeploy : IPlugin
                     cloneReposAndCheckout(config);
                 }
             }
-            git.Run("rm .");
+            git.Run("rm -r .");
             Shared.SharedLib.DirectoryHelper.CopyDirectory(distribution, ghDirectory, overwrite: true);
             if (config.type == "github")
             {
@@ -124,6 +125,7 @@ public class GitDeploy : IPlugin
             PluginHelper.printConsole("Config is null, please save you config into ../configs/GitDeploy.config.json", ConsoleColor.Red);
         }
     }
+
     private void updateSitemap(string distribution)
     {
         string robots = Path.Combine(distribution, "robots.txt");
@@ -172,7 +174,9 @@ public class GitDeploy : IPlugin
     {
         CommandRunner git = new CommandRunner("git", PluginHelper.CurrentDirectory);
         PluginHelper.printConsole(git.Run($"clone {config.repos} {ghDirectoryName}"));
-        if (git.Run($"checkout -b {config.branch}").Contains("already exists")) git.Run($"checkout {config.branch}");
+        CommandRunner gitDeploy = new CommandRunner("git", ghDirectory);
+
+        if (gitDeploy.Run($"checkout -b {config.branch}").Contains("already exists")) gitDeploy.Run($"checkout {config.branch}");
     }
 
     class CommandRunner
@@ -208,6 +212,15 @@ public class GitDeploy : IPlugin
                 output += s.ReadToEnd();
             }
             return output;
+        }
+
+        public static string RunAlone(string command, string argument = "", string workingDirectory = "")
+        {
+            if (workingDirectory == "")
+            {
+                workingDirectory = Environment.CurrentDirectory;
+            }
+            return new CommandRunner(command, workingDirectory).Run(argument);
         }
     }
 

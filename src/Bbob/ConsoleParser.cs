@@ -1,6 +1,7 @@
 using System.Reflection;
 using Bbob.Main;
 using Bbob.Main.Cli;
+using Bbob.Main.Configuration;
 using Bbob.Main.PluginManager;
 using Bbob.Plugin;
 using static Bbob.Main.Cli.List;
@@ -14,6 +15,20 @@ class ConsoleParser
     public ConsoleParser(string[] _arguments)
     {
         arguments = _arguments;
+    }
+
+    public bool requireInitialize()
+    {
+        var files = new string[]{
+            "config.json",
+            "BbobInitDone"
+        };
+        foreach (var file in files)
+        {
+            var path = Path.Combine(Environment.CurrentDirectory, file);
+            if (!File.Exists(path)) return true;
+        }
+        return false;
     }
 
     public void Parse()
@@ -51,6 +66,11 @@ class ConsoleParser
             --i;
             return false;
         };
+        if (arguments[0] != Commands.Init.Current && arguments[0] != Commands.Init.CurrentAka && requireInitialize())
+        {
+            ConsoleHelper.printWarning($"Please ensure initialize first! Example: `bbob init`");
+            return;
+        }
         switch (arguments[i])
         {
             case Commands.Init.Current:
@@ -116,6 +136,34 @@ class ConsoleParser
                 Creator creater = new Creator(filename, afp, types);
                 creater.Process();
                 break;
+            case Commands.Dev.Current:
+                if (isHelp(printHelp<Dev>)) return;
+                {
+                    var isConcise = false;
+                    if (++i < length)
+                        switch (arguments[i])
+                        {
+                            case Commands.Dev.Concise.Current:
+                                isConcise = true;
+                                break;
+                            default:
+                                ConsoleHelper.printWarning($"Unknown option '{arguments[i]}'!");
+                                return;
+                        }
+
+                    Dev dev = new Dev()
+                    {
+                        isConcise = isConcise,
+                    };
+                    Generator generater = new Generator(dev.Distribution, dev.ArticlesFolder);
+                    if (dev.Process())
+                    {
+                        generater.Process();
+                        dev.ProcessAfterGenerated();
+                    }
+
+                    break;
+                }
             case Commands.Deploy.Current:
             case Commands.Deploy.CurrentAka:
                 if (isHelp(printHelp<Deploy>)) return;
@@ -270,22 +318,20 @@ class ConsoleParser
                     string content = string.Empty;
                     bool global = false;
                     bool replace = false;
+                    bool isList = false;
                     Func<string, bool> checkArgument = (argument) =>
                     {
                         switch (argument)
                         {
                             case Commands.Add.Address:
                             case Commands.Add.AddressAka:
+                                if (option != null) break;
+                                option = Add.Options.Address;
+                                break;
                             case Commands.Add.File:
                             case Commands.Add.FileAka:
                                 if (option != null) break;
-                                option = argument == Commands.Add.Address || argument == Commands.Add.AddressAka ? Add.Options.Address : Add.Options.File;
-                                if (++i < length) content = arguments[i];
-                                else
-                                {
-                                    ConsoleHelper.printError("Please enter <content>!");
-                                    return false;
-                                }
+                                option = Add.Options.File;
                                 break;
                             case Commands.Add.Global:
                             case Commands.Add.GlobalAka:
@@ -295,8 +341,12 @@ class ConsoleParser
                             case Commands.Add.ReplaceAka:
                                 replace = true;
                                 break;
+                            case Commands.Add.List:
+                            case Commands.Add.ListAka:
+                                isList = true;
+                                break;
                             default:
-                                ConsoleHelper.printWarning($"Unknown option '{argument}'!");
+                                content = argument;
                                 return false;
                         }
                         return true;
@@ -310,12 +360,12 @@ class ConsoleParser
                         ConsoleHelper.printError("Please enter option '--address' or '--file'!");
                         return;
                     }
-                    if (string.IsNullOrWhiteSpace(content))
+                    if (!isList && string.IsNullOrWhiteSpace(content))
                     {
                         ConsoleHelper.printError("Please enter the <content> of your want add.");
                         return;
                     }
-                    Add install = new Add(content, option.Value, global, replace);
+                    Add install = new Add(content, option.Value, global, replace, isList);
                     install.Process();
                 }
                 break;
@@ -325,6 +375,8 @@ class ConsoleParser
                     TurnMessageShow(TurnOption.All, false);
                     string name = string.Empty;
                     bool global = false;
+                    bool isAllPlugin = false;
+                    bool isAllTheme = false;
                     Func<string, bool> checkArgument = (argument) =>
                     {
                         switch (argument)
@@ -332,6 +384,12 @@ class ConsoleParser
                             case Commands.Remove.Global:
                             case Commands.Remove.GlobalAka:
                                 global = true;
+                                break;
+                            case Commands.Remove.AllPlugin:
+                                isAllPlugin = true;
+                                break;
+                            case Commands.Remove.AllTheme:
+                                isAllTheme = true;
                                 break;
                             default:
                                 name = argument;
@@ -343,12 +401,12 @@ class ConsoleParser
                     {
                         if (!checkArgument(arguments[i])) return;
                     }
-                    if (string.IsNullOrWhiteSpace(name))
+                    if (!isAllPlugin && !isAllTheme && string.IsNullOrWhiteSpace(name))
                     {
                         ConsoleHelper.printError("Please enter the <name> of your want remove.");
                         return;
                     }
-                    Remove remove = new Remove(name, global);
+                    Remove remove = new Remove(name, global, isAllPlugin, isAllTheme);
                     remove.Process();
                 }
                 break;
@@ -431,11 +489,6 @@ class ConsoleParser
             public const string Current = "--help";
             public const string CurrentAka = "-h";
         }
-        public static class Version
-        {
-            public const string Current = "--version";
-            public const string CurrentAka = "-v";
-        }
         public static class Init
         {
             public const string Current = "init";
@@ -452,6 +505,14 @@ class ConsoleParser
         {
             public const string Current = "generate";
             public const string CurrentAka = "g";
+        }
+        public static class Dev
+        {
+            public const string Current = "dev";
+            public static class Concise
+            {
+                public const string Current = "--concise";
+            }
         }
 
         public static class Deploy
@@ -506,6 +567,8 @@ class ConsoleParser
             public const string GlobalAka = "-g";
             public const string Replace = "--replace";
             public const string ReplaceAka = "-r";
+            public const string List = "--list";
+            public const string ListAka = "-l";
         }
 
         public static class Remove
@@ -513,6 +576,8 @@ class ConsoleParser
             public const string Current = "remove";
             public const string Global = Add.Global;
             public const string GlobalAka = Add.GlobalAka;
+            public const string AllPlugin = "--all-plugin";
+            public const string AllTheme = "--all-theme";
         }
 
         public static class Run

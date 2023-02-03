@@ -7,7 +7,7 @@ namespace Bbob.Main.Cli;
 public class Init : Command
 {
     public new static string Name => "init";
-    public new static string Help => "Initialize the blog. No do anything.\n"+
+    public new static string Help => "Initialize the blog. No do anything. To use Bbob must initialize first.\n"+
     "Use:\n"+
     "// init\n"+
     "// i";
